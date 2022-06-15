@@ -1,27 +1,34 @@
 package com.prgrms.airbnb.user.domain;
 
-import com.prgrms.airbnb.common.Email;
-import com.prgrms.airbnb.common.Phone;
+import com.prgrms.airbnb.common.jpa.EmailConverter;
+import com.prgrms.airbnb.common.jpa.PhoneConverter;
+import com.prgrms.airbnb.common.model.BaseEntity;
+import com.prgrms.airbnb.common.model.Email;
+import com.prgrms.airbnb.common.model.Phone;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class User {
+@Access(AccessType.FIELD)
+@Table(name = "users")
+public class User extends BaseEntity {
     @Id
     @GeneratedValue
     private Long id;
 
-    @Embedded
+    @Convert(converter = EmailConverter.class)
     private Email email;
 
-    @Embedded
-    private Phone phoneNumber;
+    @Convert(converter = PhoneConverter.class)
+    private Phone phone;
+
+    public User(Email email, Phone phone) {
+        this.email = email;
+        this.phone = phone;
+    }
 }
