@@ -1,7 +1,11 @@
 package com.prgrms.airbnb.common.model;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.Objects;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Money {
     private int value;
 

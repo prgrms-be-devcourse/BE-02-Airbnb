@@ -1,12 +1,12 @@
 package com.prgrms.airbnb.common.model;
 
-import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Email {
     private String email;
-
-    protected Email() {
-    }
 
     public Email(String email) {
         this.email = email;

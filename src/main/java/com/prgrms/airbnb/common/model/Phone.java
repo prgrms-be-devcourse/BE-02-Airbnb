@@ -1,12 +1,13 @@
 package com.prgrms.airbnb.common.model;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.Objects;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Phone {
     private String number;
-
-    protected Phone() {
-    }
 
     public Phone(String phoneNumber) {
         this.number = number;

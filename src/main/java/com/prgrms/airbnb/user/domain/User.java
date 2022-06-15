@@ -6,6 +6,7 @@ import com.prgrms.airbnb.common.model.BaseEntity;
 import com.prgrms.airbnb.common.model.Email;
 import com.prgrms.airbnb.common.model.Phone;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,13 +22,17 @@ public class User extends BaseEntity {
     @GeneratedValue
     private Long id;
 
+    private String name;
+
     @Convert(converter = EmailConverter.class)
     private Email email;
 
     @Convert(converter = PhoneConverter.class)
     private Phone phone;
 
-    public User(Email email, Phone phone) {
+    @Builder
+    public User(String name, Email email, Phone phone) {
+        this.name = name;
         this.email = email;
         this.phone = phone;
     }

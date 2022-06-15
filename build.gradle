@@ -2,6 +2,12 @@ plugins {
 	id 'org.springframework.boot' version '2.7.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'jacoco'
+}
+
+jacoco {
+	// JaCoCo 버전
+	toolVersion = '0.8.5'
 }
 
 group = 'com.prgrms'
@@ -29,4 +35,37 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+	reports {
+		html.enabled true
+		csv.enabled false
+		xml.enabled false
+	}
+	finalizedBy 'jacocoTestCoverageVerification' // 추가
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			enabled = true
+			element = 'CLASS'
+
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.60
+			}
+
+			limit {
+				counter = 'BRANCH'
+				value = 'COVEREDRATIO'
+				minimum = 0.60
+			}
+
+			excludes = []
+		}
+	}
 }
