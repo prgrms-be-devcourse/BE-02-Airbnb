@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
 public class Email {
-    private final String regx = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+    private final String EMAIL_REGX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
     private String email;
 
     public Email(String email) {
@@ -17,7 +17,7 @@ public class Email {
     }
 
     private void validationEmail(String email) {
-        if (StringUtils.isBlank(email) || !email.matches(regx)) {
+        if (StringUtils.isBlank(email) || !email.matches(EMAIL_REGX)) {
             throw new IllegalArgumentException();
         }
     }
