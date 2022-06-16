@@ -2,6 +2,7 @@ package com.prgrms.airbnb.review.domain;
 
 import com.prgrms.airbnb.common.model.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,7 @@ public class Review extends BaseEntity {
 
     private Long reservationId;
 
+    @Builder
     public Review(String comment, Integer rating, Long reservationId) {
         this.comment = comment;
         this.rating = rating;

@@ -4,11 +4,12 @@ import com.prgrms.airbnb.common.model.BaseEntity;
 import com.prgrms.airbnb.room.domain.Room;
 import com.prgrms.airbnb.user.domain.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,9 +24,9 @@ public class Reservation extends BaseEntity {
 
     private ReservationStatus reservationStatus;
 
-    private LocalDateTime checkIn;
+    private LocalDate checkIn;
 
-    private LocalDateTime checkOut;
+    private LocalDate checkOut;
 
     private Integer period;
 
@@ -37,7 +38,8 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "rooms_id")
     private Room room;
 
-    public Reservation(ReservationStatus reservationStatus, LocalDateTime checkIn, LocalDateTime checkOut, Integer period, User user, Room room) {
+    @Builder
+    public Reservation(ReservationStatus reservationStatus, LocalDate checkIn, LocalDate checkOut, Integer period, User user, Room room) {
         this.reservationStatus = reservationStatus;
         this.checkIn = checkIn;
         this.checkOut = checkOut;

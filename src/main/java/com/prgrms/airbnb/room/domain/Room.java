@@ -1,6 +1,7 @@
 package com.prgrms.airbnb.room.domain;
 
 import com.prgrms.airbnb.common.jpa.MoneyConverter;
+import com.prgrms.airbnb.common.model.Address;
 import com.prgrms.airbnb.common.model.BaseEntity;
 import com.prgrms.airbnb.common.model.Money;
 import com.prgrms.airbnb.user.domain.User;
@@ -8,7 +9,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.tomcat.jni.Address;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -63,4 +63,6 @@ public class Room extends BaseEntity {
         images.clear();
         images.addAll(newImages);
     }
+
+
 }

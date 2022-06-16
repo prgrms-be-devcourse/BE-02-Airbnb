@@ -32,7 +32,7 @@ public class User extends BaseEntity {
     private Phone phone;
 
     @Builder
-    public User(String name, String email, String phone) {
+    public User(String name, Email email, Phone phone) {
         setName(name);
         setEmail(email);
         setPhone(phone);
@@ -45,12 +45,11 @@ public class User extends BaseEntity {
         this.name = name;
     }
 
-    public void setEmail(String email) {
-        this.email = new Email(email);
+    public void setEmail(Email email) {
+        this.email = email;
     }
 
-    public void setPhone(String phone) {
-
-        this.phone = new Phone(phone);
+    public void setPhone(Phone phone) {
+        this.phone = phone;
     }
 }

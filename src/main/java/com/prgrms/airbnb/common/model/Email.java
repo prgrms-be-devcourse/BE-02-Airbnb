@@ -1,12 +1,12 @@
 package com.prgrms.airbnb.common.model;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Objects;
-
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
 public class Email {
     private final String regx = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
     private String email;
@@ -30,16 +30,4 @@ public class Email {
         return email;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Email email1 = (Email) o;
-        return Objects.equals(email, email1.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(email);
-    }
 }
