@@ -32,8 +32,12 @@ public class User extends BaseEntity {
 
     @Builder
     public User(String name, Email email, Phone phone) {
-        this.name = name;
+        setName(name);
         this.email = email;
         this.phone = phone;
+    }
+
+    private void setName(String name) {
+        this.name = name;
     }
 }
