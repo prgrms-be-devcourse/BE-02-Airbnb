@@ -10,7 +10,14 @@ public class Money {
     private int value;
 
     public Money(int value) {
+        validationMoney(value);
         this.value = value;
+    }
+
+    private void validationMoney(int value) {
+        if (value <= 0) {
+            throw new IllegalArgumentException();
+        }
     }
 
     public int getValue() {

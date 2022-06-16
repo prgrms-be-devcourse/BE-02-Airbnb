@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 
@@ -31,13 +32,25 @@ public class User extends BaseEntity {
     private Phone phone;
 
     @Builder
-    public User(String name, Email email, Phone phone) {
+    public User(String name, String email, String phone) {
         setName(name);
-        this.email = email;
-        this.phone = phone;
+        setEmail(email);
+        setPhone(phone);
     }
 
     private void setName(String name) {
+        if (StringUtils.isBlank(name)) {
+            throw new IllegalArgumentException();
+        }
         this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = new Email(email);
+    }
+
+    public void setPhone(String phone) {
+
+        this.phone = new Phone(phone);
     }
 }
