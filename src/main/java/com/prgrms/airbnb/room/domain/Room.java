@@ -4,7 +4,6 @@ import com.prgrms.airbnb.common.jpa.MoneyConverter;
 import com.prgrms.airbnb.common.model.Address;
 import com.prgrms.airbnb.common.model.BaseEntity;
 import com.prgrms.airbnb.common.model.Money;
-import com.prgrms.airbnb.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,18 +40,16 @@ public class Room extends BaseEntity {
     @OrderColumn(name = "image_idx")
     private List<RoomImage> images = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_id")
-    private User user;
+    private Long userId;
 
     @Builder
-    public Room(Address address, Money charge, String description, Integer maxGuest, List<RoomImage> images, User user) {
+    public Room(Address address, Money charge, String description, Integer maxGuest, List<RoomImage> images, Long userId) {
         this.address = address;
         this.charge = charge;
         this.description = description;
         this.maxGuest = maxGuest;
         this.images.addAll(images);
-        this.user = user;
+        this.userId = userId;
     }
 
     public List<RoomImage> getImages() {

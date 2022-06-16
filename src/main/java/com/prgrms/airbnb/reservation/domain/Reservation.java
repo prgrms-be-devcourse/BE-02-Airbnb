@@ -1,8 +1,6 @@
 package com.prgrms.airbnb.reservation.domain;
 
 import com.prgrms.airbnb.common.model.BaseEntity;
-import com.prgrms.airbnb.room.domain.Room;
-import com.prgrms.airbnb.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +20,7 @@ public class Reservation extends BaseEntity {
     @GeneratedValue
     private Long id;
 
+    @Enumerated(value = EnumType.STRING)
     private ReservationStatus reservationStatus;
 
     private LocalDate checkIn;
@@ -30,21 +29,17 @@ public class Reservation extends BaseEntity {
 
     private Integer period;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_id")
-    private User user;
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rooms_id")
-    private Room room;
+    private Long roomId;
 
     @Builder
-    public Reservation(ReservationStatus reservationStatus, LocalDate checkIn, LocalDate checkOut, Integer period, User user, Room room) {
+    public Reservation(ReservationStatus reservationStatus, LocalDate checkIn, LocalDate checkOut, Integer period, Long userId, Long roomId) {
         this.reservationStatus = reservationStatus;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
         this.period = period;
-        this.user = user;
-        this.room = room;
+        this.userId = userId;
+        this.roomId = roomId;
     }
 }

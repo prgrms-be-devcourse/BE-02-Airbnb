@@ -22,28 +22,9 @@ class ReservationTest {
                 .checkIn(LocalDate.of(2022, 6, 16))
                 .checkOut(LocalDate.of(2022, 6, 22))
                 .period(6)
-                .user(
-                        User.builder()
-                                .name("팀에프")
-                                .email(new Email("dhkstnaos@gmail.com"))
-                                .phone(new Phone("010-1234-5678"))
-                                .build()
-                )
-                .room(
-                        Room.builder()
-                                .address(new Address("동백 7로 80", "코아루"))
-                                .charge(new Money(100))
-                                .description("최고급 빌라")
-                                .maxGuest(3)
-                                .images(List.of(new RoomImage("s3...")))
-                                .user(
-                                        User.builder()
-                                                .name("팀에프")
-                                                .email(new Email("dhkstnaos@gmail.com"))
-                                                .phone(new Phone("010-1234-5678"))
-                                                .build())
-                                .build()
-                ).build();
+                .userId(1L)
+                .roomId(1L)
+                .build();
         Assertions.assertThat(reservation.getReservationStatus()).isEqualTo(ReservationStatus.ACCEPTED);
     }
 }

@@ -45,11 +45,11 @@ public class User extends BaseEntity {
         this.name = name;
     }
 
-    public void setEmail(Email email) {
+    private void setEmail(Email email) {
         this.email = email;
     }
 
-    public void setPhone(Phone phone) {
+    private void setPhone(Phone phone) {
         this.phone = phone;
     }
 }
