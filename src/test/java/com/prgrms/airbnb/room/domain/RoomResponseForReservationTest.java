@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-class RoomTest {
+class RoomResponseForReservationTest {
 
     @Test
     void room_created() {
