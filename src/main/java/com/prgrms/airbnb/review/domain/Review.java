@@ -11,10 +11,9 @@ import org.springframework.util.ObjectUtils;
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Access(AccessType.FIELD)
-@Getter
 @Table(name = "review")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
     @Id
     @GeneratedValue

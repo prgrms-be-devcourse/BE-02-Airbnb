@@ -14,10 +14,9 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-@Access(AccessType.FIELD)
 @Table(name = "reservation")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reservation extends BaseEntity {
 
     @Id
@@ -26,9 +25,9 @@ public class Reservation extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    private LocalDate checkIn;
+    private LocalDate startDate;
 
-    private LocalDate checkOut;
+    private LocalDate endDate;
 
     private Integer period;
 
@@ -42,13 +41,13 @@ public class Reservation extends BaseEntity {
     private Long roomId;
 
     @Builder
-    public Reservation(String id, ReservationStatus reservationStatus, LocalDate checkIn, LocalDate checkOut, Integer period, Money charge, Long userId, Long roomId) {
+    public Reservation(String id, ReservationStatus reservationStatus, LocalDate startDate, LocalDate endDate, Integer period, Money oneDayCharge, Long userId, Long roomId) {
         setId(id);
         setReservationStatus(reservationStatus);
-        setCheckIn(checkIn);
-        setCheckOut(checkOut);
+        setStartDate(startDate);
+        setEndDate(endDate);
         setPeriod(period);
-        calculatePrice(charge);
+        calculatePrice(oneDayCharge);
         setUserId(userId);
         setRoomId(roomId);
     }
@@ -65,27 +64,19 @@ public class Reservation extends BaseEntity {
             throw new IllegalArgumentException();
         }
     }
-    private Long userId;
 
-    private Long roomId;
-
-    @Builder
-    public Reservation(ReservationStatus reservationStatus, LocalDate checkIn, LocalDate checkOut, Integer period, Long userId, Long roomId) {
-        this.reservationStatus = reservationStatus;
-    }
-
-    private void setCheckIn(LocalDate checkIn) {
+    private void setStartDate(LocalDate checkIn) {
         if (ObjectUtils.isEmpty(checkIn)) {
             throw new IllegalArgumentException();
         }
-        this.checkIn = checkIn;
+        this.startDate = checkIn;
     }
 
-    private void setCheckOut(LocalDate checkOut) {
+    private void setEndDate(LocalDate checkOut) {
         if (ObjectUtils.isEmpty(checkOut)) {
             throw new IllegalArgumentException();
         }
-        this.checkOut = checkOut;
+        this.endDate = checkOut;
     }
 
     private void setPeriod(Integer period) {
@@ -111,7 +102,5 @@ public class Reservation extends BaseEntity {
 
     private void calculatePrice(Money charge) {
         totalPrice = charge.multiply(period);
-        this.userId = userId;
-        this.roomId = roomId;
     }
 }

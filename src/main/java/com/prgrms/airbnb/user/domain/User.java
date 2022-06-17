@@ -14,10 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-@Access(AccessType.FIELD)
 @Table(name = "user")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
     @Id
     @GeneratedValue

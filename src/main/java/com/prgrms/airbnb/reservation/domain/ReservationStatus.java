@@ -7,6 +7,6 @@ public enum ReservationStatus {
     GUEST_CANCELLED,
     HOST_CANCELLED,
     WAIT_REVIEW,
-    COMPLETE
-    CANCELLED
+    COMPLETE,
+    CANCELLED;
 }
