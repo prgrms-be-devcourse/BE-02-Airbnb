@@ -64,6 +64,13 @@ public class Reservation extends BaseEntity {
         if (ObjectUtils.isEmpty(reservationStatus)) {
             throw new IllegalArgumentException();
         }
+    }
+    private Long userId;
+
+    private Long roomId;
+
+    @Builder
+    public Reservation(ReservationStatus reservationStatus, LocalDate checkIn, LocalDate checkOut, Integer period, Long userId, Long roomId) {
         this.reservationStatus = reservationStatus;
     }
 
@@ -104,5 +111,7 @@ public class Reservation extends BaseEntity {
 
     private void calculatePrice(Money charge) {
         totalPrice = charge.multiply(period);
+        this.userId = userId;
+        this.roomId = roomId;
     }
 }
