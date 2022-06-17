@@ -1,13 +1,19 @@
 package com.prgrms.airbnb.room.domain;
 
 import com.prgrms.airbnb.common.model.BaseEntity;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
-
-import javax.persistence.*;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "images")
+@Table(name = "image")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RoomImage extends BaseEntity {
     @Id
     @GeneratedValue
@@ -16,10 +22,9 @@ public class RoomImage extends BaseEntity {
 
     private String path;
 
-    protected RoomImage() {
-    }
-
     public RoomImage(String path) {
         this.path = path;
     }
+
+
 }
