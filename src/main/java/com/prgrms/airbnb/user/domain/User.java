@@ -17,7 +17,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Access(AccessType.FIELD)
-@Table(name = "users")
+@Table(name = "user")
 public class User extends BaseEntity {
     @Id
     @GeneratedValue
@@ -31,11 +31,15 @@ public class User extends BaseEntity {
     @Convert(converter = PhoneConverter.class)
     private Phone phone;
 
+    @Enumerated(value = EnumType.STRING)
+    private UserType userType;
+
     @Builder
-    public User(String name, Email email, Phone phone) {
+    public User(String name, Email email, Phone phone, UserType userType) {
         setName(name);
         setEmail(email);
         setPhone(phone);
+        setUserType(userType);
     }
 
     private void setName(String name) {
@@ -51,5 +55,9 @@ public class User extends BaseEntity {
 
     private void setPhone(Phone phone) {
         this.phone = phone;
+    }
+
+    private void setUserType(UserType userType) {
+        this.userType = userType;
     }
 }

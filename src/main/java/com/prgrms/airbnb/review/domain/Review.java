@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
 
@@ -12,7 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Access(AccessType.FIELD)
 @Getter
-@Table(name = "reviews")
+@Table(name = "review")
 public class Review extends BaseEntity {
     @Id
     @GeneratedValue
@@ -24,10 +26,45 @@ public class Review extends BaseEntity {
 
     private Long reservationId;
 
+    private Boolean visible;
+
     @Builder
-    public Review(String comment, Integer rating, Long reservationId) {
+    public Review(String comment, Integer rating, Long reservationId, Boolean visible) {
+        setComment(comment);
+        setRating(rating);
+        setReservationId(reservationId);
+        setVisible(visible);
+    }
+
+    private void setComment(String comment) {
+        if (StringUtils.isBlank(comment)) {
+            throw new IllegalArgumentException();
+        }
         this.comment = comment;
+    }
+
+    private void setRating(Integer rating) {
+        if (ObjectUtils.isEmpty(rating)) {
+            throw new IllegalArgumentException();
+        }
         this.rating = rating;
+    }
+
+    private void setReservationId(Long reservationId) {
+        if (ObjectUtils.isEmpty(reservationId)) {
+            throw new IllegalArgumentException();
+        }
         this.reservationId = reservationId;
+    }
+
+    private void setVisible(Boolean visible) {
+        if (ObjectUtils.isEmpty(reservationId)) {
+            throw new IllegalArgumentException();
+        }
+        this.visible = visible;
+    }
+
+    public Boolean isVisible() {
+        return visible;
     }
 }

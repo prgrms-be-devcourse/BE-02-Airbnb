@@ -3,7 +3,10 @@ package com.prgrms.airbnb.reservation.domain;
 public enum ReservationStatus {
     WAITED_OK,
     ACCEPTED,
-    CANCELLED,
     REJECTED,
-    WAIT_REVIEW
+    GUEST_CANCELLED,
+    HOST_CANCELLED,
+    WAIT_REVIEW,
+    COMPLETE
+    CANCELLED
 }
