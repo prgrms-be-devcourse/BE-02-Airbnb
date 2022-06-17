@@ -20,5 +20,7 @@ public class ReservationDetailResponseForHost {
     private LocalDate endDate;
     private Integer period;
     private Money totalPrice;
-    private RoomReservation roomReservation;
+    private UserResponseForReservation guest;
+    private RoomResponseForReservation roomResponseForReservation;
+
 }
