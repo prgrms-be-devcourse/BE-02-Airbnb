@@ -7,24 +7,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
 public class Money {
-    private int value;
+    private Integer value;
 
-    public Money(int value) {
+    public Money(Integer value) {
         validationMoney(value);
         this.value = value;
     }
 
-    private void validationMoney(int value) {
+    private void validationMoney(Integer value) {
         if (value <= 0) {
             throw new IllegalArgumentException();
         }
     }
 
-    public Money multiply(int multiplier) {
+    public Money multiply(Integer multiplier) {
         return new Money(value * multiplier);
     }
 
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 }
