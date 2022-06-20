@@ -19,20 +19,21 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
-    @Id
-    @GeneratedValue
-    private Long id;
 
-    private String name;
+  @Id
+  @GeneratedValue
+  private Long id;
 
-    @Convert(converter = EmailConverter.class)
-    private Email email;
+  private String name;
 
-    @Convert(converter = PhoneConverter.class)
-    private Phone phone;
+  @Convert(converter = EmailConverter.class)
+  private Email email;
 
-    @Enumerated(value = EnumType.STRING)
-    private UserType userType;
+  @Convert(converter = PhoneConverter.class)
+  private Phone phone;
+
+  @Enumerated(value = EnumType.STRING)
+  private UserType userType;
 
     @Builder
     public User(String name, Email email, Phone phone, UserType userType) {
@@ -42,22 +43,35 @@ public class User extends BaseEntity {
         setUserType(userType);
     }
 
-    private void setName(String name) {
-        if (StringUtils.isBlank(name)) {
-            throw new IllegalArgumentException();
-        }
-        this.name = name;
+  private void setName(String name) {
+    if (StringUtils.isBlank(name)) {
+      throw new IllegalArgumentException();
     }
+    this.name = name;
+  }
 
-    private void setEmail(Email email) {
-        this.email = email;
-    }
+  private void setEmail(Email email) {
+    this.email = email;
+  }
 
-    private void setPhone(Phone phone) {
-        this.phone = phone;
-    }
+  private void setPhone(Phone phone) {
+    this.phone = phone;
+  }
 
-    private void setUserType(UserType userType) {
-        this.userType = userType;
-    }
+  private void setUserType(UserType userType) {
+    this.userType = userType;
+  }
+
+  private void setProvider(String provider) {
+    this.provider = provider;
+  }
+
+  private void setProviderId(String providerId) {
+    this.providerId = providerId;
+  }
+
+  private void setGroup(Group group) {
+    this.group = group;
+  }
+
 }
