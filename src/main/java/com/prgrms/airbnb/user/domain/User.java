@@ -1,5 +1,6 @@
 package com.prgrms.airbnb.user.domain;
 
+import com.prgrms.airbnb.auth.domain.Group;
 import com.prgrms.airbnb.common.jpa.EmailConverter;
 import com.prgrms.airbnb.common.jpa.PhoneConverter;
 import com.prgrms.airbnb.common.model.BaseEntity;
