@@ -22,4 +22,16 @@ public class RoomSummaryResponse {
   private String name;
   private RoomType roomType;
   private RoomImage roomImage;
+
+  @QueryProjection
+  public RoomSummaryResponse(Long id, Address address, Money charge, String name,
+      RoomType roomType, List<RoomImage> roomImages
+  ) {
+    this.id = id;
+    this.address = address;
+    this.charge = charge;
+    this.name = name;
+    this.roomType = roomType;
+    this.roomImage = roomImages.get(0);
+  }
 }
