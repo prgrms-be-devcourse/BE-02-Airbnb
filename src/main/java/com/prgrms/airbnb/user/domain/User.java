@@ -35,13 +35,35 @@ public class User extends BaseEntity {
   @Enumerated(value = EnumType.STRING)
   private UserType userType;
 
-    @Builder
-    public User(String name, Email email, Phone phone, UserType userType) {
-        setName(name);
-        setEmail(email);
-        setPhone(phone);
-        setUserType(userType);
-    }
+  @Column(name = "provider")
+  private String provider;
+
+  @Column(name = "provider_id")
+  private String providerId;
+
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "group_id")
+  private Group group;
+
+  @Builder
+  public User(String name, Email email, Phone phone, UserType userType) {
+    setName(name);
+    setEmail(email);
+    setPhone(phone);
+    setUserType(userType);
+  }
+
+  public User(String name, Email email, String provider, String providerId, Group group) {
+    setName(name);
+    setEmail(email);
+    setProvider(provider);
+    setProviderId(providerId);
+    setGroup(group);
+  }
+
+  public void addPhone(Phone phone) {
+    setPhone(phone);
+  }
 
   private void setName(String name) {
     if (StringUtils.isBlank(name)) {
