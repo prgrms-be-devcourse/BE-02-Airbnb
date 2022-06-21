@@ -1,12 +1,11 @@
 package com.prgrms.airbnb.common.model;
 
-import com.querydsl.core.annotations.QueryProjection;
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
