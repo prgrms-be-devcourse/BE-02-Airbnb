@@ -26,7 +26,6 @@ public class HostReservationService {
         this.userRepository = userRepository;
     }
 
-
     public ReservationDetailResponseForHost findDetailById(String reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(IllegalArgumentException::new);
         User guest = userRepository.findById(reservation.getUserId()).orElseThrow(IllegalArgumentException::new);

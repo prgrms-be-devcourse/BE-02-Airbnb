@@ -22,5 +22,4 @@ public class ReservationDetailResponseForHost {
     private Money totalPrice;
     private UserResponseForReservation guest;
     private RoomResponseForReservation roomResponseForReservation;
-
 }

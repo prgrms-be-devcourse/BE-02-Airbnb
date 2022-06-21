@@ -27,6 +27,12 @@ public class GuestReservationService {
         this.userRepository = userRepository;
     }
 
+    public ReservationDetailResponseForGuest findDetailById(String reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(IllegalArgumentException::new);
+        Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(IllegalArgumentException::new);
+        User host = userRepository.findById(room.getUserId()).orElseThrow(IllegalArgumentException::new);
+        return ReservationConverter.ofDetailForGuest(reservation, host, room);
+    }
 
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
