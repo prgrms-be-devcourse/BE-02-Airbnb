@@ -18,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class GuestReservationService {
     private final ReservationRepository reservationRepository;
-    private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
 
     public GuestReservationService(ReservationRepository reservationRepository, RoomRepository roomRepository, UserRepository userRepository) {
         this.reservationRepository = reservationRepository;
@@ -27,19 +27,21 @@ public class GuestReservationService {
         this.userRepository = userRepository;
     }
 
+
+
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ReservationDetailResponseForGuest save(CreateReservationRequest createReservationRequest) {
-        User guest = userRepository.findById(createReservationRequest.getUserId()).orElseThrow(IllegalArgumentException::new);
         Room room = roomRepository.findById(createReservationRequest.getRoomId()).orElseThrow(IllegalArgumentException::new);
-        String reservationNo = reservationRepository.createReservationNo();
-        Reservation reservation = ReservationConverter.toReservation(reservationNo, createReservationRequest);
+        User host = userRepository.findById(room.getUserId()).orElseThrow(IllegalArgumentException::new);
+        String reservationId = reservationRepository.createReservationId();
+        Reservation reservation = ReservationConverter.toReservation(reservationId, createReservationRequest);
         Reservation savedReservation = reservationRepository.save(reservation);
-        return ReservationConverter.ofDetailForGuest(savedReservation, guest, room);
+        return ReservationConverter.ofDetailForGuest(savedReservation, host, room);
     }
 
     @Transactional
-    public void cancel(String reservationNo) {
-        Reservation reservation = reservationRepository.findById(reservationNo).orElseThrow(IllegalArgumentException::new);
+    public void cancel(String reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(IllegalArgumentException::new);
         reservation.cancelReservation(ReservationStatus.GUEST_CANCELLED);
     }
 }

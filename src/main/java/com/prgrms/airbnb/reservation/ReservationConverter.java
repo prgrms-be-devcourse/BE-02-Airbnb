@@ -44,4 +44,15 @@ public class ReservationConverter {
                 .roomResponseForReservation(new RoomResponseForReservation(room.getId(), room.getName(), room.getAddress()))
                 .build();
     }
+
+    public static ReservationSummaryResponse ofSummary(Reservation reservation) {
+        return ReservationSummaryResponse.builder()
+                .id(reservation.getId())
+                .reservationStatus(reservation.getReservationStatus())
+                .startDate(reservation.getStartDate())
+                .endDate(reservation.getEndDate())
+                .period(reservation.getPeriod())
+                .totalPrice(reservation.getTotalPrice())
+                .build();
+    }
 }
