@@ -42,6 +42,7 @@ public abstract class SearchRoomRepository implements RoomCustomRepository {
         ))
         .from(room)
         .leftJoin(room.images, roomImage)
+        .fetchJoin()
         .where(
             roomTypeEq(searchRoomRequest.getRoomType()),
             minCharge(searchRoomRequest.getMinCharge()),
