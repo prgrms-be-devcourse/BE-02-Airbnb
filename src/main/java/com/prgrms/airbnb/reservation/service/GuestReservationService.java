@@ -31,8 +31,8 @@ public class GuestReservationService {
     public ReservationDetailResponseForGuest save(CreateReservationRequest createReservationRequest) {
         User guest = userRepository.findById(createReservationRequest.getUserId()).orElseThrow(IllegalArgumentException::new);
         Room room = roomRepository.findById(createReservationRequest.getRoomId()).orElseThrow(IllegalArgumentException::new);
-        String reservationId = reservationRepository.createReservationId();
-        Reservation reservation = ReservationConverter.toReservation(reservationId, createReservationRequest);
+        String reservationNo = reservationRepository.createReservationNo();
+        Reservation reservation = ReservationConverter.toReservation(reservationNo, createReservationRequest);
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationConverter.ofDetailForGuest(savedReservation, guest, room);
     }
