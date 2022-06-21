@@ -35,8 +35,14 @@ public class HostReservationService {
     }
 
     @Transactional
-    public void cancel(String reservationId) {
+    public void approval(String reservationId, Long userId, ReservationStatus reservationStatus) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(IllegalArgumentException::new);
-        reservation.cancelReservation(ReservationStatus.ACCEPTED_AFTER_CANCELLED);
+        Long hostId = roomRepository.findById(reservation.getRoomId()).orElseThrow(IllegalArgumentException::new).getUserId();
+        if (userId != hostId) {
+            //TODO 권한 없음 에러 처리 필요
+            throw new IllegalArgumentException();
+        }
+        reservation.approval(reservationStatus);
     }
+
 }
