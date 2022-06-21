@@ -23,7 +23,7 @@ public class Reservation extends BaseEntity {
     private String id;
 
     @Enumerated(value = EnumType.STRING)
-    private ReservationStatus reservationStatus;
+    private ReservationStatus reservationStatus = ReservationStatus.WAITED_OK;
 
     private LocalDate startDate;
 
@@ -50,6 +50,20 @@ public class Reservation extends BaseEntity {
         calculatePrice(oneDayCharge);
         setUserId(userId);
         setRoomId(roomId);
+    }
+
+    public void cancelReservation(ReservationStatus reservationStatus) {
+        if (canCancelled()) {
+            setReservationStatus(reservationStatus);
+        }
+    }
+
+    private boolean canCancelled() {
+        if (startDate.isAfter(LocalDate.now()) || startDate.isEqual(LocalDate.now())) {
+            //TODO: 환불 정책 필요, 에러 추가 필요
+            throw new IllegalArgumentException();
+        }
+        return this.reservationStatus.equals(ReservationStatus.WAITED_OK) || this.reservationStatus.equals(ReservationStatus.ACCEPTED);
     }
 
     private void setId(String id) {
