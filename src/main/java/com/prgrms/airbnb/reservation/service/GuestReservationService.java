@@ -14,12 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class ReservationService {
+public class GuestReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, RoomRepository roomRepository, UserRepository userRepository) {
+    public GuestReservationService(ReservationRepository reservationRepository, RoomRepository roomRepository, UserRepository userRepository) {
         this.reservationRepository = reservationRepository;
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
@@ -27,11 +27,16 @@ public class ReservationService {
 
     @Transactional
     public ReservationDetailResponseForGuest save(CreateReservationRequest createReservationRequest) {
-        User user = userRepository.findById(createReservationRequest.getUserId()).orElseThrow(IllegalArgumentException::new);
+        User guest = userRepository.findById(createReservationRequest.getUserId()).orElseThrow(IllegalArgumentException::new);
         Room room = roomRepository.findById(createReservationRequest.getRoomId()).orElseThrow(IllegalArgumentException::new);
         String reservationNo = reservationRepository.createReservationNo();
         Reservation reservation = ReservationConverter.toReservation(reservationNo, createReservationRequest);
         Reservation savedReservation = reservationRepository.save(reservation);
-        return ReservationConverter.ofDetailForGuest(savedReservation, user, room);
+        return ReservationConverter.ofDetailForGuest(savedReservation, guest, room);
+    }
+
+    @Transactional
+    public void cancel(String reservationNo) {
+        reservationRepository.deleteById(reservationNo);
     }
 }
