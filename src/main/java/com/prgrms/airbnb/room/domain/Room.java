@@ -44,7 +44,7 @@ public class Room extends BaseEntity {
   @Embedded
   private Address address;
 
-
+  @Embedded
   @Convert(converter = MoneyConverter.class)
   private Money charge;
 
