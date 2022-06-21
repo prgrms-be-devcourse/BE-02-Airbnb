@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class RoomSummaryResponse {
 
   private Long id;
