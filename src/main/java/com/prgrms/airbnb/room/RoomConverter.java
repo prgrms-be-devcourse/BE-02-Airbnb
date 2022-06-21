@@ -8,15 +8,16 @@ import com.prgrms.airbnb.room.dto.RoomSummaryResponse;
 public class RoomConverter {
 
   public static Room toRoom(CreateRoomRequest createRoomRequest) {
-    return Room.builder()
-        .address(createRoomRequest.getAddress())
-        .charge(createRoomRequest.getCharge())
-        .name(createRoomRequest.getName())
-        .description(createRoomRequest.getDescription())
-        .roomInfo(createRoomRequest.getRoomInfo())
-        .roomType(createRoomRequest.getRoomType())
-        .userId(createRoomRequest.getUserId())
-        .build();
+    return new Room(
+        createRoomRequest.getAddress(),
+        createRoomRequest.getCharge(),
+        createRoomRequest.getName(),
+        createRoomRequest.getDescription(),
+        createRoomRequest.getRoomInfo(),
+        createRoomRequest.getRoomType(),
+        createRoomRequest.getImages(),
+        createRoomRequest.getUserId()
+    );
   }
 
   public static RoomDetailResponse ofDetail(Room room) {

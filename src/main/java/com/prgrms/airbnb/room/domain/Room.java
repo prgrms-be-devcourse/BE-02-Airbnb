@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,7 +45,6 @@ public class Room extends BaseEntity {
   @Embedded
   private Address address;
 
-  @Embedded
   @Convert(converter = MoneyConverter.class)
   private Money charge;
 
@@ -70,20 +70,36 @@ public class Room extends BaseEntity {
 
   private Long userId;
 
-  @Builder
-  public Room(Long id, Address address, Money charge, String name, RoomInfo roomInfo,
-      RoomType roomType, List<RoomImage> images, Long userId, String description,
-      ReviewInfo reviewInfo) {
-    this.id = id;
-    setAddress(address);
-    setCharge(charge);
-    setName(name);
+
+  public Room(Address address, Money charge, String name, String description,
+      RoomInfo roomInfo, RoomType roomType, List<RoomImage> images,
+      Long userId) {
+
+    this.address = address;
+    this.charge = charge;
+    this.name = name;
+    this.description = description;
     this.roomInfo = roomInfo;
-    setRoomType(roomType);
-    setImages(images);
-    setUserId(userId);
-    setDescription(description);
+    this.roomType = roomType;
+    this.images = images;
+    this.userId = userId;
+    this.isDeleted = Boolean.FALSE;
+  }
+
+  public Room(Long id, Address address, Money charge, String name, String description,
+      RoomInfo roomInfo, RoomType roomType, ReviewInfo reviewInfo, List<RoomImage> images,
+      Long userId) {
+    this.id = id;
+    this.address = address;
+    this.charge = charge;
+    this.name = name;
+    this.description = description;
+    this.roomInfo = roomInfo;
+    this.roomType = roomType;
     this.reviewInfo = reviewInfo;
+    this.images = images;
+    this.userId = userId;
+    this.isDeleted = Boolean.FALSE;
   }
 
   public List<RoomImage> getImages() {
