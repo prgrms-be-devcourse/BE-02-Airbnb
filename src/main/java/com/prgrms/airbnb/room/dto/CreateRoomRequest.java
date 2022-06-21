@@ -27,4 +27,8 @@ public class CreateRoomRequest {
   @Builder.Default
   private List<RoomImage> images = new ArrayList<>();
   private Long userId;
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
 }

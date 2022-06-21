@@ -5,6 +5,8 @@ import com.prgrms.airbnb.room.RoomConverter;
 import com.prgrms.airbnb.room.domain.Room;
 import com.prgrms.airbnb.room.dto.CreateRoomRequest;
 import com.prgrms.airbnb.room.dto.RoomDetailResponse;
+import com.prgrms.airbnb.room.dto.RoomSummaryResponse;
+import com.prgrms.airbnb.room.dto.SortTypeForHost;
 import com.prgrms.airbnb.room.dto.UpdateRoomRequest;
 import com.prgrms.airbnb.room.repository.RoomRepository;
 import org.springframework.data.domain.Page;
@@ -49,17 +51,12 @@ public class RoomService {
     return RoomConverter.ofDetail(room);
   }
 
-  public Page<RoomDetailResponse> findAllPages(Pageable pageable) {
-    return roomRepository.findAll(pageable).map(RoomConverter::ofDetail);
+  public Page<RoomSummaryResponse> findByHostId(Long hostId, SortTypeForHost sortType, Pageable pageable) {
+    return sortType.findByHost(hostId, pageable, roomRepository)
+        .map(RoomConverter::ofSummary);
   }
 
   public void remove(Long id) {
     roomRepository.deleteById(id);
   }
-
-
-
-
-
-
 }

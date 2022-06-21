@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
 @Access(value = AccessType.FIELD)
-@Embeddable
 public class Money {
     private Integer value;
 

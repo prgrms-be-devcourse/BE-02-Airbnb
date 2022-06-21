@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateRoomRequest {
   private Long id;
-  private Address address;
   private Money charge;
   private String name;
   private String description;
@@ -27,4 +26,8 @@ public class UpdateRoomRequest {
   @Builder.Default
   private List<RoomImage> images = new ArrayList<>();
   private Long userId;
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
 }
