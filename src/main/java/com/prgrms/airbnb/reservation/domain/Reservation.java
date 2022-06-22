@@ -1,8 +1,7 @@
 package com.prgrms.airbnb.reservation.domain;
 
-import com.prgrms.airbnb.common.jpa.MoneyConverter;
 import com.prgrms.airbnb.common.model.BaseEntity;
-import com.prgrms.airbnb.common.model.Money;
+import javax.persistence.criteria.CriteriaBuilder.In;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,8 +30,7 @@ public class Reservation extends BaseEntity {
 
     private Integer period;
 
-    @Convert(converter = MoneyConverter.class)
-    private Money totalPrice;
+    private Integer totalPrice;
 
     @NotNull(message = "userId는 null 일 수 없습니다")
     private Long userId;
@@ -41,7 +39,7 @@ public class Reservation extends BaseEntity {
     private Long roomId;
 
     @Builder
-    public Reservation(String id, ReservationStatus reservationStatus, LocalDate startDate, LocalDate endDate, Integer period, Money oneDayCharge, Long userId, Long roomId) {
+    public Reservation(String id, ReservationStatus reservationStatus, LocalDate startDate, LocalDate endDate, Integer period, Integer oneDayCharge, Long userId, Long roomId) {
         setId(id);
         setReservationStatus(reservationStatus);
         setStartDate(startDate);
@@ -132,7 +130,7 @@ public class Reservation extends BaseEntity {
         this.roomId = roomId;
     }
 
-    private void calculatePrice(Money charge) {
-        totalPrice = charge.multiply(period);
+    private void calculatePrice(Integer charge) {
+        totalPrice = charge * period;
     }
 }

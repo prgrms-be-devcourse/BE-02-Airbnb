@@ -1,7 +1,6 @@
 package com.prgrms.airbnb.room.dto;
 
 import com.prgrms.airbnb.common.model.Address;
-import com.prgrms.airbnb.common.model.Money;
 import com.prgrms.airbnb.room.domain.RoomImage;
 import com.prgrms.airbnb.room.domain.RoomType;
 import com.querydsl.core.annotations.QueryProjection;
@@ -20,13 +19,13 @@ public class RoomSummaryResponse {
 
   private Long id;
   private Address address;
-  private Money charge;
+  private Integer charge;
   private String name;
   private RoomType roomType;
   private RoomImage roomImage;
 
   @QueryProjection
-  public RoomSummaryResponse(Long id, Address address, Money charge, String name,
+  public RoomSummaryResponse(Long id, Address address, Integer charge, String name,
       RoomType roomType, List<RoomImage> roomImages
   ) {
     this.id = id;

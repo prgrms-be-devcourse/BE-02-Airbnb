@@ -1,6 +1,5 @@
 package com.prgrms.airbnb.room.dto;
 
-import com.prgrms.airbnb.common.model.Money;
 import com.prgrms.airbnb.room.domain.RoomInfo;
 import com.prgrms.airbnb.room.domain.RoomType;
 import lombok.AccessLevel;
@@ -18,8 +17,8 @@ public class SearchRoomRequest {
   private String keyword;
   private RoomType roomType;
   private RoomInfo roomInfo;
-  private Money minCharge;
-  private Money maxCharge;
+  private Integer minCharge;
+  private Integer maxCharge;
   private Double rating;
 
 }

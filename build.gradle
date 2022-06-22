@@ -11,6 +11,7 @@ plugins {
 	id 'jacoco'
 	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id "io.franzbecker.gradle-lombok" version "3.0.0"
 }
 
 jacoco {

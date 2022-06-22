@@ -1,7 +1,6 @@
 package com.prgrms.airbnb.room.dto;
 
 import com.prgrms.airbnb.common.model.Address;
-import com.prgrms.airbnb.common.model.Money;
 import com.prgrms.airbnb.room.domain.RoomImage;
 import com.prgrms.airbnb.room.domain.RoomInfo;
 import com.prgrms.airbnb.room.domain.RoomType;
@@ -19,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class CreateRoomRequest {
 
   private Address address;
-  private Money charge;
+  private Integer charge;
   private String name;
   private String description;
   private RoomInfo roomInfo;

@@ -1,5 +1,5 @@
-package com.prgrms.airbnb.common.model;
-
-class AddressTest {
-
-}
+//package com.prgrms.airbnb.common.model;
+//
+//class AddressTest {
+//
+//}

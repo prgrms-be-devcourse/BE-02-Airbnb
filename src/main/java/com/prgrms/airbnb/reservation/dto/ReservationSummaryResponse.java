@@ -1,6 +1,5 @@
 package com.prgrms.airbnb.reservation.dto;
 
-import com.prgrms.airbnb.common.model.Money;
 import com.prgrms.airbnb.reservation.domain.ReservationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,5 +18,5 @@ public class ReservationSummaryResponse {
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer period;
-    private Money totalPrice;
+    private Integer totalPrice;
 }

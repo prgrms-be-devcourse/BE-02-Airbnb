@@ -1,9 +1,7 @@
 package com.prgrms.airbnb.room.domain;
 
-import com.prgrms.airbnb.common.jpa.MoneyConverter;
 import com.prgrms.airbnb.common.model.Address;
 import com.prgrms.airbnb.common.model.BaseEntity;
-import com.prgrms.airbnb.common.model.Money;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,9 +18,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
+import javax.persistence.criteria.CriteriaBuilder.In;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -45,8 +42,7 @@ public class Room extends BaseEntity {
   @Embedded
   private Address address;
 
-  @Convert(converter = MoneyConverter.class)
-  private Money charge;
+  private Integer charge;
 
   private String name;
 
@@ -71,7 +67,7 @@ public class Room extends BaseEntity {
   private Long userId;
 
 
-  public Room(Address address, Money charge, String name, String description,
+  public Room(Address address, Integer charge, String name, String description,
       RoomInfo roomInfo, RoomType roomType, List<RoomImage> images,
       Long userId) {
 
@@ -86,7 +82,7 @@ public class Room extends BaseEntity {
     this.isDeleted = Boolean.FALSE;
   }
 
-  public Room(Long id, Address address, Money charge, String name, String description,
+  public Room(Long id, Address address, Integer charge, String name, String description,
       RoomInfo roomInfo, RoomType roomType, ReviewInfo reviewInfo, List<RoomImage> images,
       Long userId) {
     this.id = id;
@@ -119,7 +115,7 @@ public class Room extends BaseEntity {
     }
   }
 
-  public void changeCharge(Money newCharge) {
+  public void changeCharge(Integer newCharge) {
     if (!this.charge.equals(newCharge)) {
       setCharge(newCharge);
     }
@@ -138,7 +134,10 @@ public class Room extends BaseEntity {
     this.address = address;
   }
 
-  private void setCharge(Money charge) {
+  private void setCharge(Integer charge) {
+    if (charge < 0) {
+      throw new IllegalArgumentException();
+    }
     this.charge = charge;
   }
 

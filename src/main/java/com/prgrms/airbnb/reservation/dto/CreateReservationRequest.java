@@ -1,6 +1,5 @@
 package com.prgrms.airbnb.reservation.dto;
 
-import com.prgrms.airbnb.common.model.Money;
 import com.prgrms.airbnb.reservation.domain.ReservationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +17,7 @@ public class CreateReservationRequest {
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer period;
-    private Money oneDayCharge;
+    private Integer oneDayCharge;
     private Long userId;
     private Long roomId;
 }
