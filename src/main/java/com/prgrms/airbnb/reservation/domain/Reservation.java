@@ -23,7 +23,7 @@ public class Reservation extends BaseEntity {
     private String id;
 
     @Enumerated(value = EnumType.STRING)
-    private ReservationStatus reservationStatus;
+    private ReservationStatus reservationStatus = ReservationStatus.WAITED_OK;
 
     private LocalDate startDate;
 
@@ -50,6 +50,38 @@ public class Reservation extends BaseEntity {
         calculatePrice(oneDayCharge);
         setUserId(userId);
         setRoomId(roomId);
+    }
+
+    public void cancelReservation(ReservationStatus reservationStatus) {
+        if (canCancelled()) {
+            setReservationStatus(reservationStatus);
+        }
+    }
+
+    public void approval(ReservationStatus reservationStatus) {
+        //TODO: 호스트만 접근이 가능해야 할 권한
+        if (this.reservationStatus.equals(ReservationStatus.WAITED_OK)) {
+            if (!(reservationStatus.equals(ReservationStatus.ACCEPTED)
+                    || reservationStatus.equals(ReservationStatus.ACCEPTED_BEFORE_CANCELLED))) {
+                //TODO: WAIT_OK 인데 적합하지 않은 Status 들어옴
+                throw new IllegalArgumentException();
+            }
+            this.reservationStatus = reservationStatus.equals(ReservationStatus.ACCEPTED) ?
+                    ReservationStatus.ACCEPTED : ReservationStatus.ACCEPTED_BEFORE_CANCELLED;
+        } else if (reservationStatus.equals(ReservationStatus.ACCEPTED_AFTER_CANCELLED)) {//대기 상태가 아님 ACCEPTED_AFTER_CANCELLED,
+            this.reservationStatus = reservationStatus;
+        } else {
+            //TODO: 승인대기상태가 아닌데 적합하지 않은 Status 들어옴
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private boolean canCancelled() {
+        if (startDate.isAfter(LocalDate.now()) || startDate.isEqual(LocalDate.now())) {
+            //TODO: 환불 정책 필요, 에러 추가 필요
+            throw new IllegalArgumentException();
+        }
+        return this.reservationStatus.equals(ReservationStatus.WAITED_OK) || this.reservationStatus.equals(ReservationStatus.ACCEPTED);
     }
 
     private void setId(String id) {

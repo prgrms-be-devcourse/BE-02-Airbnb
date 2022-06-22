@@ -6,8 +6,9 @@ import com.prgrms.airbnb.room.domain.Room;
 import com.prgrms.airbnb.user.domain.User;
 
 public class ReservationConverter {
-    public static Reservation toReservation(CreateReservationRequest createReservationRequest) {
+    public static Reservation toReservation(String reservationNo, CreateReservationRequest createReservationRequest) {
         return Reservation.builder()
+                .id(reservationNo)
                 .reservationStatus(createReservationRequest.getReservationStatus())
                 .startDate(createReservationRequest.getStartDate())
                 .endDate(createReservationRequest.getEndDate())
@@ -18,7 +19,7 @@ public class ReservationConverter {
                 .build();
     }
 
-    public static ReservationDetailResponseForHost ofDetailForHost(Reservation reservation, Room room, User guest) {
+    public static ReservationDetailResponseForHost ofDetailForHost(Reservation reservation, User guest, Room room) {
         return ReservationDetailResponseForHost.builder()
                 .id(reservation.getId())
                 .reservationStatus(reservation.getReservationStatus())
@@ -31,7 +32,7 @@ public class ReservationConverter {
                 .build();
     }
 
-    public static ReservationDetailResponseForGuest ofDetailForGuest(Reservation reservation, Room room, User host) {
+    public static ReservationDetailResponseForGuest ofDetailForGuest(Reservation reservation, User host, Room room) {
         return ReservationDetailResponseForGuest.builder()
                 .id(reservation.getId())
                 .reservationStatus(reservation.getReservationStatus())
@@ -41,6 +42,17 @@ public class ReservationConverter {
                 .totalPrice(reservation.getTotalPrice())
                 .host(new UserResponseForReservation(host.getId(), host.getName(), host.getEmail(), host.getPhone()))
                 .roomResponseForReservation(new RoomResponseForReservation(room.getId(), room.getName(), room.getAddress()))
+                .build();
+    }
+
+    public static ReservationSummaryResponse ofSummary(Reservation reservation) {
+        return ReservationSummaryResponse.builder()
+                .id(reservation.getId())
+                .reservationStatus(reservation.getReservationStatus())
+                .startDate(reservation.getStartDate())
+                .endDate(reservation.getEndDate())
+                .period(reservation.getPeriod())
+                .totalPrice(reservation.getTotalPrice())
                 .build();
     }
 }
