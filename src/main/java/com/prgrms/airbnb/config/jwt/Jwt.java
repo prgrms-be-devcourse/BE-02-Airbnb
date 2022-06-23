@@ -45,6 +45,8 @@ public final class Jwt {
       builder.withExpiresAt(new Date(now.getTime() + expirySeconds * 1_000L));
     }
     builder.withClaim("username", claims.username);
+    builder.withClaim("userEmail", claims.userEmail);
+    builder.withClaim("userId", claims.userId);
     builder.withArrayClaim("roles", claims.roles);
     return builder.sign(algorithm);
   }
@@ -76,6 +78,8 @@ public final class Jwt {
   static public class Claims {
 
     String username;
+    String userEmail;
+    Long userId;
     String[] roles;
     Date iat;
     Date exp;
@@ -91,13 +95,23 @@ public final class Jwt {
       if (!roles.isNull()) {
         this.roles = roles.asArray(String.class);
       }
+      Claim userEmail = decodedJWT.getClaim("userEmail");
+      if (!userEmail.isNull()) {
+        this.userEmail = userEmail.asString();
+      }
+      Claim userId = decodedJWT.getClaim("userId");
+      if (!userId.isNull()) {
+        this.userId = userId.asLong();
+      }
       this.iat = decodedJWT.getIssuedAt();
       this.exp = decodedJWT.getExpiresAt();
     }
 
-    public static Claims from(String username, String[] roles) {
+    public static Claims from(String username, String userEmail, Long userId, String[] roles) {
       Claims claims = new Claims();
       claims.username = username;
+      claims.userEmail = userEmail;
+      claims.userId = userId;
       claims.roles = roles;
       return claims;
     }
@@ -105,6 +119,8 @@ public final class Jwt {
     public Map<String, Object> asMap() {
       Map<String, Object> map = new HashMap<>();
       map.put("username", username);
+      map.put("userEmail", userEmail);
+      map.put("userId", userId);
       map.put("roles", roles);
       map.put("iat", iat());
       map.put("exp", exp());
@@ -131,6 +147,8 @@ public final class Jwt {
     public String toString() {
       return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
           .append("username", username)
+          .append("userEmail", userEmail)
+          .append("userId", userId)
           .append("roles", Arrays.toString(roles))
           .append("iat", iat)
           .append("exp", exp)
