@@ -1,10 +1,13 @@
 package com.prgrms.airbnb.domain.review.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,11 +38,15 @@ public class Review extends BaseEntity {
   @Column(name = "reservation_id")
   private String reservationId;
 
-  public Review(String comment, Integer rating, String reservationId, Boolean visible) {
+  @OneToMany(mappedBy = "review")
+  private List<ReviewImage> images = new ArrayList<>();
+
+  public Review(String comment, Integer rating, String reservationId, Boolean visible, List<ReviewImage> images) {
     setComment(comment);
     setRating(rating);
     setReservationId(reservationId);
     setVisible(visible);
+    setImages(images);
   }
 
   public void changeComment(String comment) {
@@ -89,5 +96,9 @@ public class Review extends BaseEntity {
 
   public Boolean isVisible() {
     return visible;
+  }
+
+  public void setImages(List<ReviewImage> images) {
+    this.images = images;
   }
 }
