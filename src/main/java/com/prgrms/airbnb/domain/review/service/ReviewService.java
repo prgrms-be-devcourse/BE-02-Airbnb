@@ -5,6 +5,7 @@ import com.prgrms.airbnb.domain.reservation.repository.ReservationRepository;
 import com.prgrms.airbnb.domain.review.dto.CreateReviewRequest;
 import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
+import com.prgrms.airbnb.domain.review.util.ReviewConverter;
 import org.springframework.stereotype.Service;
 
 @Service
