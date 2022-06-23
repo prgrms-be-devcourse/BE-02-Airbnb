@@ -1,14 +1,16 @@
 package com.prgrms.airbnb.domain.review.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ObjectUtils;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "review")
