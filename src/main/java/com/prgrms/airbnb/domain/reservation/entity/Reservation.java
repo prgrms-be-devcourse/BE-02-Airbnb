@@ -1,15 +1,18 @@
 package com.prgrms.airbnb.domain.reservation.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import java.time.LocalDate;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.ObjectUtils;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "reservation")
@@ -45,7 +48,6 @@ public class Reservation extends BaseEntity {
   @Column(name = "room_id")
   private Long roomId;
 
-  @Builder
   public Reservation(String id, ReservationStatus reservationStatus, LocalDate startDate,
       LocalDate endDate, Integer term, Integer oneDayCharge, Long userId, Long roomId) {
     setId(id);
@@ -58,13 +60,7 @@ public class Reservation extends BaseEntity {
     setRoomId(roomId);
   }
 
-  public void cancelReservation(ReservationStatus reservationStatus) {
-    if (canCancelled()) {
-      setReservationStatus(reservationStatus);
-    }
-  }
-
-  public void approval(ReservationStatus newReservationStatus) {
+  public void changeStatus(ReservationStatus newReservationStatus) {
     reservationStatus = reservationStatus.changeStatus(newReservationStatus);
   }
 
