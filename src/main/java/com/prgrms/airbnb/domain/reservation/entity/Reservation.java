@@ -72,7 +72,7 @@ public class Reservation extends BaseEntity {
     return reservationStatus.equals(ReservationStatus.WAIT_REVIEW);
   }
 
-  private boolean canCancelled() {
+  public boolean canCancelled() {
     if (startDate.isAfter(LocalDate.now()) || startDate.isEqual(LocalDate.now())) {
       //TODO: 환불 정책 필요, 에러 추가 필요
       throw new IllegalArgumentException();
