@@ -31,10 +31,9 @@ public class Review extends BaseEntity {
   private Boolean visible;
 
   @Column(name = "reservation_id")
-  private Long reservationId;
+  private String reservationId;
 
-  @Builder
-  public Review(String comment, Integer rating, Long reservationId, Boolean visible) {
+  public Review(String comment, Integer rating, String reservationId, Boolean visible) {
     setComment(comment);
     setRating(rating);
     setReservationId(reservationId);
@@ -55,7 +54,7 @@ public class Review extends BaseEntity {
     this.rating = rating;
   }
 
-  private void setReservationId(Long reservationId) {
+  private void setReservationId(String reservationId) {
     if (ObjectUtils.isEmpty(reservationId)) {
       throw new IllegalArgumentException();
     }
