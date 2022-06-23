@@ -42,6 +42,23 @@ public class Review extends BaseEntity {
     setVisible(visible);
   }
 
+  public void changeComment(String comment) {
+    setComment(comment);
+  }
+
+  public void changeRating(Integer rating){
+    setRating(rating);
+  }
+
+  public void changeVisible(Boolean visible){
+    setVisible(visible);
+  }
+
+  public void changeImage(List<ReviewImage> images){
+    setImages(images);
+  }
+
+
   private void setComment(String comment) {
     if (StringUtils.isBlank(comment)) {
       throw new IllegalArgumentException();
