@@ -27,6 +27,16 @@ public class UserService {
   }
 
   @Transactional(readOnly = true)
+  public Optional<User> findById(Long userId) {
+    return userRepository.findById(userId);
+  }
+
+  @Transactional(readOnly = true)
+  public Optional<User> findByEmail(String userEmail) {
+    return userRepository.findByEmail(userEmail);
+  }
+
+  @Transactional(readOnly = true)
   public Optional<User> findByUsername(String username) {
     return userRepository.findByUsername(username);
   }
