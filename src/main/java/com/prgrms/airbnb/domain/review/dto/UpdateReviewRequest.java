@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateReviewRequest {
+public class UpdateReviewRequest {
   private String comment;
   private Integer rating;
   private Boolean visible;
