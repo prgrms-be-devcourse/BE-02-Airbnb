@@ -49,7 +49,7 @@ public class HostReservationService {
       //TODO 권한 없음 에러 처리 필요
       throw new IllegalArgumentException();
     }
-    reservation.approval(reservationStatus);
+    reservation.changeStatus(reservationStatus);
   }
 
 }
