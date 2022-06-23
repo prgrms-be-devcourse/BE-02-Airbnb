@@ -4,22 +4,22 @@ public enum ReservationStatus {
   WAITED_OK("승인대기") {
     public ReservationStatus changeStatus(ReservationStatus newReservationStatus) {
       if (!(newReservationStatus.equals(ReservationStatus.ACCEPTED)
-          || newReservationStatus.equals(ReservationStatus.ACCEPTED_BEFORE_CANCELLED))) {
+          || newReservationStatus.equals(ReservationStatus.ACCEPTED_BEFORE_CANCELLED)
+          || newReservationStatus.equals(ReservationStatus.GUEST_CANCELLED))) {
         throw new IllegalArgumentException();
       }
-      return newReservationStatus.equals(ReservationStatus.ACCEPTED) ?
-          ReservationStatus.ACCEPTED : ReservationStatus.ACCEPTED_BEFORE_CANCELLED;
+      return newReservationStatus;
     }
   },
   ACCEPTED("승인완료") {
     public ReservationStatus changeStatus(ReservationStatus newReservationStatus) {
       //승인후 취소, 리뷰 대기
       if (!(newReservationStatus.equals(ReservationStatus.ACCEPTED_AFTER_CANCELLED)
-          || newReservationStatus.equals(ReservationStatus.WAIT_REVIEW))) {
+          || newReservationStatus.equals(ReservationStatus.WAIT_REVIEW)
+          || newReservationStatus.equals(ReservationStatus.GUEST_CANCELLED))) {
         throw new IllegalArgumentException();
       }
-      return newReservationStatus.equals(ReservationStatus.ACCEPTED_AFTER_CANCELLED) ?
-          ReservationStatus.ACCEPTED_AFTER_CANCELLED : ReservationStatus.WAIT_REVIEW;
+      return newReservationStatus;
     }
   },
   GUEST_CANCELLED("게스트취소") {
@@ -42,7 +42,7 @@ public enum ReservationStatus {
       if (!(newReservationStatus.equals(ReservationStatus.COMPLETE))) {
         throw new IllegalArgumentException();
       }
-      return ReservationStatus.COMPLETE;
+      return newReservationStatus;
     }
   },
   COMPLETE("완료") {
