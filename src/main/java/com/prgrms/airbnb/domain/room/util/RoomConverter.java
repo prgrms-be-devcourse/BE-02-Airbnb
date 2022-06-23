@@ -8,7 +8,7 @@ import com.prgrms.airbnb.domain.user.entity.User;
 
 public class RoomConverter {
 
-  public static Room getRoomFrom(CreateRoomRequest createRoomRequest, User user) {
+  public static Room toRoom(CreateRoomRequest createRoomRequest, User user) {
     return new Room(
         createRoomRequest.getAddress(),
         createRoomRequest.getCharge(),

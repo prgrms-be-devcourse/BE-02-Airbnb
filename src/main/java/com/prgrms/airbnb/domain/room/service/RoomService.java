@@ -21,7 +21,7 @@ public class RoomService {
 
   @Transactional
   public RoomDetailResponse save(CreateRoomRequest createRoomRequest, User user) {
-    Room room = RoomConverter.getRoomFrom(createRoomRequest, user);
+    Room room = RoomConverter.toRoom(createRoomRequest, user);
     Room savedRoom = roomRepository.save(room);
     return RoomConverter.ofDetail(savedRoom);
   }
