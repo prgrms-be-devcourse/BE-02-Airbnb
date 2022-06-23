@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface RoomRepository extends JpaRepository<Room, Long>, RoomCustomRepository{
+public interface RoomRepository extends JpaRepository<Room, Long>, RoomSearchRepository {
 
   Page<Room> findByUserIdOrderByCreatedAt(Long userId, Pageable pageable);
 

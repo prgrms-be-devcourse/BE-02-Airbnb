@@ -2,6 +2,7 @@ package com.prgrms.airbnb.domain.room.service;
 
 import com.prgrms.airbnb.domain.room.dto.*;
 import com.prgrms.airbnb.domain.room.entity.Room;
+import com.prgrms.airbnb.domain.room.entity.SortTypeForHost;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.room.util.RoomConverter;
 import com.prgrms.airbnb.domain.user.entity.User;

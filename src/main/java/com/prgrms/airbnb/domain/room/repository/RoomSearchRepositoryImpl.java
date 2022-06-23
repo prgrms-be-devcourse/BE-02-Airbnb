@@ -22,11 +22,11 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.ObjectUtils;
 
-public class RoomCustomRepositoryImpl implements RoomCustomRepository{
+public class RoomSearchRepositoryImpl implements RoomSearchRepository {
 
   private JPAQueryFactory jpaQueryFactory;
 
-  public RoomCustomRepositoryImpl(EntityManager em) {
+  public RoomSearchRepositoryImpl(EntityManager em) {
     this.jpaQueryFactory = new JPAQueryFactory(em);
   }
 

@@ -5,6 +5,6 @@ import com.prgrms.airbnb.domain.room.dto.SearchRoomRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-public interface RoomCustomRepository {
+public interface RoomSearchRepository {
   Slice<RoomSummaryResponse> findAll(SearchRoomRequest searchRoomRequest, Pageable pageable);
 }
