@@ -22,6 +22,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends BaseEntity {
+
   @Id
   @GeneratedValue
   @Column(name = "id")

@@ -32,10 +32,10 @@ public class UserDto {
   @Override
   public String toString() {
     return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-      .append("token", token)
-      .append("username", username)
-      .append("group", group)
-      .toString();
+        .append("token", token)
+        .append("username", username)
+        .append("group", group)
+        .toString();
   }
 
 }

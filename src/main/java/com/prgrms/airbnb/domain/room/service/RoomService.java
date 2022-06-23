@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class RoomService {
+
   private final RoomRepository roomRepository;
 
   @Transactional
@@ -45,7 +46,8 @@ public class RoomService {
     return RoomConverter.ofDetail(room);
   }
 
-  public Page<RoomSummaryResponse> findByHostId(Long hostId, SortTypeForHost sortType, Pageable pageable) {
+  public Page<RoomSummaryResponse> findByHostId(Long hostId, SortTypeForHost sortType,
+      Pageable pageable) {
     return sortType.findByHost(hostId, pageable, roomRepository)
         .map(RoomConverter::ofSummary);
   }

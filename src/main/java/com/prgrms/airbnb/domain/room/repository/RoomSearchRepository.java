@@ -6,5 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface RoomSearchRepository {
+
   Slice<RoomSummaryResponse> findAll(SearchRoomRequest searchRoomRequest, Pageable pageable);
 }

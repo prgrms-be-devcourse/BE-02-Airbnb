@@ -71,9 +71,6 @@ dependencies {
 
 	//RestDocs
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-
-	// test 전용 DB
-
 }
 
 tasks.named('test') {

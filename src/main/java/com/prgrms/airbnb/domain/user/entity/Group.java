@@ -35,17 +35,17 @@ public class Group {
 
   public List<GrantedAuthority> getAuthorities() {
     return permissions.stream()
-      .map(gp -> new SimpleGrantedAuthority(gp.getPermission().getName()))
-      .collect(toList());
+        .map(gp -> new SimpleGrantedAuthority(gp.getPermission().getName()))
+        .collect(toList());
   }
 
   @Override
   public String toString() {
     return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-      .append("id", id)
-      .append("name", name)
-      .append("authorities", getAuthorities())
-      .toString();
+        .append("id", id)
+        .append("name", name)
+        .append("authorities", getAuthorities())
+        .toString();
   }
 
 }

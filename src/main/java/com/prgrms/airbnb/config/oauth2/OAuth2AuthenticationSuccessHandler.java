@@ -16,49 +16,51 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+public class OAuth2AuthenticationSuccessHandler extends
+    SavedRequestAwareAuthenticationSuccessHandler {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final Jwt jwt;
+  private final Jwt jwt;
 
-    private final UserService userService;
+  private final UserService userService;
 
-    public OAuth2AuthenticationSuccessHandler(Jwt jwt, UserService userService) {
-        this.jwt = jwt;
-        this.userService = userService;
+  public OAuth2AuthenticationSuccessHandler(Jwt jwt, UserService userService) {
+    this.jwt = jwt;
+    this.userService = userService;
+  }
+
+  @Override
+  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+      Authentication authentication) throws ServletException, IOException {
+    if (authentication instanceof OAuth2AuthenticationToken) {
+      OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
+      OAuth2User principal = oauth2Token.getPrincipal();
+      String registrationId = oauth2Token.getAuthorizedClientRegistrationId();
+
+      User user = processUserOAuth2UserJoin(principal, registrationId);
+      String loginSuccessJson = generateLoginSuccessJson(user);
+      response.setContentType("application/json;charset=UTF-8");
+      response.setContentLength(loginSuccessJson.getBytes(StandardCharsets.UTF_8).length);
+      response.getWriter().write(loginSuccessJson);
+    } else {
+      super.onAuthenticationSuccess(request, response, authentication);
     }
+  }
 
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws ServletException, IOException {
-        if (authentication instanceof OAuth2AuthenticationToken) {
-            OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
-            OAuth2User principal = oauth2Token.getPrincipal();
-            String registrationId = oauth2Token.getAuthorizedClientRegistrationId();
+  private User processUserOAuth2UserJoin(OAuth2User oAuth2User, String registrationId) {
+    return userService.join(oAuth2User, registrationId);
+  }
 
-            User user = processUserOAuth2UserJoin(principal, registrationId);
-            String loginSuccessJson = generateLoginSuccessJson(user);
-            response.setContentType("application/json;charset=UTF-8");
-            response.setContentLength(loginSuccessJson.getBytes(StandardCharsets.UTF_8).length);
-            response.getWriter().write(loginSuccessJson);
-        } else {
-            super.onAuthenticationSuccess(request, response, authentication);
-        }
-    }
+  private String generateLoginSuccessJson(User user) {
+    String token = generateToken(user);
+    log.debug("Jwt({}) created for oauth2 login user {}", token, user.getName());
+    return "{\"token\":\"" + token + "\", \"username\":\"" + user.getName() + "\", \"group\":\""
+        + user.getGroup().getName() + "\"}";
+  }
 
-    private User processUserOAuth2UserJoin(OAuth2User oAuth2User, String registrationId) {
-        return userService.join(oAuth2User, registrationId);
-    }
-
-    private String generateLoginSuccessJson(User user) {
-        String token = generateToken(user);
-        log.debug("Jwt({}) created for oauth2 login user {}", token, user.getName());
-        return "{\"token\":\"" + token + "\", \"username\":\"" + user.getName() + "\", \"group\":\"" + user.getGroup().getName() + "\"}";
-    }
-
-    private String generateToken(User user) {
-        return jwt.sign(Jwt.Claims.from(user.getName(), new String[]{"ROLE_USER"}));
-    }
+  private String generateToken(User user) {
+    return jwt.sign(Jwt.Claims.from(user.getName(), new String[]{"ROLE_USER"}));
+  }
 
 }

@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateRoomRequest {
+
   private Long id;
   private Integer charge;
   private String name;

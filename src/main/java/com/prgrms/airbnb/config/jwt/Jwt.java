@@ -74,6 +74,7 @@ public final class Jwt {
   }
 
   static public class Claims {
+
     String username;
     String[] roles;
     Date iat;
@@ -83,8 +84,9 @@ public final class Jwt {
 
     Claims(DecodedJWT decodedJWT) {
       Claim username = decodedJWT.getClaim("username");
-      if (!username.isNull())
+      if (!username.isNull()) {
         this.username = username.asString();
+      }
       Claim roles = decodedJWT.getClaim("roles");
       if (!roles.isNull()) {
         this.roles = roles.asArray(String.class);

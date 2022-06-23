@@ -7,7 +7,8 @@ import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.user.entity.User;
 
 public class RoomConverter {
-  public static Room getRoomFrom(CreateRoomRequest createRoomRequest, User user){
+
+  public static Room getRoomFrom(CreateRoomRequest createRoomRequest, User user) {
     return new Room(
         createRoomRequest.getAddress(),
         createRoomRequest.getCharge(),
@@ -19,6 +20,7 @@ public class RoomConverter {
         user.getId()
     );
   }
+
   public static Room toRoom(CreateRoomRequest createRoomRequest) {
     return new Room(
         createRoomRequest.getAddress(),

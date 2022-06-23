@@ -13,12 +13,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReservationDetailResponseForGuest {
-    private String id;
-    private ReservationStatus reservationStatus;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private Integer period;
-    private Integer totalPrice;
-    private UserResponseForReservation host;
-    private RoomResponseForReservation roomResponseForReservation;
+
+  private String id;
+  private ReservationStatus reservationStatus;
+  private LocalDate startDate;
+  private LocalDate endDate;
+  private Integer period;
+  private Integer totalPrice;
+  private UserResponseForReservation host;
+  private RoomResponseForReservation roomResponseForReservation;
 }

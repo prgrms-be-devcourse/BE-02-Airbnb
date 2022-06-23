@@ -13,11 +13,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateReservationRequest {
-    private ReservationStatus reservationStatus;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private Integer period;
-    private Integer oneDayCharge;
-    private Long userId;
-    private Long roomId;
+
+  private ReservationStatus reservationStatus;
+  private LocalDate startDate;
+  private LocalDate endDate;
+  private Integer period;
+  private Integer oneDayCharge;
+  private Long userId;
+  private Long roomId;
 }

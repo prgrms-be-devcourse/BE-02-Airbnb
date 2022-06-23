@@ -12,19 +12,20 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RoomImage extends BaseEntity {
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private Long id;
 
-    @Column(name = "path")
-    private String path;
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
-    private Room room;
+  @Column(name = "path")
+  private String path;
 
-    public RoomImage(String path) {
-        this.path = path;
-    }
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
+  private Room room;
+
+  public RoomImage(String path) {
+    this.path = path;
+  }
 }

@@ -15,60 +15,61 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
-    @Id
-    @GeneratedValue
-    @Column(name = "id")
-    private Long id;
 
-    @Column(name = "comment")
-    private String comment;
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-    @Column(name = "rating")
-    private Integer rating;
+  @Column(name = "comment")
+  private String comment;
 
-    @Column(name = "visible")
-    private Boolean visible;
+  @Column(name = "rating")
+  private Integer rating;
 
-    @Column(name = "reservation_id")
-    private Long reservationId;
+  @Column(name = "visible")
+  private Boolean visible;
 
-    @Builder
-    public Review(String comment, Integer rating, Long reservationId, Boolean visible) {
-        setComment(comment);
-        setRating(rating);
-        setReservationId(reservationId);
-        setVisible(visible);
+  @Column(name = "reservation_id")
+  private Long reservationId;
+
+  @Builder
+  public Review(String comment, Integer rating, Long reservationId, Boolean visible) {
+    setComment(comment);
+    setRating(rating);
+    setReservationId(reservationId);
+    setVisible(visible);
+  }
+
+  private void setComment(String comment) {
+    if (StringUtils.isBlank(comment)) {
+      throw new IllegalArgumentException();
     }
+    this.comment = comment;
+  }
 
-    private void setComment(String comment) {
-        if (StringUtils.isBlank(comment)) {
-            throw new IllegalArgumentException();
-        }
-        this.comment = comment;
+  private void setRating(Integer rating) {
+    if (ObjectUtils.isEmpty(rating)) {
+      throw new IllegalArgumentException();
     }
+    this.rating = rating;
+  }
 
-    private void setRating(Integer rating) {
-        if (ObjectUtils.isEmpty(rating)) {
-            throw new IllegalArgumentException();
-        }
-        this.rating = rating;
+  private void setReservationId(Long reservationId) {
+    if (ObjectUtils.isEmpty(reservationId)) {
+      throw new IllegalArgumentException();
     }
+    this.reservationId = reservationId;
+  }
 
-    private void setReservationId(Long reservationId) {
-        if (ObjectUtils.isEmpty(reservationId)) {
-            throw new IllegalArgumentException();
-        }
-        this.reservationId = reservationId;
+  private void setVisible(Boolean visible) {
+    if (ObjectUtils.isEmpty(reservationId)) {
+      throw new IllegalArgumentException();
     }
+    this.visible = visible;
+  }
 
-    private void setVisible(Boolean visible) {
-        if (ObjectUtils.isEmpty(reservationId)) {
-            throw new IllegalArgumentException();
-        }
-        this.visible = visible;
-    }
-
-    public Boolean isVisible() {
-        return visible;
-    }
+  public Boolean isVisible() {
+    return visible;
+  }
 }

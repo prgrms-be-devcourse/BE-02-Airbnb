@@ -12,8 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponseForReservation {
-    private Long id;
-    private String name;
-    private Email email;
-    private Phone phoneNumber;
+
+  private Long id;
+  private String name;
+  private Email email;
+  private Phone phoneNumber;
 }

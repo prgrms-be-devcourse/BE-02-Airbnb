@@ -19,19 +19,21 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 public class RoomRestControllerForHost {
-    private final RoomService roomService;
-    private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<RoomDetailResponse> registerRoom(
-        @AuthenticationPrincipal JwtAuthentication authentication,
-        @RequestBody CreateRoomRequest createRoomRequest) {
-        User user = userService.findByUsername(authentication.username)
-            .orElseThrow(() -> new IllegalArgumentException("Could not found user for " + authentication.username));
-        RoomDetailResponse response = roomService.save(createRoomRequest, user);
-        return ResponseEntity.created(URI.create("/api/v1/room/" + response.getId()))
-            .body(response);
-    }
+  private final RoomService roomService;
+  private final UserService userService;
+
+  @PostMapping
+  public ResponseEntity<RoomDetailResponse> registerRoom(
+      @AuthenticationPrincipal JwtAuthentication authentication,
+      @RequestBody CreateRoomRequest createRoomRequest) {
+    User user = userService.findByUsername(authentication.username)
+        .orElseThrow(() -> new IllegalArgumentException(
+            "Could not found user for " + authentication.username));
+    RoomDetailResponse response = roomService.save(createRoomRequest, user);
+    return ResponseEntity.created(URI.create("/api/v1/room/" + response.getId()))
+        .body(response);
+  }
 
 //    @PutMapping
 //    // TODO: 2022/06/21 updateDto <= hostId 필요? servletRequest에 담겨져있고 아직 검증 로직이 없어서 만들어야하나

@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 @EntityListeners(value = {AuditingEntityListener.class})
 public abstract class BaseEntity implements Serializable {
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+  @CreationTimestamp
+  @Column(name = "created_at", updatable = false)
+  private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", updatable = true)
-    private LocalDateTime updatedAt;
+  @UpdateTimestamp
+  @Column(name = "updated_at", updatable = true)
+  private LocalDateTime updatedAt;
 
 }

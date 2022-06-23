@@ -13,17 +13,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserRestController {
-    private final UserService userService;
 
-    /**
-     * 보호받는 엔드포인트 - ROLE_USER 또는 ROLE_ADMIN 권한 필요함
-     */
-    @GetMapping(path = "/user/me")
-    public UserDto me(@AuthenticationPrincipal JwtAuthentication authentication) {
-        return userService.findByUsername(authentication.username)
-            .map(user ->
-                new UserDto(authentication.token, authentication.username, user.getGroup().getName())
-            )
-            .orElseThrow(() -> new IllegalArgumentException("Could not found user for " + authentication.username));
-    }
+  private final UserService userService;
+
+  /**
+   * 보호받는 엔드포인트 - ROLE_USER 또는 ROLE_ADMIN 권한 필요함
+   */
+  @GetMapping(path = "/user/me")
+  public UserDto me(@AuthenticationPrincipal JwtAuthentication authentication) {
+    return userService.findByUsername(authentication.username)
+        .map(user ->
+            new UserDto(authentication.token, authentication.username, user.getGroup().getName())
+        )
+        .orElseThrow(() -> new IllegalArgumentException(
+            "Could not found user for " + authentication.username));
+  }
 }

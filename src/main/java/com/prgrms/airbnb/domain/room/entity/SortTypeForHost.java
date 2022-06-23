@@ -6,16 +6,17 @@ import org.springframework.data.domain.Pageable;
 
 public enum SortTypeForHost {
 
-  RECENTLY{
+  RECENTLY {
     public Page<Room> findByHost(Long hostId, Pageable pageable, RoomRepository roomRepository) {
       return roomRepository.findByUserIdOrderByCreatedAt(hostId, pageable);
     }
   },
-  RATING{
+  RATING {
     public Page<Room> findByHost(Long hostId, Pageable pageable, RoomRepository roomRepository) {
       return roomRepository.findByHostIdOrderByRating(hostId, pageable);
     }
   };
 
-  abstract public Page<Room> findByHost(Long hostId, Pageable pageable, RoomRepository roomRepository);
+  abstract public Page<Room> findByHost(Long hostId, Pageable pageable,
+      RoomRepository roomRepository);
 }

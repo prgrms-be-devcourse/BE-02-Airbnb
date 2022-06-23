@@ -17,15 +17,17 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReservationService {
-    private final ReservationRepository reservationRepository;
 
-    public Slice<ReservationSummaryResponse> reservationList(Long userId, Pageable pageable) {
-        Slice<Reservation> reservationList = reservationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
-        return new SliceImpl<>(
-                reservationList.getContent().stream()
-                        .map(
-                                ReservationConverter::ofSummary).collect(Collectors.toList()),
-                pageable,
-                reservationList.hasNext());
-    }
+  private final ReservationRepository reservationRepository;
+
+  public Slice<ReservationSummaryResponse> reservationList(Long userId, Pageable pageable) {
+    Slice<Reservation> reservationList = reservationRepository.findByUserIdOrderByCreatedAtDesc(
+        userId, pageable);
+    return new SliceImpl<>(
+        reservationList.getContent().stream()
+            .map(
+                ReservationConverter::ofSummary).collect(Collectors.toList()),
+        pageable,
+        reservationList.hasNext());
+  }
 }

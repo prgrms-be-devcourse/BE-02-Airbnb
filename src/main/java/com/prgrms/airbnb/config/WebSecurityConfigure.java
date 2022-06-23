@@ -28,103 +28,104 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private final JwtConfigure jwtConfigure;
-    private final UserService userService;
 
-    public WebSecurityConfigure(JwtConfigure jwtConfigure, UserService userService) {
-        this.jwtConfigure = jwtConfigure;
-        this.userService = userService;
-    }
+  private final Logger log = LoggerFactory.getLogger(getClass());
+  private final JwtConfigure jwtConfigure;
+  private final UserService userService;
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/assets/**", "/h2-console/**");
-    }
+  public WebSecurityConfigure(JwtConfigure jwtConfigure, UserService userService) {
+    this.jwtConfigure = jwtConfigure;
+    this.userService = userService;
+  }
 
-    @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, e) -> {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Object principal = authentication != null ? authentication.getPrincipal() : null;
-            log.warn("{} is denied", principal, e);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write("ACCESS DENIED");
-            response.getWriter().flush();
-            response.getWriter().close();
-        };
-    }
+  @Override
+  public void configure(WebSecurity web) {
+    web.ignoring().antMatchers("/assets/**", "/h2-console/**");
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public AccessDeniedHandler accessDeniedHandler() {
+    return (request, response, e) -> {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      Object principal = authentication != null ? authentication.getPrincipal() : null;
+      log.warn("{} is denied", principal, e);
+      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      response.setContentType("text/plain;charset=UTF-8");
+      response.getWriter().write("ACCESS DENIED");
+      response.getWriter().flush();
+      response.getWriter().close();
+    };
+  }
 
-    @Bean
-    public Jwt jwt() {
-        return new Jwt(
-            jwtConfigure.getIssuer(),
-            jwtConfigure.getClientSecret(),
-            jwtConfigure.getExpirySeconds()
-        );
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        Jwt jwt = getApplicationContext().getBean(Jwt.class);
-        return new JwtAuthenticationFilter(jwtConfigure.getHeader(), jwt);
-    }
+  @Bean
+  public Jwt jwt() {
+    return new Jwt(
+        jwtConfigure.getIssuer(),
+        jwtConfigure.getClientSecret(),
+        jwtConfigure.getExpirySeconds()
+    );
+  }
 
-    @Bean
-    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
-        return new HttpCookieOAuth2AuthorizationRequestRepository();
-    }
+  public JwtAuthenticationFilter jwtAuthenticationFilter() {
+    Jwt jwt = getApplicationContext().getBean(Jwt.class);
+    return new JwtAuthenticationFilter(jwtConfigure.getHeader(), jwt);
+  }
 
-    @Bean
-    public OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler() {
-        Jwt jwt = getApplicationContext().getBean(Jwt.class);
-        return new OAuth2AuthenticationSuccessHandler(jwt, userService);
-    }
+  @Bean
+  public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+    return new HttpCookieOAuth2AuthorizationRequestRepository();
+  }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-            .antMatchers("/api/user/me").hasAnyRole("USER", "ADMIN")
-            .anyRequest().permitAll()
-            .and()
-            .formLogin()
-            .disable()
-            .csrf()
-            .disable()
-            .headers()
-            .disable()
-            .httpBasic()
-            .disable()
-            .rememberMe()
-            .disable()
-            .logout()
-            .disable()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            /**
-             * OAuth2 설정
-             */
-            .oauth2Login()
-            .authorizationEndpoint()
-            .authorizationRequestRepository(authorizationRequestRepository())
-            .and()
-            .successHandler(getApplicationContext().getBean(OAuth2AuthenticationSuccessHandler.class))
-            .and()
-            .exceptionHandling()
-            .accessDeniedHandler(accessDeniedHandler())
-            .and()
-            /**
-             * Jwt 필터
-             */
-            .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class)
-        ;
-    }
+  @Bean
+  public OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler() {
+    Jwt jwt = getApplicationContext().getBean(Jwt.class);
+    return new OAuth2AuthenticationSuccessHandler(jwt, userService);
+  }
+
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http
+        .authorizeRequests()
+        .antMatchers("/api/user/me").hasAnyRole("USER", "ADMIN")
+        .anyRequest().permitAll()
+        .and()
+        .formLogin()
+        .disable()
+        .csrf()
+        .disable()
+        .headers()
+        .disable()
+        .httpBasic()
+        .disable()
+        .rememberMe()
+        .disable()
+        .logout()
+        .disable()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+        /**
+         * OAuth2 설정
+         */
+        .oauth2Login()
+        .authorizationEndpoint()
+        .authorizationRequestRepository(authorizationRequestRepository())
+        .and()
+        .successHandler(getApplicationContext().getBean(OAuth2AuthenticationSuccessHandler.class))
+        .and()
+        .exceptionHandling()
+        .accessDeniedHandler(accessDeniedHandler())
+        .and()
+        /**
+         * Jwt 필터
+         */
+        .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class)
+    ;
+  }
 
 }
