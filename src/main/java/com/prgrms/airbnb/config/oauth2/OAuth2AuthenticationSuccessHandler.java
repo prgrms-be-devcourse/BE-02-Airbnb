@@ -1,9 +1,8 @@
 package com.prgrms.airbnb.config.oauth2;
 
-import com.prgrms.airbnb.auth.service.OAuthService;
-
 import com.prgrms.airbnb.config.jwt.Jwt;
-import com.prgrms.airbnb.user.domain.User;
+import com.prgrms.airbnb.domain.user.entity.User;
+import com.prgrms.airbnb.domain.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -24,15 +23,16 @@ public class OAuth2AuthenticationSuccessHandler extends
 
   private final Jwt jwt;
 
-  private final OAuthService oauthService;
+  private final UserService userService;
 
-  public OAuth2AuthenticationSuccessHandler(Jwt jwt, OAuthService oauthService) {
+  public OAuth2AuthenticationSuccessHandler(Jwt jwt, UserService userService) {
     this.jwt = jwt;
-    this.oauthService = oauthService;
+    this.userService = userService;
   }
 
   @Override
-  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
+  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+      Authentication authentication) throws ServletException, IOException {
     if (authentication instanceof OAuth2AuthenticationToken) {
       OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
       OAuth2User principal = oauth2Token.getPrincipal();
@@ -49,13 +49,14 @@ public class OAuth2AuthenticationSuccessHandler extends
   }
 
   private User processUserOAuth2UserJoin(OAuth2User oAuth2User, String registrationId) {
-    return oauthService.join(oAuth2User, registrationId);
+    return userService.join(oAuth2User, registrationId);
   }
 
   private String generateLoginSuccessJson(User user) {
     String token = generateToken(user);
     log.debug("Jwt({}) created for oauth2 login user {}", token, user.getName());
-    return "{\"token\":\"" + token + "\", \"username\":\"" + user.getName() + "\", \"group\":\"" + user.getGroup().getName() + "\"}";
+    return "{\"token\":\"" + token + "\", \"username\":\"" + user.getName() + "\", \"group\":\""
+        + user.getGroup().getName() + "\"}";
   }
 
   private String generateToken(User user) {

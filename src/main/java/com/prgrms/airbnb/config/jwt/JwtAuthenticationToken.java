@@ -1,26 +1,29 @@
 package com.prgrms.airbnb.config.jwt;
 
-import java.util.Collection;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
+
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
   private final Object principal;
-
   private String credentials;
 
+  // 인증되기 이전
   public JwtAuthenticationToken(String principal, String credentials) {
     super(null);
-    super.setAuthenticated(false);
+    super.setAuthenticated(false); // 아직 인증되지 않음을 표시
 
     this.principal = principal;
     this.credentials = credentials;
   }
 
-  JwtAuthenticationToken(Object principal, String credentials, Collection<? extends GrantedAuthority> authorities) {
+  // 인증된 이후
+  JwtAuthenticationToken(Object principal, String credentials,
+      Collection<? extends GrantedAuthority> authorities) {
     super(authorities);
     super.setAuthenticated(true);
 
@@ -40,11 +43,14 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
   public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
     if (isAuthenticated) {
-      throw new IllegalArgumentException("Cannot set this token to trusted - use constructor which takes a GrantedAuthority list instead");
+      throw new IllegalArgumentException(
+          "Cannot set this token to trusted - use constructor which takes a " +
+              "GrantedAuthority list instead");
     }
     super.setAuthenticated(false);
   }
 
+  // 비밀번호 지우기
   @Override
   public void eraseCredentials() {
     super.eraseCredentials();
