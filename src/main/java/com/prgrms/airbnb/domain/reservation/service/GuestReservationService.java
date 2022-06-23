@@ -58,6 +58,10 @@ public class GuestReservationService {
   public void cancel(String reservationId) {
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(IllegalArgumentException::new);
-    reservation.cancelReservation(ReservationStatus.GUEST_CANCELLED);
+    if (!reservation.canCancelled()) {
+      //TODO: 취소가 될 수 없는데 취소하려 함
+      throw new IllegalArgumentException();
+    }
+    reservation.changeStatus(ReservationStatus.GUEST_CANCELLED);
   }
 }
