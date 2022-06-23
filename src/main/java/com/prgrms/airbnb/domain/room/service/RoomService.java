@@ -1,12 +1,14 @@
 package com.prgrms.airbnb.domain.room.service;
 
-import com.prgrms.airbnb.domain.room.dto.*;
+import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
+import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
+import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
+import com.prgrms.airbnb.domain.room.dto.UpdateRoomRequest;
 import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.entity.SortTypeForHost;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.room.util.RoomConverter;
 import com.prgrms.airbnb.domain.user.entity.User;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class RoomService {
 
   private final RoomRepository roomRepository;
+
+  public RoomService(RoomRepository roomRepository) {
+    this.roomRepository = roomRepository;
+  }
 
   @Transactional
   public RoomDetailResponse save(CreateRoomRequest createRoomRequest, User user) {

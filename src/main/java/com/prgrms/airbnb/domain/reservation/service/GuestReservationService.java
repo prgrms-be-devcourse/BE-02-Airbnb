@@ -10,19 +10,26 @@ import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class GuestReservationService {
 
   private final ReservationRepository reservationRepository;
   private final UserRepository userRepository;
   private final RoomRepository roomRepository;
+
+  public GuestReservationService(
+      ReservationRepository reservationRepository,
+      UserRepository userRepository,
+      RoomRepository roomRepository) {
+    this.reservationRepository = reservationRepository;
+    this.userRepository = userRepository;
+    this.roomRepository = roomRepository;
+  }
 
   public ReservationDetailResponseForGuest findDetailById(String reservationId) {
     Reservation reservation = reservationRepository.findById(reservationId)

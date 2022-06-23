@@ -1,11 +1,12 @@
 package com.prgrms.airbnb.domain.room.controller;
 
 import com.prgrms.airbnb.config.jwt.JwtAuthentication;
-import com.prgrms.airbnb.domain.room.dto.*;
+import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
+import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
 import com.prgrms.airbnb.domain.room.service.RoomService;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.service.UserService;
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,15 +14,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-
 @RequestMapping("/api/v1/room")
 @RestController
-@RequiredArgsConstructor
 public class RoomRestControllerForHost {
 
   private final RoomService roomService;
   private final UserService userService;
+
+  public RoomRestControllerForHost(RoomService roomService,
+      UserService userService) {
+    this.roomService = roomService;
+    this.userService = userService;
+  }
 
   @PostMapping
   public ResponseEntity<RoomDetailResponse> registerRoom(
