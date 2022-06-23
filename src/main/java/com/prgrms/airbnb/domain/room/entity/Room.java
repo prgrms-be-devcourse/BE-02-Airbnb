@@ -94,7 +94,7 @@ public class Room extends BaseEntity {
   }
 
   public void changeImages(List<RoomImage> newImages) {
-    if (this.images != null) {
+    if (!ObjectUtils.isEmpty(newImages)) {
       images.clear();
     }
     images.addAll(newImages);
