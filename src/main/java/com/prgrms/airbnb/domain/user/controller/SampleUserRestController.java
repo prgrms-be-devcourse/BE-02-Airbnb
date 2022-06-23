@@ -1,4 +1,4 @@
-package com.prgrms.airbnb.domain.user;
+package com.prgrms.airbnb.domain.user.controller;
 
 import com.prgrms.airbnb.config.jwt.JwtAuthentication;
 import com.prgrms.airbnb.domain.user.dto.UserDto;
@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
-public class UserRestController {
+public class SampleUserRestController {
 
   private final UserService userService;
 
   /**
    * 보호받는 엔드포인트 - ROLE_USER 또는 ROLE_ADMIN 권한 필요함
    */
-  @GetMapping(path = "/user/me")
+  @GetMapping(path = "/me")
   public UserDto me(@AuthenticationPrincipal JwtAuthentication authentication) {
-    return userService.findByUsername(authentication.username)
+    return userService.findById(authentication.userId)
         .map(user ->
             new UserDto(authentication.token, authentication.username, user.getGroup().getName())
         )

@@ -60,7 +60,7 @@ public class OAuth2AuthenticationSuccessHandler extends
   }
 
   private String generateToken(User user) {
-    return jwt.sign(Jwt.Claims.from(user.getName(), new String[]{"ROLE_USER"}));
+    return jwt.sign(Jwt.Claims.from(user.getName(),user.getEmail().getEmail(), user.getId(), new String[]{"ROLE_USER"}));
   }
 
 }
