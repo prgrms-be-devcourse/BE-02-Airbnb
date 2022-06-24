@@ -37,4 +37,9 @@ public class RoomImage extends BaseEntity {
     this.room = room;
     room.getImages().add(this);
   }
+
+  public void deleteRoom() {
+    this.room.getImages().remove(this);
+    this.room = null;
+  }
 }

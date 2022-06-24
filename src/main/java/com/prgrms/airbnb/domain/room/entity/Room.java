@@ -12,7 +12,6 @@ import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -68,7 +67,7 @@ public class Room extends BaseEntity {
     setDescription(description);
     this.roomInfo = roomInfo;
     setRoomType(roomType);
-    images.forEach(this::setImages);
+    images.forEach(this::setImage);
     setUserId(userId);
     this.isDeleted = Boolean.FALSE;
   }
@@ -84,7 +83,7 @@ public class Room extends BaseEntity {
     this.roomInfo = roomInfo;
     setRoomType(roomType);
     this.reviewInfo = reviewInfo;
-    images.forEach(this::setImages);
+    images.forEach(this::setImage);
     setUserId(userId);
     this.isDeleted = Boolean.FALSE;
   }
@@ -107,8 +106,12 @@ public class Room extends BaseEntity {
     this.description = description;
   }
 
-  public void setImages(RoomImage roomImage) {
+  public void setImage(RoomImage roomImage) {
     roomImage.setRoom(this);
+  }
+
+  public void deleteImage(RoomImage roomImage) {
+    roomImage.deleteRoom();
   }
 
   private void setRoomType(RoomType roomType) {
