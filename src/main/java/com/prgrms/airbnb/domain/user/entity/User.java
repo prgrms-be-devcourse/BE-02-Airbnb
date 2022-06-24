@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
@@ -59,14 +60,8 @@ public class User extends BaseEntity {
     setGroup(group);
   }
 
-  public void addPhone(Phone phone) {
-    setPhone(phone);
-  }
-
   private void setName(String name) {
-    if (StringUtils.isBlank(name)) {
-      throw new IllegalArgumentException();
-    }
+    checkBlank(name);
     this.name = name;
   }
 
@@ -83,14 +78,25 @@ public class User extends BaseEntity {
   }
 
   private void setProvider(String provider) {
+    checkBlank(provider);
     this.provider = provider;
   }
 
   private void setProviderId(String providerId) {
+    checkBlank(providerId);
     this.providerId = providerId;
   }
 
   private void setGroup(Group group) {
+    if (ObjectUtils.isEmpty(group)) {
+      throw new IllegalArgumentException();
+    }
     this.group = group;
+  }
+
+  private void checkBlank(String target) {
+    if (StringUtils.isBlank(target)) {
+      throw new IllegalArgumentException();
+    }
   }
 }

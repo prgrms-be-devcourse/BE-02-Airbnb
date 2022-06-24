@@ -24,14 +24,14 @@ import org.springframework.util.ObjectUtils;
 
 public class RoomSearchRepositoryImpl implements RoomSearchRepository {
 
-  private JPAQueryFactory jpaQueryFactory;
+  private final JPAQueryFactory jpaQueryFactory;
 
   public RoomSearchRepositoryImpl(EntityManager em) {
     this.jpaQueryFactory = new JPAQueryFactory(em);
   }
 
   @Override
-  public Slice<RoomSummaryResponse> findAll(SearchRoomRequest searchRoomRequest,
+  public Slice<RoomSummaryResponse> searchRoom(SearchRoomRequest searchRoomRequest,
       Pageable pageable) {
 
     JPAQuery<RoomSummaryResponse> roomJPAQuery = jpaQueryFactory
@@ -46,6 +46,7 @@ public class RoomSearchRepositoryImpl implements RoomSearchRepository {
         .from(room)
         .leftJoin(room.images, roomImage)
         .where(
+            keywordListContains(searchRoomRequest.getKeyword()),
             roomTypeEq(searchRoomRequest.getRoomType()),
             minCharge(searchRoomRequest.getMinCharge()),
             maxCharge(searchRoomRequest.getMaxCharge()),
