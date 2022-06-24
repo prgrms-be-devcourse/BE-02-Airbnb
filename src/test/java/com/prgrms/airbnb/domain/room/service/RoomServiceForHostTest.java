@@ -6,6 +6,7 @@ import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
 import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
+import com.prgrms.airbnb.domain.room.dto.UpdateRoomRequest;
 import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import com.prgrms.airbnb.domain.room.entity.RoomInfo;
@@ -18,6 +19,7 @@ import com.prgrms.airbnb.domain.user.repository.GroupRepository;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,6 +81,7 @@ class RoomServiceForHostTest {
         images, hostId);
 
     defaultRoom = roomRepository.save(room);
+    roomId = defaultRoom.getId();
   }
 
   @AfterEach
@@ -90,9 +93,10 @@ class RoomServiceForHostTest {
 
   Room defaultRoom;
   Long hostId;
+  Long roomId;
 
   @Nested
-  class 저장 {
+  class 저장_save {
 
     @Test
     @DisplayName("성공: room 저장에 성공합니다. roomImage도 관련 repo에 저장됩니다.")
@@ -288,8 +292,48 @@ class RoomServiceForHostTest {
       assertThat(allRoomImages).contains(roomImage3);
       assertThat(allRoomImages).contains(roomImage4);
     }
-
-
   }
 
+  @Nested
+  class 수정_modify {
+
+    @Test
+    @DisplayName("성공: Room 수정에 성공합니다.")
+    public void success() throws Exception {
+
+      List<RoomImage> roomImages = new ArrayList<>();
+      RoomImage roomImage1 = new RoomImage("roomImage path");
+      roomImages.add(roomImage1);
+      //given
+      Integer charge = 5000;
+      String roomName = "영업 안해요";
+      String description = "영업 안합니다";
+      Integer maxGuest = 2;
+      Integer bedCount = 2;
+      UpdateRoomRequest updateRoomRequest = UpdateRoomRequest.builder()
+          .id(roomId)
+          .charge(charge)
+          .name(roomName)
+          .description(description)
+          .maxGuest(maxGuest)
+          .bedCount(bedCount)
+          .images(roomImages)
+          .build();
+
+      //when
+      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+
+      //then
+      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
+
+      assertThat(room.getId()).isEqualTo(roomId);
+      assertThat(room.getCharge()).isEqualTo(charge);
+      assertThat(room.getName()).isEqualTo(roomName);
+      assertThat(room.getDescription()).isEqualTo(description);
+      assertThat(room.getRoomInfo().getMaxGuest()).isEqualTo(maxGuest);
+      assertThat(room.getRoomInfo().getBedCount()).isEqualTo(bedCount);
+      assertThat(room.getUserId()).isEqualTo(hostId);
+      assertThat(room.getImages().size()).isEqualTo(roomImages.size());
+    }
+  }
 }
