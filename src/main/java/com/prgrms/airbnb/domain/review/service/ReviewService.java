@@ -8,8 +8,12 @@ import com.prgrms.airbnb.domain.review.dto.UpdateReviewRequest;
 import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.review.util.ReviewConverter;
+import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -18,10 +22,13 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReservationRepository reservationRepository;
 
+    private final RoomRepository roomRepository;
+
     public ReviewService(ReviewRepository reviewRepository,
-                         ReservationRepository reservationRepository) {
+                         ReservationRepository reservationRepository, RoomRepository roomRepository) {
         this.reviewRepository = reviewRepository;
         this.reservationRepository = reservationRepository;
+        this.roomRepository = roomRepository;
     }
 
     @Transactional
@@ -46,6 +53,11 @@ public class ReviewService {
         review.changeVisible(updateReviewRequest.getVisible());
         review.changeImage(updateReviewRequest.getImages());
         return ReviewConverter.of(review);
+    }
+
+    public List<ReviewResponse> findAllByRoomId(Long roomId) {
+        List<Review> reviewList = reviewRepository.findAllByRoomId(roomId);
+        return reviewList.stream().map(ReviewConverter::of).collect(Collectors.toList());
     }
 
     @Transactional
