@@ -7,7 +7,6 @@ import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.room.util.RoomConverter;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class RoomServiceForHost {
     room.setCharge(updateRoomRequest.getCharge());
     room.getRoomInfo().setMaxGuest(updateRoomRequest.getRoomInfo().getMaxGuest());
     room.getRoomInfo().setBedCount(updateRoomRequest.getRoomInfo().getBedCount());
-    updateRoomRequest.getImages().forEach(room::setImages);
+    updateRoomRequest.getImages().forEach(room::setImage);
     room.setDescription(updateRoomRequest.getDescription());
     return RoomConverter.ofDetail(room);
   }
