@@ -2,7 +2,9 @@ package com.prgrms.airbnb.domain.user.dto;
 
 import com.prgrms.airbnb.domain.user.entity.Group;
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 @Builder
 public class UserDetailResponse {
   private Long id;

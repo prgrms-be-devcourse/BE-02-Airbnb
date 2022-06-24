@@ -1,20 +1,22 @@
 package com.prgrms.airbnb.domain.user.service;
 
 import com.prgrms.airbnb.domain.common.entity.Email;
+import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
 import com.prgrms.airbnb.domain.user.entity.Group;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.GroupRepository;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
+import com.prgrms.airbnb.domain.user.util.UserConverter;
+import java.util.Map;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.Optional;
-
 @Service
+@Transactional(readOnly = true)
 public class UserService {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -25,27 +27,6 @@ public class UserService {
     this.userRepository = userRepository;
     this.groupRepository = groupRepository;
   }
-
-  @Transactional(readOnly = true)
-  public Optional<User> findById(Long userId) {
-    return userRepository.findById(userId);
-  }
-
-  @Transactional(readOnly = true)
-  public Optional<User> findByEmail(String userEmail) {
-    return userRepository.findByEmail(userEmail);
-  }
-
-  @Transactional(readOnly = true)
-  public Optional<User> findByUsername(String username) {
-    return userRepository.findByUsername(username);
-  }
-
-  @Transactional(readOnly = true)
-  public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
-    return userRepository.findByProviderAndProviderId(provider, providerId);
-  }
-
 
   @Transactional
   public User join(OAuth2User oauth2User, String authorizedClientRegistrationId) {
@@ -72,5 +53,17 @@ public class UserService {
                   new Email(email))
           );
         });
+  }
+
+  public Optional<UserDetailResponse> findById(Long userId) {
+    return userRepository.findById(userId).map(UserConverter::from);
+  }
+
+  public Optional<User> findByUsername(String username) {
+    return userRepository.findByUsername(username);
+  }
+
+  public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
+    return userRepository.findByProviderAndProviderId(provider, providerId);
   }
 }
