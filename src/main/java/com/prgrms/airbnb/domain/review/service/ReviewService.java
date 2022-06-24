@@ -1,6 +1,7 @@
 package com.prgrms.airbnb.domain.review.service;
 
 import com.prgrms.airbnb.domain.reservation.entity.Reservation;
+import com.prgrms.airbnb.domain.reservation.entity.ReservationStatus;
 import com.prgrms.airbnb.domain.reservation.repository.ReservationRepository;
 import com.prgrms.airbnb.domain.review.dto.CreateReviewRequest;
 import com.prgrms.airbnb.domain.review.dto.ReviewResponse;
@@ -41,6 +42,7 @@ public class ReviewService {
         }
         Review review = ReviewConverter.toReview(reservationId, createReviewRequest);
         Review savedReview = reviewRepository.save(review);
+        reservation.changeStatus(ReservationStatus.COMPLETE);
         return ReviewConverter.of(savedReview);
     }
 
