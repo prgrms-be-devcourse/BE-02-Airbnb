@@ -1,20 +1,12 @@
 package com.prgrms.airbnb.domain.room.controller;
 
 import com.prgrms.airbnb.config.jwt.JwtAuthentication;
-<<<<<<< HEAD
-import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
-import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
-import com.prgrms.airbnb.domain.room.service.RoomService;
-import com.prgrms.airbnb.domain.user.entity.User;
-import com.prgrms.airbnb.domain.user.service.UserService;
-import java.net.URI;
-=======
 import com.prgrms.airbnb.domain.room.dto.*;
 import com.prgrms.airbnb.domain.room.entity.SortTypeForHost;
 import com.prgrms.airbnb.domain.room.service.RoomServiceForHost;
+import java.net.URI;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
->>>>>>> FBNB-36
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,13 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-<<<<<<< HEAD
-@RequestMapping("/api/v1/room")
-=======
-import java.net.URI;
-
 @RequestMapping("/api/v1/host/room")
->>>>>>> FBNB-36
 @RestController
 public class RoomRestControllerForHost {
 
@@ -41,12 +27,6 @@ public class RoomRestControllerForHost {
 
   public RoomRestControllerForHost(RoomServiceForHost roomService) {
     this.roomService = roomService;
-  }
-
-  public RoomRestControllerForHost(RoomService roomService,
-      UserService userService) {
-    this.roomService = roomService;
-    this.userService = userService;
   }
 
   @PostMapping

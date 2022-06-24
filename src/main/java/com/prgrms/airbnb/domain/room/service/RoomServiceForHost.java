@@ -9,11 +9,7 @@ import com.prgrms.airbnb.domain.room.entity.SortTypeForHost;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.room.util.RoomConverter;
 import com.prgrms.airbnb.domain.user.entity.User;
-<<<<<<< HEAD:src/main/java/com/prgrms/airbnb/domain/room/service/RoomService.java
-import org.springframework.data.domain.Page;
-=======
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
->>>>>>> FBNB-36:src/main/java/com/prgrms/airbnb/domain/room/service/RoomServiceForHost.java
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -21,23 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-<<<<<<< HEAD:src/main/java/com/prgrms/airbnb/domain/room/service/RoomService.java
-public class RoomService {
-=======
 public class RoomServiceForHost {
->>>>>>> FBNB-36:src/main/java/com/prgrms/airbnb/domain/room/service/RoomServiceForHost.java
 
   private final RoomRepository roomRepository;
   private final UserRepository userRepository;
 
-  public RoomServiceForHost(RoomRepository roomRepository,
-      UserRepository userRepository) {
+  public RoomServiceForHost(RoomRepository roomRepository, UserRepository userRepository) {
     this.roomRepository = roomRepository;
     this.userRepository = userRepository;
-  }
-
-  public RoomService(RoomRepository roomRepository) {
-    this.roomRepository = roomRepository;
   }
 
   @Transactional
