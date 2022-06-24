@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public interface ReservationRepository extends JpaRepository<Reservation, String> {
+public interface ReservationRepository extends JpaRepository<Reservation, String>, ReservationStatusRepository {
 
     Slice<Reservation> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
