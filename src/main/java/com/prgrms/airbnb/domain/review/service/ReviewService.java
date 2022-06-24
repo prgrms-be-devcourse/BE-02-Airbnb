@@ -34,7 +34,6 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse save(String reservationId, CreateReviewRequest createReviewRequest) {
-        //TODO: 리턴 타입 지정해야함
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(IllegalArgumentException::new);
         if (!reservation.canReviewed()) {
@@ -48,7 +47,6 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse modify(Long reviewId, UpdateReviewRequest updateReviewRequest) {
-        //TODO: 리턴 타입 지정해야함
         Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
         review.changeComment(updateReviewRequest.getComment());
         review.changeRating(updateReviewRequest.getRating());
