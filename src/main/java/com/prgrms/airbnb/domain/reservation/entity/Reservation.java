@@ -1,15 +1,18 @@
 package com.prgrms.airbnb.domain.reservation.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import java.time.LocalDate;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.ObjectUtils;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "reservation")
@@ -45,7 +48,6 @@ public class Reservation extends BaseEntity {
   @Column(name = "room_id")
   private Long roomId;
 
-  @Builder
   public Reservation(String id, ReservationStatus reservationStatus, LocalDate startDate,
       LocalDate endDate, Integer term, Integer oneDayCharge, Long userId, Long roomId) {
     setId(id);
@@ -58,32 +60,15 @@ public class Reservation extends BaseEntity {
     setRoomId(roomId);
   }
 
-  public void cancelReservation(ReservationStatus reservationStatus) {
-    if (canCancelled()) {
-      setReservationStatus(reservationStatus);
-    }
+  public void changeStatus(ReservationStatus newReservationStatus) {
+    reservationStatus = reservationStatus.changeStatus(newReservationStatus);
   }
 
-  public void approval(ReservationStatus reservationStatus) {
-    //TODO: 호스트만 접근이 가능해야 할 권한
-    if (this.reservationStatus.equals(ReservationStatus.WAITED_OK)) {
-      if (!(reservationStatus.equals(ReservationStatus.ACCEPTED)
-          || reservationStatus.equals(ReservationStatus.ACCEPTED_BEFORE_CANCELLED))) {
-        //TODO: WAIT_OK 인데 적합하지 않은 Status 들어옴
-        throw new IllegalArgumentException();
-      }
-      this.reservationStatus = reservationStatus.equals(ReservationStatus.ACCEPTED) ?
-          ReservationStatus.ACCEPTED : ReservationStatus.ACCEPTED_BEFORE_CANCELLED;
-    } else if (reservationStatus.equals(
-        ReservationStatus.ACCEPTED_AFTER_CANCELLED)) {//대기 상태가 아님 ACCEPTED_AFTER_CANCELLED,
-      this.reservationStatus = reservationStatus;
-    } else {
-      //TODO: 승인대기상태가 아닌데 적합하지 않은 Status 들어옴
-      throw new IllegalArgumentException();
-    }
+  public boolean canReviewed(){
+    return reservationStatus.equals(ReservationStatus.WAIT_REVIEW);
   }
 
-  private boolean canCancelled() {
+  public boolean canCancelled() {
     if (startDate.isAfter(LocalDate.now()) || startDate.isEqual(LocalDate.now())) {
       //TODO: 환불 정책 필요, 에러 추가 필요
       throw new IllegalArgumentException();

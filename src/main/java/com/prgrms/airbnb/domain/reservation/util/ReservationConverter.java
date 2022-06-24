@@ -9,16 +9,15 @@ public class ReservationConverter {
 
   public static Reservation toReservation(String reservationNo,
       CreateReservationRequest createReservationRequest) {
-    return Reservation.builder()
-        .id(reservationNo)
-        .reservationStatus(createReservationRequest.getReservationStatus())
-        .startDate(createReservationRequest.getStartDate())
-        .endDate(createReservationRequest.getEndDate())
-        .term(createReservationRequest.getPeriod())
-        .oneDayCharge(createReservationRequest.getOneDayCharge())
-        .userId(createReservationRequest.getUserId())
-        .roomId(createReservationRequest.getRoomId())
-        .build();
+    return  new Reservation(reservationNo,
+        createReservationRequest.getReservationStatus(),
+        createReservationRequest.getStartDate(),
+        createReservationRequest.getEndDate(),
+        createReservationRequest.getPeriod(),
+        createReservationRequest.getOneDayCharge(),
+        createReservationRequest.getUserId(),
+        createReservationRequest.getRoomId()
+        );
   }
 
   public static ReservationDetailResponseForHost ofDetailForHost(Reservation reservation,
