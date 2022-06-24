@@ -48,5 +48,10 @@ public class ReviewService {
         return ReviewConverter.of(review);
     }
 
+    @Transactional
+    public void remove(Long reviewId) {
+        reviewRepository.deleteById(reviewId);
+    }
+
 
 }
