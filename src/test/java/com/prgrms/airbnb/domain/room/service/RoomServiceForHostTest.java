@@ -19,7 +19,6 @@ import com.prgrms.airbnb.domain.user.repository.GroupRepository;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,9 +37,6 @@ class RoomServiceForHostTest {
   RoomRepository roomRepository;
 
   @Autowired
-  RoomServiceForHost roomServiceForHost;
-
-  @Autowired
   UserRepository userRepository;
 
   @Autowired
@@ -49,39 +45,70 @@ class RoomServiceForHostTest {
   @Autowired
   RoomImageRepository roomImageRepository;
 
+  @Autowired
+  RoomServiceForHost roomServiceForHost;
+
+  Room defaultRoom;
+  Long hostId;
+  Long roomId;
+
+  Address address;
+  Integer charge;
+  String roomName;
+  String roomDescription;
+  RoomInfo roomInfo;
+  List<RoomImage> images;
+  RoomImage roomImage1;
+  RoomImage roomImage2;
+  RoomImage roomImage3;
+  RoomImage roomImage4;
+
   @BeforeEach
   void setup() {
     Group group = groupRepository.findByName("USER_GROUP")
         .orElseThrow(() -> new IllegalStateException("Could not found group for USER_GROUP"));
 
-    User user = userRepository.save(new User("user",
-        "provider",
-        "providerId",
-        "profileImage",
-        group,
-        new Email("aaa@gmail.com")));
+    User user = userRepository.save(new User("user", "provider", "providerId",
+        "profileImage", group, new Email("aaa@gmail.com")));
+
     hostId = user.getId();
 
-    Address address = new Address("default address1", "default address2");
-    Integer charge = 10000;
-    String roomName = "default roomName";
-    String roomDescription = "default roomDescription";
-    RoomInfo roomInfo = new RoomInfo(1, 1, 1, 1);
-    List<RoomImage> images = new ArrayList<>();
-    RoomImage roomImage1 = new RoomImage("default roomImage Path 1");
-    images.add(roomImage1);
-    RoomImage roomImage2 = new RoomImage("default roomImage Path 2");
-    images.add(roomImage2);
-    RoomImage roomImage3 = new RoomImage("default roomImage Path 3");
-    images.add(roomImage3);
-    RoomImage roomImage4 = new RoomImage("default roomImage Path 4");
-    images.add(roomImage4);
+    Address defaultAddress = new Address("default address1", "default address2");
+    Integer defaultCharge = 20000;
+    String defaultRoomName = "default roomName";
+    String defaultRoomDescription = "default roomDescription";
+    RoomInfo defaultRoomInfo = new RoomInfo(1, 1, 1, 1);
+    List<RoomImage> defaultImages = new ArrayList<>();
+    RoomImage defaultRoomImage1 = new RoomImage("default roomImage Path 1");
+    defaultImages.add(defaultRoomImage1);
+    RoomImage defaultRoomImage2 = new RoomImage("default roomImage Path 2");
+    defaultImages.add(defaultRoomImage2);
+    RoomImage defaultRoomImage3 = new RoomImage("default roomImage Path 3");
+    defaultImages.add(defaultRoomImage3);
+    RoomImage defaultRoomImage4 = new RoomImage("default roomImage Path 4");
+    defaultImages.add(defaultRoomImage4);
 
-    Room room = new Room(address, charge, roomName, roomDescription, roomInfo, RoomType.APARTMENT,
-        images, hostId);
+    Room room = new Room(defaultAddress, defaultCharge, defaultRoomName, defaultRoomDescription,
+        defaultRoomInfo, RoomType.APARTMENT, defaultImages, hostId);
 
     defaultRoom = roomRepository.save(room);
     roomId = defaultRoom.getId();
+
+    address = new Address("address1", "address2");
+    charge = 10000;
+    roomName = "roomName";
+    roomDescription = "roomDescription";
+    roomInfo = new RoomInfo(1, 1, 1, 1);
+    images = new ArrayList<>();
+    roomImage1 = new RoomImage("roomImage Path 1");
+    roomImage2 = new RoomImage("roomImage Path 2");
+    roomImage3 = new RoomImage("roomImage Path 3");
+    roomImage4 = new RoomImage("roomImage Path 4");
+
+    images.add(roomImage1);
+    images.add(roomImage2);
+    images.add(roomImage3);
+    images.add(roomImage4);
   }
 
   @AfterEach
@@ -91,9 +118,7 @@ class RoomServiceForHostTest {
     roomRepository.deleteAll();
   }
 
-  Room defaultRoom;
-  Long hostId;
-  Long roomId;
+
 
   @Nested
   class 저장_save {
@@ -101,22 +126,6 @@ class RoomServiceForHostTest {
     @Test
     @DisplayName("성공: room 저장에 성공합니다. roomImage도 관련 repo에 저장됩니다.")
     public void success() throws Exception {
-
-      //given
-      Address address = new Address("address1", "address2");
-      Integer charge = 10000;
-      String roomName = "roomName";
-      String roomDescription = "roomDescription";
-      RoomInfo roomInfo = new RoomInfo(1, 1, 1, 1);
-      List<RoomImage> images = new ArrayList<>();
-      RoomImage roomImage1 = new RoomImage("roomImage Path 1");
-      images.add(roomImage1);
-      RoomImage roomImage2 = new RoomImage("roomImage Path 2");
-      images.add(roomImage2);
-      RoomImage roomImage3 = new RoomImage("roomImage Path 3");
-      images.add(roomImage3);
-      RoomImage roomImage4 = new RoomImage("roomImage Path 4");
-      images.add(roomImage4);
 
       //when
       CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
@@ -156,19 +165,6 @@ class RoomServiceForHostTest {
     @DisplayName("성공: room 저장에 성공합니다. roomImage가 없다면 repo역시 저장되지 않습니다.")
     public void successWithoutImage() throws Exception {
 
-      //given
-      Address address = new Address("address1", "address2");
-      Integer charge = 10000;
-      String roomName = "roomName";
-      String roomDescription = "roomDescription";
-      RoomInfo roomInfo = new RoomInfo(1, 1, 1, 1);
-      List<RoomImage> images = new ArrayList<>();
-
-      RoomImage roomImage1 = new RoomImage("roomImage Path 1");
-      RoomImage roomImage2 = new RoomImage("roomImage Path 2");
-      RoomImage roomImage3 = new RoomImage("roomImage Path 3");
-      RoomImage roomImage4 = new RoomImage("roomImage Path 4");
-
       //when
       CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
           .address(address)
@@ -205,21 +201,6 @@ class RoomServiceForHostTest {
     @Test
     @DisplayName("실패: DB에 같은 주소의 Room이 존재한다면 새 Room 을 등록할 수 없습니다.")
     public void failCreateSameAddressRoom() throws Exception {
-
-      //given
-      Integer charge = 10000;
-      String roomName = "new roomName";
-      String roomDescription = "new roomDescription";
-      RoomInfo roomInfo = new RoomInfo(1, 1, 1, 1);
-      List<RoomImage> images = new ArrayList<>();
-      RoomImage roomImage1 = new RoomImage("new roomImage Path 1");
-      images.add(roomImage1);
-      RoomImage roomImage2 = new RoomImage("new roomImage Path 2");
-      images.add(roomImage2);
-      RoomImage roomImage3 = new RoomImage("new roomImage Path 3");
-      images.add(roomImage3);
-      RoomImage roomImage4 = new RoomImage("new roomImage Path 4");
-      images.add(roomImage4);
 
       //when
       Address address = new Address("default address1", "default address2");
@@ -301,15 +282,16 @@ class RoomServiceForHostTest {
     @DisplayName("성공: Room 수정에 성공합니다.")
     public void success() throws Exception {
 
-      List<RoomImage> roomImages = new ArrayList<>();
-      RoomImage roomImage1 = new RoomImage("roomImage path");
-      roomImages.add(roomImage1);
       //given
       Integer charge = 5000;
       String roomName = "영업 안해요";
       String description = "영업 안합니다";
       Integer maxGuest = 2;
       Integer bedCount = 2;
+      List<RoomImage> roomImages = new ArrayList<>();
+      RoomImage roomImage1 = new RoomImage("roomImage path");
+      roomImages.add(roomImage1);
+
       UpdateRoomRequest updateRoomRequest = UpdateRoomRequest.builder()
           .id(roomId)
           .charge(charge)
