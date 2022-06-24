@@ -56,36 +56,37 @@ public class Room extends BaseEntity {
   @Embedded
   private ReviewInfo reviewInfo;
 
-  @OneToMany(mappedBy = "room")
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<RoomImage> images = new ArrayList<>();
 
   public Room(Address address, Integer charge, String name, String description,
-      RoomInfo roomInfo, RoomType roomType, List<RoomImage> images,
-      Long userId) {
-    this.address = address;
-    this.charge = charge;
-    this.name = name;
-    this.description = description;
-    this.roomInfo = roomInfo;
-    this.roomType = roomType;
-    this.images = images;
-    this.userId = userId;
+      Integer maxGuest, Integer roomCount, Integer bedCount, Integer bathroomCount,
+      RoomType roomType, List<RoomImage> images, Long userId) {
+    setAddress(address);
+    setCharge(charge);
+    setName(name);
+    setDescription(description);
+    this.roomInfo = new RoomInfo(maxGuest, roomCount, bedCount, bathroomCount);
+    setRoomType(roomType);
+    images.forEach(this::setImages);
+    setUserId(userId);
     this.isDeleted = Boolean.FALSE;
   }
 
   public Room(Long id, Address address, Integer charge, String name, String description,
+      Integer maxGuest, Integer roomCount, Integer bedCount, Integer bathroomCount,
       RoomInfo roomInfo, RoomType roomType, ReviewInfo reviewInfo, List<RoomImage> images,
       Long userId) {
     this.id = id;
-    this.address = address;
-    this.charge = charge;
-    this.name = name;
-    this.description = description;
-    this.roomInfo = roomInfo;
-    this.roomType = roomType;
+    setAddress(address);
+    setCharge(charge);
+    setName(name);
+    setDescription(description);
+    this.roomInfo = new RoomInfo(maxGuest, roomCount, bedCount, bathroomCount);
+    setRoomType(roomType);
     this.reviewInfo = reviewInfo;
-    this.images = images;
-    this.userId = userId;
+    images.forEach(this::setImages);
+    setUserId(userId);
     this.isDeleted = Boolean.FALSE;
   }
 
@@ -93,53 +94,32 @@ public class Room extends BaseEntity {
     return Collections.unmodifiableList(images);
   }
 
-  public void changeImages(List<RoomImage> newImages) {
-    if (!ObjectUtils.isEmpty(newImages)) {
-      images.clear();
-    }
-    images.addAll(newImages);
-  }
-
-  public void changeName(String newName) {
-    if (!this.name.equals(newName)) {
-      setName(newName);
-    }
-  }
-
-  public void changeCharge(Integer newCharge) {
-    if (!this.charge.equals(newCharge)) {
-      setCharge(newCharge);
-    }
-  }
-
-  public void changeDescription(String newDescription) {
-    if (!this.charge.equals(newDescription)) {
-      setDescription(newDescription);
-    }
-  }
-
-  private void setAddress(Address address) {
-    if (ObjectUtils.isEmpty(address)) {
-      throw new IllegalArgumentException();
-    }
-    this.address = address;
-  }
-
-  private void setCharge(Integer charge) {
+  public void setCharge(Integer charge) {
     if (charge < 0) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("가격은 0보다 작을 수 없습니다.");
     }
     this.charge = charge;
   }
 
-  private void setName(String newName) {
+  public void setName(String newName) {
     if (StringUtils.isBlank(newName)) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("이름은 필수 입력사항입니다.");
     }
     this.name = newName;
   }
 
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public void setImages(RoomImage roomImage) {
+    roomImage.setRoom(this);
+  }
+
   private void setRoomType(RoomType roomType) {
+    if (ObjectUtils.isEmpty(roomType)) {
+      throw new IllegalArgumentException();
+    }
     this.roomType = roomType;
   }
 
@@ -150,12 +130,11 @@ public class Room extends BaseEntity {
     this.userId = userId;
   }
 
-  private void setDescription(String description) {
-    this.description = description;
-  }
-
-  private void setImages(List<RoomImage> images) {
-    this.images = images;
+  private void setAddress(Address address) {
+    if (ObjectUtils.isEmpty(address)) {
+      throw new IllegalArgumentException();
+    }
+    this.address = address;
   }
 
   @Embeddable
@@ -173,5 +152,4 @@ public class Room extends BaseEntity {
       this.reviewCount = reviewCount;
     }
   }
-
 }

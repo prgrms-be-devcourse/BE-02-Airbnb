@@ -32,19 +32,7 @@ public class RoomInfo {
     setBathroomCount(bathroomCount);
   }
 
-  public void changeMaxGuest(Integer newMaxGuest) {
-    if (!this.maxGuest.equals(newMaxGuest)) {
-      setMaxGuest(newMaxGuest);
-    }
-  }
-
-  public void changeBedCount(Integer newBedCount) {
-    if (!this.bedCount.equals(newBedCount)) {
-      setBedCount(newBedCount);
-    }
-  }
-
-  private void setMaxGuest(Integer maxGuest) {
+  public void setMaxGuest(Integer maxGuest) {
     if (ObjectUtils.isEmpty(maxGuest)) {
       throw new IllegalArgumentException();
     }
@@ -58,7 +46,7 @@ public class RoomInfo {
     this.roomCount = roomCount;
   }
 
-  private void setBedCount(Integer bedCount) {
+  public void setBedCount(Integer bedCount) {
     if (ObjectUtils.isEmpty(maxGuest)) {
       throw new IllegalArgumentException();
     }
