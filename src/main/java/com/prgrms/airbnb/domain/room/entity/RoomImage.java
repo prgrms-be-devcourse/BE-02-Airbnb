@@ -31,7 +31,7 @@ public class RoomImage extends BaseEntity {
   }
 
   public void setRoom(Room room) {
-    if (ObjectUtils.isEmpty(this.room)) {
+    if (this.room != null) {
       this.room.getImages().remove(this);
     }
     this.room = room;

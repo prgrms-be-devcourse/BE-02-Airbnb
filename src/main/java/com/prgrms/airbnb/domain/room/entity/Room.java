@@ -60,13 +60,13 @@ public class Room extends BaseEntity {
   private List<RoomImage> images = new ArrayList<>();
 
   public Room(Address address, Integer charge, String name, String description,
-      Integer maxGuest, Integer roomCount, Integer bedCount, Integer bathroomCount,
-      RoomType roomType, List<RoomImage> images, Long userId) {
+      RoomInfo roomInfo, RoomType roomType, List<RoomImage> images, Long userId) {
+
     setAddress(address);
     setCharge(charge);
     setName(name);
     setDescription(description);
-    this.roomInfo = new RoomInfo(maxGuest, roomCount, bedCount, bathroomCount);
+    this.roomInfo = roomInfo;
     setRoomType(roomType);
     images.forEach(this::setImages);
     setUserId(userId);
@@ -74,7 +74,6 @@ public class Room extends BaseEntity {
   }
 
   public Room(Long id, Address address, Integer charge, String name, String description,
-      Integer maxGuest, Integer roomCount, Integer bedCount, Integer bathroomCount,
       RoomInfo roomInfo, RoomType roomType, ReviewInfo reviewInfo, List<RoomImage> images,
       Long userId) {
     this.id = id;
@@ -82,16 +81,12 @@ public class Room extends BaseEntity {
     setCharge(charge);
     setName(name);
     setDescription(description);
-    this.roomInfo = new RoomInfo(maxGuest, roomCount, bedCount, bathroomCount);
+    this.roomInfo = roomInfo;
     setRoomType(roomType);
     this.reviewInfo = reviewInfo;
     images.forEach(this::setImages);
     setUserId(userId);
     this.isDeleted = Boolean.FALSE;
-  }
-
-  public List<RoomImage> getImages() {
-    return Collections.unmodifiableList(images);
   }
 
   public void setCharge(Integer charge) {
@@ -124,7 +119,7 @@ public class Room extends BaseEntity {
   }
 
   private void setUserId(Long userId) {
-    if (ObjectUtils.isEmpty(id)) {
+    if (ObjectUtils.isEmpty(userId)) {
       throw new IllegalArgumentException();
     }
     this.userId = userId;

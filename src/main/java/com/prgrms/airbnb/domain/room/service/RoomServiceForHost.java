@@ -41,12 +41,12 @@ public class RoomServiceForHost {
         .orElseThrow(IllegalArgumentException::new);
     validateHost(room, hostId);
 
-    room.changeName(updateRoomRequest.getName());
-    room.changeCharge(updateRoomRequest.getCharge());
-    room.getRoomInfo().changeMaxGuest(updateRoomRequest.getRoomInfo().getMaxGuest());
-    room.getRoomInfo().changeBedCount(updateRoomRequest.getRoomInfo().getBedCount());
-    room.changeImages(updateRoomRequest.getImages());
-    room.changeDescription(updateRoomRequest.getDescription());
+    room.setName(updateRoomRequest.getName());
+    room.setCharge(updateRoomRequest.getCharge());
+    room.getRoomInfo().setMaxGuest(updateRoomRequest.getRoomInfo().getMaxGuest());
+    room.getRoomInfo().setBedCount(updateRoomRequest.getRoomInfo().getBedCount());
+    updateRoomRequest.getImages().forEach(room::setImages);
+    room.setDescription(updateRoomRequest.getDescription());
     return RoomConverter.ofDetail(room);
   }
 
