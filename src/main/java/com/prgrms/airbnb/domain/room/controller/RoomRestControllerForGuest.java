@@ -33,7 +33,7 @@ public class RoomRestControllerForGuest {
   }
 
   @GetMapping("/{roomId}")
-  public ResponseEntity<RoomDetailResponse> getRoomDetailInfo(@PathVariable Long roomId) {
+  public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId) {
     RoomDetailResponse roomDetailInfo = roomService.findDetailById(roomId);
 
     return ResponseEntity.ok(roomDetailInfo);

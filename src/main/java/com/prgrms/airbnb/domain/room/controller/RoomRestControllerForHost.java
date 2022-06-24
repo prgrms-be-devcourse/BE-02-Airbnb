@@ -62,7 +62,7 @@ public class RoomRestControllerForHost {
   }
 
   @GetMapping("/{roomId}")
-  public ResponseEntity<RoomDetailResponse> getDetailInfo(
+  public ResponseEntity<RoomDetailResponse> getDetail(
       @AuthenticationPrincipal JwtAuthentication authentication,
       @PathVariable("roomId") Long roomId
   ) {
