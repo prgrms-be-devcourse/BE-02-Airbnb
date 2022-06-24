@@ -709,6 +709,67 @@ class RoomTest {
       assertThrows(RuntimeException.class, () -> room.deleteImage(roomImage5));
     }
 
+    @Test
+    @DisplayName("성공: Description 변경할 수 있음")
+    public void successChangeDescription() throws Exception {
+      //given
+      Address address = new Address("address1", "address2");
+      Integer charge = 10000;
+      String roomName = "roomName";
+      String roomDescription = "roomDescription";
+      RoomInfo roomInfo = new RoomInfo(1, 1, 1, 1);
+      List<RoomImage> images = new ArrayList<>();
+      RoomImage roomImage1 = new RoomImage("roomImage Path 1");
+      images.add(roomImage1);
+      RoomImage roomImage2 = new RoomImage("roomImage Path 2");
+      images.add(roomImage2);
+      RoomImage roomImage3 = new RoomImage("roomImage Path 3");
+      images.add(roomImage3);
+      RoomImage roomImage4 = new RoomImage("roomImage Path 4");
+      images.add(roomImage4);
+      Long hostId = 1000L;
+
+      Room room = new Room(address, charge, roomName, roomDescription, roomInfo, RoomType.APARTMENT,
+          images, hostId);
+
+      //when
+      String newDescription = "new Description";
+      room.setDescription(newDescription);
+
+      //then
+      assertThat(room.getDescription()).isEqualTo(newDescription);
+    }
+
+    @Test
+    @DisplayName("성공: Description을 Null로 변경할 수 있음")
+    public void successChangeDescriptionToNull() throws Exception {
+      //given
+      Address address = new Address("address1", "address2");
+      Integer charge = 10000;
+      String roomName = "roomName";
+      String roomDescription = "roomDescription";
+      RoomInfo roomInfo = new RoomInfo(1, 1, 1, 1);
+      List<RoomImage> images = new ArrayList<>();
+      RoomImage roomImage1 = new RoomImage("roomImage Path 1");
+      images.add(roomImage1);
+      RoomImage roomImage2 = new RoomImage("roomImage Path 2");
+      images.add(roomImage2);
+      RoomImage roomImage3 = new RoomImage("roomImage Path 3");
+      images.add(roomImage3);
+      RoomImage roomImage4 = new RoomImage("roomImage Path 4");
+      images.add(roomImage4);
+      Long hostId = 1000L;
+
+      Room room = new Room(address, charge, roomName, roomDescription, roomInfo, RoomType.APARTMENT,
+          images, hostId);
+
+      //when
+      String newDescription = null;
+      room.setDescription(newDescription);
+
+      //then
+      assertThat(room.getDescription()).isEqualTo(newDescription);
+    }
   }
 
 }
