@@ -5,6 +5,7 @@ import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
 import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.dto.UpdateRoomRequest;
 import com.prgrms.airbnb.domain.room.entity.Room;
+import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import com.prgrms.airbnb.domain.room.entity.SortTypeForHost;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.room.util.RoomConverter;
@@ -48,10 +49,16 @@ public class RoomServiceForHost {
 
     room.setName(updateRoomRequest.getName());
     room.setCharge(updateRoomRequest.getCharge());
+    room.setDescription(updateRoomRequest.getDescription());
+
+    // TODO: 2022/06/24 새로 추가되는 이미지에 포함되지 않는 이미지의 연관관계 제거
+    room.getImages().stream()
+        .filter(i -> !updateRoomRequest.getImages().contains(i))
+        .forEach(RoomImage::deleteRoom);
+    updateRoomRequest.getImages().forEach(room::setImage);
+
     room.getRoomInfo().setMaxGuest(updateRoomRequest.getRoomInfo().getMaxGuest());
     room.getRoomInfo().setBedCount(updateRoomRequest.getRoomInfo().getBedCount());
-    updateRoomRequest.getImages().forEach(room::setImage);
-    room.setDescription(updateRoomRequest.getDescription());
     return RoomConverter.ofDetail(room);
   }
 
