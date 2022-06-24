@@ -1,8 +1,11 @@
 package com.prgrms.airbnb.domain.room.dto;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
+import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import com.prgrms.airbnb.domain.room.entity.RoomInfo;
 import com.prgrms.airbnb.domain.room.entity.RoomType;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 
 @Getter
@@ -18,9 +21,6 @@ public class CreateRoomRequest {
   private String description;
   private RoomInfo roomInfo;
   private RoomType roomType;
-  private Long userId;
-
-  public void setUserId(Long userId) {
-    this.userId = userId;
-  }
+  @Builder.Default
+  private List<RoomImage> roomImages = new ArrayList<>();
 }
