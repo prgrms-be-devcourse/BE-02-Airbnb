@@ -12,7 +12,6 @@ import org.springframework.util.ObjectUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -56,20 +55,20 @@ public class Room extends BaseEntity {
   @Embedded
   private ReviewInfo reviewInfo;
 
-  @OneToMany(mappedBy = "room")
+  @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<RoomImage> images = new ArrayList<>();
 
   public Room(Address address, Integer charge, String name, String description,
-      RoomInfo roomInfo, RoomType roomType, List<RoomImage> images,
-      Long userId) {
-    this.address = address;
-    this.charge = charge;
-    this.name = name;
-    this.description = description;
+      RoomInfo roomInfo, RoomType roomType, List<RoomImage> images, Long userId) {
+
+    setAddress(address);
+    setCharge(charge);
+    setName(name);
+    setDescription(description);
     this.roomInfo = roomInfo;
-    this.roomType = roomType;
-    this.images = images;
-    this.userId = userId;
+    setRoomType(roomType);
+    images.forEach(this::setImage);
+    setUserId(userId);
     this.isDeleted = Boolean.FALSE;
   }
 
@@ -77,45 +76,56 @@ public class Room extends BaseEntity {
       RoomInfo roomInfo, RoomType roomType, ReviewInfo reviewInfo, List<RoomImage> images,
       Long userId) {
     this.id = id;
-    this.address = address;
-    this.charge = charge;
-    this.name = name;
-    this.description = description;
+    setAddress(address);
+    setCharge(charge);
+    setName(name);
+    setDescription(description);
     this.roomInfo = roomInfo;
-    this.roomType = roomType;
+    setRoomType(roomType);
     this.reviewInfo = reviewInfo;
-    this.images = images;
-    this.userId = userId;
+    images.forEach(this::setImage);
+    setUserId(userId);
     this.isDeleted = Boolean.FALSE;
   }
 
-  public List<RoomImage> getImages() {
-    return Collections.unmodifiableList(images);
+  public void setCharge(Integer charge) {
+    if (charge < 0) {
+      throw new IllegalArgumentException("가격은 0보다 작을 수 없습니다.");
+    }
+    this.charge = charge;
   }
 
-  public void changeImages(List<RoomImage> newImages) {
-    if (this.images != null) {
-      images.clear();
+  public void setName(String newName) {
+    if (StringUtils.isBlank(newName)) {
+      throw new IllegalArgumentException("이름은 필수 입력사항입니다.");
     }
-    images.addAll(newImages);
+    this.name = newName;
   }
 
-  public void changeName(String newName) {
-    if (!this.name.equals(newName)) {
-      setName(newName);
-    }
+  public void setDescription(String description) {
+    this.description = description;
   }
 
-  public void changeCharge(Integer newCharge) {
-    if (!this.charge.equals(newCharge)) {
-      setCharge(newCharge);
-    }
+  public void setImage(RoomImage roomImage) {
+    roomImage.setRoom(this);
   }
 
-  public void changeDescription(String newDescription) {
-    if (!this.charge.equals(newDescription)) {
-      setDescription(newDescription);
+  public void deleteImage(RoomImage roomImage) {
+    roomImage.deleteRoom();
+  }
+
+  private void setRoomType(RoomType roomType) {
+    if (ObjectUtils.isEmpty(roomType)) {
+      throw new IllegalArgumentException();
     }
+    this.roomType = roomType;
+  }
+
+  private void setUserId(Long userId) {
+    if (ObjectUtils.isEmpty(userId)) {
+      throw new IllegalArgumentException();
+    }
+    this.userId = userId;
   }
 
   private void setAddress(Address address) {
@@ -123,39 +133,6 @@ public class Room extends BaseEntity {
       throw new IllegalArgumentException();
     }
     this.address = address;
-  }
-
-  private void setCharge(Integer charge) {
-    if (charge < 0) {
-      throw new IllegalArgumentException();
-    }
-    this.charge = charge;
-  }
-
-  private void setName(String newName) {
-    if (StringUtils.isBlank(newName)) {
-      throw new IllegalArgumentException();
-    }
-    this.name = newName;
-  }
-
-  private void setRoomType(RoomType roomType) {
-    this.roomType = roomType;
-  }
-
-  private void setUserId(Long userId) {
-    if (ObjectUtils.isEmpty(id)) {
-      throw new IllegalArgumentException();
-    }
-    this.userId = userId;
-  }
-
-  private void setDescription(String description) {
-    this.description = description;
-  }
-
-  private void setImages(List<RoomImage> images) {
-    this.images = images;
   }
 
   @Embeddable
@@ -173,5 +150,4 @@ public class Room extends BaseEntity {
       this.reviewCount = reviewCount;
     }
   }
-
 }
