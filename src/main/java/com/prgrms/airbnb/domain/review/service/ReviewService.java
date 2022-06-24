@@ -10,6 +10,7 @@ import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.review.util.ReviewConverter;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
+import com.prgrms.airbnb.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class ReviewService {
-
     private final ReviewRepository reviewRepository;
     private final ReservationRepository reservationRepository;
 
@@ -55,9 +55,19 @@ public class ReviewService {
         return ReviewConverter.of(review);
     }
 
-    public List<ReviewResponse> findAllByRoomId(Long roomId) {
+    public List<ReviewResponse> findAllByRoomId(Long roomId, User user) {
         List<Review> reviewList = reviewRepository.findAllByRoomId(roomId);
-        return reviewList.stream().map(ReviewConverter::of).collect(Collectors.toList());
+
+        //HINT 리뷰 작성자가 아니면서 익명 글일땐 List에 추가하지 않는다.
+        return reviewList.stream()
+                .filter(review -> {
+                    Reservation reservation = reservationRepository.findById(review.getReservationId()).orElseThrow(IllegalArgumentException::new);
+                    if (!review.isVisible() && !reservation.getUserId().equals(user.getId())) {
+                        return false;
+                    }
+                    return true;
+                })
+                .map(ReviewConverter::of).collect(Collectors.toList());
     }
 
     @Transactional
