@@ -360,13 +360,9 @@ class RoomInfoTest {
 
       //when
       Integer newBedCount = -1;
-      roomInfo.setBedCount(newBedCount);
 
       //then
-      Assertions.assertThat(roomInfo.getBedCount()).isEqualTo(newBedCount);
+      assertThrows(RuntimeException.class, () -> roomInfo.setBedCount(newBedCount));
     }
-
   }
-
-
 }
