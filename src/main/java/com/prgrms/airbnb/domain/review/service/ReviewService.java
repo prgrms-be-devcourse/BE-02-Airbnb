@@ -8,8 +8,10 @@ import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.review.util.ReviewConverter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class ReviewService {
 
   private final ReviewRepository reviewRepository;
@@ -21,6 +23,7 @@ public class ReviewService {
     this.reservationRepository = reservationRepository;
   }
 
+  @Transactional
   public void save(String reservationId, CreateReviewRequest createReviewRequest) {
     //TODO: 리턴 타입 지정해야함
     Reservation reservation = reservationRepository.findById(reservationId)
@@ -31,6 +34,7 @@ public class ReviewService {
     reviewRepository.save(ReviewConverter.toReview(reservationId, createReviewRequest));
   }
 
+  @Transactional
   public void modify(Long reviewId, UpdateReviewRequest updateReviewRequest) {
     //TODO: 리턴 타입 지정해야함
     Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
