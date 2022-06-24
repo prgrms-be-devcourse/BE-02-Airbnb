@@ -16,21 +16,8 @@ public class RoomConverter {
         createRoomRequest.getDescription(),
         createRoomRequest.getRoomInfo(),
         createRoomRequest.getRoomType(),
-        null,
+        createRoomRequest.getRoomImages(),
         user.getId()
-    );
-  }
-
-  public static Room toRoom(CreateRoomRequest createRoomRequest) {
-    return new Room(
-        createRoomRequest.getAddress(),
-        createRoomRequest.getCharge(),
-        createRoomRequest.getName(),
-        createRoomRequest.getDescription(),
-        createRoomRequest.getRoomInfo(),
-        createRoomRequest.getRoomType(),
-        null,
-        createRoomRequest.getUserId()
     );
   }
 
@@ -44,6 +31,7 @@ public class RoomConverter {
         .roomInfo(room.getRoomInfo())
         .roomType(room.getRoomType())
         .userId(room.getUserId())
+        .images(room.getImages())
         .build();
   }
 
