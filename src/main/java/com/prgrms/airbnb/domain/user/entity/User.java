@@ -94,8 +94,8 @@ public class User extends BaseEntity {
     this.group = group;
   }
 
-  private void checkBlank(String providerId) {
-    if (StringUtils.isBlank(providerId)) {
+  private void checkBlank(String target) {
+    if (StringUtils.isBlank(target)) {
       throw new IllegalArgumentException();
     }
   }
