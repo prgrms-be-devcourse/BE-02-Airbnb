@@ -93,3 +93,26 @@ create table reservation
     user_id            bigint       not null,
     primary key (id)
 );
+
+create table review
+(
+    id            bigint NOT NULL AUTO_INCREMENT,
+    created_at    timestamp,
+    updated_at    timestamp,
+    comment       varchar(255),
+    rating        integer,
+    visible       boolean,
+    reservation_id  varchar(255) not null,
+    primary key (id)
+);
+
+create table review_image
+(
+    id         bigint NOT NULL AUTO_INCREMENT,
+    created_at timestamp,
+    updated_at timestamp,
+    path       varchar(255),
+    review_id    bigint not null,
+    primary key (id),
+    CONSTRAINT fk_review_id_for_review_image FOREIGN KEY (review_id) REFERENCES review (id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);

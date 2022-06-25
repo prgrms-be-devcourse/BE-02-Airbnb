@@ -45,6 +45,15 @@ public class Review extends BaseEntity {
         setImages(images);
     }
 
+    public Review(Long id, String comment, Integer rating, String reservationId, Boolean visible, List<ReviewImage> images) {
+        this.id = id;
+        setComment(comment);
+        setRating(rating);
+        setReservationId(reservationId);
+        setVisible(visible);
+        setImages(images);
+    }
+
     public Boolean isVisible() {
         return visible;
     }
