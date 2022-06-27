@@ -36,13 +36,16 @@ public class RoomConverter {
   }
 
   public static RoomSummaryResponse ofSummary(Room room) {
-    return RoomSummaryResponse.builder()
+    RoomSummaryResponse roomSummaryResponse = RoomSummaryResponse.builder()
         .id(room.getId())
         .address(room.getAddress())
         .charge(room.getCharge())
         .name(room.getName())
         .roomType(room.getRoomType())
-        .roomImage(room.getImages().get(0))
         .build();
+    if (room.getImages().size() > 0) {
+      roomSummaryResponse.setRoomImage(room.getImages().get(0));
+    }
+    return roomSummaryResponse;
   }
 }

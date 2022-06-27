@@ -35,4 +35,8 @@ public class RoomSummaryResponse {
     this.roomType = roomType;
     this.roomImage = roomImages.get(0);
   }
+
+  public void setRoomImage(RoomImage roomImage) {
+    this.roomImage = roomImage;
+  }
 }
