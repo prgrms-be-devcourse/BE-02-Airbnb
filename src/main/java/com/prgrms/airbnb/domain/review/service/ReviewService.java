@@ -96,7 +96,9 @@ public class ReviewService {
 
   @Transactional
   public void remove(Long reviewId) {
-    reviewRepository.deleteById(reviewId);
+    Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
+    review.getImages().forEach(reviewImage -> uploadService.delete(reviewImage.getPath()));
+    reviewRepository.delete(review);
   }
 
 
