@@ -138,7 +138,6 @@ class RoomServiceForHostTest {
     images.add(roomImage2);
     images.add(roomImage3);
     images.add(roomImage4);
-
   }
 
   @Nested
@@ -162,28 +161,21 @@ class RoomServiceForHostTest {
       RoomDetailResponse createRoomResponse = roomServiceForHost.save(createRoomRequest, hostId);
 
       //then
+      assertThat(createRoomResponse)
+          .usingRecursiveComparison()
+          .ignoringFields("id", "userId")
+          .isEqualTo(createRoomRequest);
+
       assertThat(createRoomResponse.getId()).isNotNull();
-      assertThat(createRoomResponse.getAddress()).isEqualTo(address);
-      assertThat(createRoomResponse.getCharge()).isEqualTo(charge);
-      assertThat(createRoomResponse.getName()).isEqualTo(roomName);
-      assertThat(createRoomResponse.getDescription()).isEqualTo(roomDescription);
-      assertThat(createRoomResponse.getRoomInfo()).isEqualTo(roomInfo);
-      assertThat(createRoomResponse.getImages()).contains(roomImage1);
-      assertThat(createRoomResponse.getImages()).contains(roomImage2);
-      assertThat(createRoomResponse.getImages()).contains(roomImage3);
-      assertThat(createRoomResponse.getImages()).contains(roomImage4);
       assertThat(createRoomResponse.getUserId()).isEqualTo(hostId);
 
       List<RoomImage> allRoomImages = roomImageRepository.findAll();
 
-      assertThat(allRoomImages).contains(roomImage1);
-      assertThat(allRoomImages).contains(roomImage2);
-      assertThat(allRoomImages).contains(roomImage3);
-      assertThat(allRoomImages).contains(roomImage4);
+      assertThat(allRoomImages).contains(roomImage1, roomImage2, roomImage3, roomImage4);
     }
 
     @Test
-    @DisplayName("성공: room 저장에 성공합니다. roomImage가 없다면 repo역시 저장되지 않습니다.")
+    @DisplayName("성공: room 저장에 성공합니다. roomImage가 없다면 image들은 RoomImageRepo에 저장되지 않습니다.")
     public void successWithoutImage() throws Exception {
 
       //when
@@ -199,24 +191,16 @@ class RoomServiceForHostTest {
       RoomDetailResponse createRoomResponse = roomServiceForHost.save(createRoomRequest, hostId);
 
       //then
+      assertThat(createRoomResponse)
+          .usingRecursiveComparison()
+          .ignoringFields("id", "userId")
+          .isEqualTo(createRoomRequest);
+
       assertThat(createRoomResponse.getId()).isNotNull();
-      assertThat(createRoomResponse.getAddress()).isEqualTo(address);
-      assertThat(createRoomResponse.getCharge()).isEqualTo(charge);
-      assertThat(createRoomResponse.getName()).isEqualTo(roomName);
-      assertThat(createRoomResponse.getDescription()).isEqualTo(roomDescription);
-      assertThat(createRoomResponse.getRoomInfo()).isEqualTo(roomInfo);
-      assertThat(createRoomResponse.getImages()).doesNotContain(roomImage1);
-      assertThat(createRoomResponse.getImages()).doesNotContain(roomImage2);
-      assertThat(createRoomResponse.getImages()).doesNotContain(roomImage3);
-      assertThat(createRoomResponse.getImages()).doesNotContain(roomImage4);
       assertThat(createRoomResponse.getUserId()).isEqualTo(hostId);
 
       List<RoomImage> allRoomImages = roomImageRepository.findAll();
-
-      assertThat(allRoomImages).doesNotContain(roomImage1);
-      assertThat(allRoomImages).doesNotContain(roomImage2);
-      assertThat(allRoomImages).doesNotContain(roomImage3);
-      assertThat(allRoomImages).doesNotContain(roomImage4);
+      assertThat(allRoomImages).doesNotContain(roomImage1, roomImage2, roomImage3, roomImage4);
     }
 
     @Test
@@ -275,24 +259,17 @@ class RoomServiceForHostTest {
       RoomDetailResponse createRoomResponse = roomServiceForHost.save(createRoomRequest, hostId);
 
       //then
+      assertThat(createRoomResponse)
+          .usingRecursiveComparison()
+          .ignoringFields("id", "userId")
+          .isEqualTo(createRoomRequest);
+
       assertThat(createRoomResponse.getId()).isNotNull();
-      assertThat(createRoomResponse.getAddress()).isEqualTo(address);
-      assertThat(createRoomResponse.getCharge()).isEqualTo(charge);
-      assertThat(createRoomResponse.getName()).isEqualTo(roomName);
-      assertThat(createRoomResponse.getDescription()).isEqualTo(roomDescription);
-      assertThat(createRoomResponse.getRoomInfo()).isEqualTo(roomInfo);
-      assertThat(createRoomResponse.getImages()).contains(roomImage1);
-      assertThat(createRoomResponse.getImages()).contains(roomImage2);
-      assertThat(createRoomResponse.getImages()).contains(roomImage3);
-      assertThat(createRoomResponse.getImages()).contains(roomImage4);
       assertThat(createRoomResponse.getUserId()).isEqualTo(hostId);
 
       List<RoomImage> allRoomImages = roomImageRepository.findAll();
 
-      assertThat(allRoomImages).contains(roomImage1);
-      assertThat(allRoomImages).contains(roomImage2);
-      assertThat(allRoomImages).contains(roomImage3);
-      assertThat(allRoomImages).contains(roomImage4);
+      assertThat(allRoomImages).contains(roomImage1, roomImage2, roomImage3, roomImage4);
     }
   }
 
@@ -331,23 +308,21 @@ class RoomServiceForHostTest {
           .description(changedDescription)
           .maxGuest(changedMaxGuest)
           .bedCount(changedBedCount)
-          .images(changedRoomImages)
+          .roomImages(changedRoomImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
+      assertThat(modify)
+          .usingRecursiveComparison()
+          .ignoringFields("address", "roomInfo", "roomType", "userId")
+          .isEqualTo(updateRoomRequest);
 
-      assertThat(room.getId()).isEqualTo(roomId);
-      assertThat(room.getCharge()).isEqualTo(changedCharge);
-      assertThat(room.getName()).isEqualTo(changedRoomName);
-      assertThat(room.getDescription()).isEqualTo(changedDescription);
-      assertThat(room.getRoomInfo().getMaxGuest()).isEqualTo(changedMaxGuest);
-      assertThat(room.getRoomInfo().getBedCount()).isEqualTo(changedBedCount);
-      assertThat(room.getUserId()).isEqualTo(hostId);
-      assertThat(room.getImages().size()).isEqualTo(changedRoomImages.size());
+      assertThat(modify.getRoomInfo().getMaxGuest()).isEqualTo(changedMaxGuest);
+      assertThat(modify.getRoomInfo().getBedCount()).isEqualTo(changedBedCount);
+      assertThat(modify.getUserId()).isEqualTo(hostId);
     }
 
     @Test
@@ -362,16 +337,14 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
-
-      assertThat(room.getCharge()).isEqualTo(changedCharge);
+      assertThat(modify.getCharge()).isEqualTo(changedCharge);
     }
 
     @Test
@@ -387,16 +360,14 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
-
-      assertThat(room.getCharge()).isEqualTo(zero);
+      assertThat(modify.getCharge()).isEqualTo(zero);
     }
 
     @Test
@@ -411,7 +382,7 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //then
@@ -431,7 +402,7 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //then
@@ -451,16 +422,14 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
-
-      assertThat(room.getName()).isEqualTo(changedRoomName);
+      assertThat(modify.getName()).isEqualTo(changedRoomName);
     }
 
     @Test
@@ -475,7 +444,7 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //then
@@ -495,7 +464,7 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //then
@@ -515,7 +484,7 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //then
@@ -535,16 +504,14 @@ class RoomServiceForHostTest {
           .description(changedDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
-
-      assertThat(room.getDescription()).isEqualTo(changedDescription);
+      assertThat(modify.getDescription()).isEqualTo(changedDescription);
     }
 
     @Test
@@ -559,16 +526,14 @@ class RoomServiceForHostTest {
           .description(null)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
-
-      assertThat(room.getDescription()).isNull();
+      assertThat(modify.getDescription()).isNull();
     }
 
     @Test
@@ -583,16 +548,14 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(changedMaxGuest)
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
-
-      assertThat(room.getRoomInfo().getMaxGuest()).isEqualTo(changedMaxGuest);
+      assertThat(modify.getRoomInfo().getMaxGuest()).isEqualTo(changedMaxGuest);
     }
 
     @Test
@@ -607,7 +570,7 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(0)
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //then
@@ -628,7 +591,7 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(-1)
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //then
@@ -648,16 +611,14 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(changedBedCount)
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
-
-      assertThat(room.getRoomInfo().getBedCount()).isEqualTo(changedBedCount);
+      assertThat(modify.getRoomInfo().getBedCount()).isEqualTo(changedBedCount);
     }
 
     @Test
@@ -674,16 +635,14 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(zero)
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
-
-      assertThat(room.getRoomInfo().getBedCount()).isEqualTo(zero);
+      assertThat(modify.getRoomInfo().getBedCount()).isEqualTo(zero);
     }
 
     @Test
@@ -700,7 +659,7 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(negative)
-          .images(defaultImages)
+          .roomImages(defaultImages)
           .build();
 
       //then
@@ -729,16 +688,14 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(changedRoomImages)
+          .roomImages(changedRoomImages)
           .build();
 
       //when
       RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
 
       //then
-      Room room = roomRepository.findById(roomId).orElseThrow(RuntimeException::new);
-
-      assertThat(room.getImages().size()).isEqualTo(changedRoomImages.size());
+      assertThat(modify.getRoomImages().size()).isEqualTo(changedRoomImages.size());
     }
 
     @Test
@@ -755,7 +712,7 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .images(changedRoomImages)
+          .roomImages(changedRoomImages)
           .build();
 
       //then
@@ -775,19 +732,9 @@ class RoomServiceForHostTest {
       RoomDetailResponse roomDetailResponse = roomServiceForHost.findDetailById(roomId, hostId);
 
       //then
-      assertThat(roomDetailResponse.getId()).isEqualTo(roomId);
-      assertThat(roomDetailResponse.getCharge()).isEqualTo(defaultCharge);
-      assertThat(roomDetailResponse.getName()).isEqualTo(defaultRoomName);
-      assertThat(roomDetailResponse.getDescription()).isEqualTo(defaultRoomDescription);
-      assertThat(roomDetailResponse.getAddress()).isEqualTo(defaultAddress);
-      assertThat(roomDetailResponse.getRoomInfo()).isEqualTo(defaultRoomInfo);
-      assertThat(roomDetailResponse.getRoomType()).isEqualTo(defaultRoomType);
-      assertThat(roomDetailResponse.getImages().size()).isEqualTo(defaultImages.size());
-      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage1);
-      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage2);
-      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage3);
-      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage4);
-      assertThat(roomDetailResponse.getUserId()).isEqualTo(hostId);
+      assertThat(roomDetailResponse)
+          .usingRecursiveComparison()
+          .isEqualTo(defaultRoom);
     }
 
     @Test
@@ -795,7 +742,7 @@ class RoomServiceForHostTest {
     public void failWrongHostId() throws Exception {
 
       //when
-      Long wrongHostId = 12311L;
+      Long wrongHostId = -1L;
 
       //then
       assertThrows(RuntimeException.class,
@@ -807,7 +754,7 @@ class RoomServiceForHostTest {
     public void failWrongRoomId() throws Exception {
 
       //when
-      Long wrongRoomId = 12311L;
+      Long wrongRoomId = -1L;
 
       //then
       assertThrows(RuntimeException.class,
@@ -819,8 +766,8 @@ class RoomServiceForHostTest {
     public void failWrongRoomIdAndWrongHostId() throws Exception {
 
       //when
-      Long wrongRoomId = 12311L;
-      Long wrongHostId = 12312L;
+      Long wrongRoomId = -1L;
+      Long wrongHostId = -2L;
 
       //then
       assertThrows(RuntimeException.class,
@@ -938,7 +885,7 @@ class RoomServiceForHostTest {
       //given
       int size = 5;
       PageRequest pageable = PageRequest.of(0, size);
-      Long testHostId = 1234L;
+      Long testHostId = -1L;
 
       //when
       Slice<RoomSummaryResponse> byHostId = roomServiceForHost.findByHostId(testHostId,

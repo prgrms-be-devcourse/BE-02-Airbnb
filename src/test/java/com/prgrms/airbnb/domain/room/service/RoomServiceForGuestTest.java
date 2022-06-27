@@ -1,7 +1,6 @@
 package com.prgrms.airbnb.domain.room.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.Email;
@@ -9,6 +8,7 @@ import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
 import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
 import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.dto.SearchRoomRequest;
+import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import com.prgrms.airbnb.domain.room.entity.RoomInfo;
 import com.prgrms.airbnb.domain.room.entity.RoomType;
@@ -107,6 +107,7 @@ class RoomServiceForGuestTest {
     hostId3 = user3.getId();
 
     RoomType[] roomTypes = {RoomType.APARTMENT, RoomType.DORMITORY, RoomType.HOUSE};
+
     for (int i = 1; i < 11; i++) {
       Address address = new Address("address1" + i, "address2" + i);
       List<RoomImage> images = new ArrayList<>();
@@ -123,6 +124,7 @@ class RoomServiceForGuestTest {
           .build();
       roomServiceForHost.save(createRoomRequest, hostId1);
     }
+
     for (int i = 11; i < 21; i++) {
       Address address = new Address("address1" + i, "address2" + i);
       List<RoomImage> images = new ArrayList<>();
@@ -139,6 +141,7 @@ class RoomServiceForGuestTest {
           .build();
       roomServiceForHost.save(createRoomRequest, hostId2);
     }
+
     for (int i = 21; i < 31; i++) {
       Address address = new Address("address1" + i, "address2" + i);
       List<RoomImage> images = new ArrayList<>();
@@ -165,6 +168,7 @@ class RoomServiceForGuestTest {
         .roomType(defaultRoomType)
         .roomImages(defaultImages)
         .build();
+
     roomId = roomServiceForHost.save(createRoomRequest, hostId1).getId();
   }
 
@@ -182,20 +186,16 @@ class RoomServiceForGuestTest {
     @DisplayName("성공: Room 상세정보 조회에 성공합니다.")
     public void success() throws Exception {
 
+      //given
+      Room room = roomRepository.findById(roomId)
+          .orElseThrow(RuntimeException::new);
       //when
       RoomDetailResponse roomDetailResponse = roomServiceForGuest.findDetailById(roomId);
 
       //then
-      assertThat(roomDetailResponse.getAddress()).isEqualTo(defaultAddress);
-      assertThat(roomDetailResponse.getCharge()).isEqualTo(defaultCharge);
-      assertThat(roomDetailResponse.getName()).isEqualTo(defaultRoomName);
-      assertThat(roomDetailResponse.getDescription()).isEqualTo(defaultRoomDescription);
-      assertThat(roomDetailResponse.getRoomInfo()).isEqualTo(defaultRoomInfo);
-      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage1);
-      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage2);
-      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage3);
-      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage4);
-      assertThat(roomDetailResponse.getUserId()).isEqualTo(hostId1);
+      assertThat(roomDetailResponse)
+          .usingRecursiveComparison()
+          .isEqualTo(room);
     }
 
     @Test
@@ -510,41 +510,37 @@ class RoomServiceForGuestTest {
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(10);
     }
-  }
+    @Test
+    @DisplayName("성공: 복합 조건")
+    public void successComplex() throws Exception {
 
-  @Test
-  @DisplayName("성공: 복합 조건")
-  public void successComplex() throws Exception {
+      //given
+      int minCharge = 25000;
+      int maxCharge = 30000;
+      int bedCount = 26;
+      int maxGuest = 29;
+      String keyword = "3";
+      SearchRoomRequest searchRoomRequest = SearchRoomRequest.builder()
+          .keyword(keyword)
+          .minCharge(minCharge)
+          .maxCharge(maxCharge)
+          .bedCount(bedCount)
+          .maxGuest(maxGuest)
+          .build();
 
-    //given
-    int minCharge = 25000;
-    int maxCharge = 30000;
-    int bedCount = 26;
-    int maxGuest = 29;
-    String keyword = "3";
-    SearchRoomRequest searchRoomRequest = SearchRoomRequest.builder()
-        .keyword(keyword)
-        .minCharge(minCharge)
-        .maxCharge(maxCharge)
-        .bedCount(bedCount)
-        .maxGuest(maxGuest)
-        .build();
+      PageRequest pageable = PageRequest.of(0, 100);
 
-    PageRequest pageable = PageRequest.of(0, 100);
+      //when
+      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
+          pageable);
 
-    //when
-    Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-        pageable);
-
-    //then
-    assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(4);
-    for (RoomSummaryResponse roomSummaryResponse : sliceOfRoomSummary) {
-      assertThat(roomSummaryResponse.getCharge()).isGreaterThanOrEqualTo(minCharge);
-      assertThat(roomSummaryResponse.getCharge()).isLessThanOrEqualTo(maxCharge);
-      assertThat(roomSummaryResponse.getName()).containsIgnoringCase(keyword);
-
-
+      //then
+      assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(4);
+      for (RoomSummaryResponse roomSummaryResponse : sliceOfRoomSummary) {
+        assertThat(roomSummaryResponse.getCharge()).isGreaterThanOrEqualTo(minCharge);
+        assertThat(roomSummaryResponse.getCharge()).isLessThanOrEqualTo(maxCharge);
+        assertThat(roomSummaryResponse.getName()).containsIgnoringCase(keyword);
+      }
     }
-
   }
 }
