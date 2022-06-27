@@ -15,6 +15,6 @@ public interface RoomRepository extends JpaRepository<Room, Long>, RoomSearchRep
 
   Slice<Room> findByUserIdOrderByCreatedAt(Long userId, Pageable pageable);
 
-  @Query("select r from Room r where r.userId =:hostId order by r.reviewInfo.reviewRating")
+  @Query("select r from Room r where r.userId =:hostId order by r.reviewInfo.reviewRating desc")
   Slice<Room> findByHostIdOrderByRating(@Param("hostId") Long hostId, Pageable pageable);
 }
