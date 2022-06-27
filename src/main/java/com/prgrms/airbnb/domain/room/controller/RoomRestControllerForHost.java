@@ -39,7 +39,7 @@ public class RoomRestControllerForHost {
 
     @PutMapping
     public ResponseEntity<RoomDetailResponse> modifyRoom(
-            UpdateRoomRequest updateRoomRequest,
+            @RequestPart(value = "room") UpdateRoomRequest updateRoomRequest,
             @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles,
             @AuthenticationPrincipal JwtAuthentication authentication) {
 
