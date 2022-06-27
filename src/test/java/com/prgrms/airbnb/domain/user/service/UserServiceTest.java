@@ -32,7 +32,7 @@ class UserServiceTest {
 
   @Nested
   @DisplayName("사용자 가입 테스트")
-  class joinTest {
+  class JoinTest {
     List<User> userList;
 
     @BeforeEach
