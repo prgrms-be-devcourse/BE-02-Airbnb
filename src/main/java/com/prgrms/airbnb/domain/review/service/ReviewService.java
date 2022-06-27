@@ -9,6 +9,7 @@ import com.prgrms.airbnb.domain.review.dto.UpdateReviewRequest;
 import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.review.util.ReviewConverter;
+import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,8 @@ public class ReviewService {
         Review review = ReviewConverter.toReview(reservationId, createReviewRequest);
         Review savedReview = reviewRepository.save(review);
         reservation.changeStatus(ReservationStatus.COMPLETE);
+        Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(IllegalArgumentException::new);
+        room.getReviewInfo().updateReviewInfo(createReviewRequest.getRating());
         return ReviewConverter.of(savedReview);
     }
 

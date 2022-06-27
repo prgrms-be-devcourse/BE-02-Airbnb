@@ -77,7 +77,6 @@ public class Review extends BaseEntity {
         setImages(images);
     }
 
-
     private void setComment(String comment) {
         if (StringUtils.isBlank(comment)) {
             throw new IllegalArgumentException();
