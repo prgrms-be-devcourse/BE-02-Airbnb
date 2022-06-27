@@ -2,6 +2,7 @@ package com.prgrms.airbnb.domain.user.service;
 
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
+import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;
 import com.prgrms.airbnb.domain.user.entity.Group;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.GroupRepository;
@@ -65,5 +66,14 @@ public class UserService {
 
   public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
     return userRepository.findByProviderAndProviderId(provider, providerId);
+  }
+
+  @Transactional
+  public UserDetailResponse modify(Long userId, UserUpdateRequest request) {
+    User user = userRepository.findById(userId).orElseThrow(RuntimeException::new);
+    user.changeName(request.getName());
+    user.changeEmail(request.getEmail());
+    userRepository.save(user);
+    return UserConverter.from(user);
   }
 }
