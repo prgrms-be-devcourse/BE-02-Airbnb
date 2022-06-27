@@ -38,7 +38,7 @@ public class RoomSearchRepositoryImpl implements RoomSearchRepository {
 
     JPAQuery<Room> roomJPAQuery = jpaQueryFactory
         .selectFrom(room)
-        .join(room.images, roomImage).fetchJoin()
+        .join(room.roomImages, roomImage).fetchJoin()
         .where(
             keywordListContains(searchRoomRequest.getKeyword()),
             roomTypeEq(searchRoomRequest.getRoomType()),

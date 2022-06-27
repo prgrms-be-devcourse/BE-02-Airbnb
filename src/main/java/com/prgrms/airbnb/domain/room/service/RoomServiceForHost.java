@@ -49,8 +49,8 @@ public class RoomServiceForHost {
     room.setCharge(updateRoomRequest.getCharge());
     room.setDescription(updateRoomRequest.getDescription());
 
-    room.getImages().removeIf(roomImage -> !updateRoomRequest.getImages().contains(roomImage));
-    updateRoomRequest.getImages().forEach(room::setImage);
+    room.getRoomImages().removeIf(roomImage -> !updateRoomRequest.getRoomImages().contains(roomImage));
+    updateRoomRequest.getRoomImages().forEach(room::setImage);
 
     room.getRoomInfo().setMaxGuest(updateRoomRequest.getMaxGuest());
     room.getRoomInfo().setBedCount(updateRoomRequest.getBedCount());

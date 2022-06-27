@@ -31,7 +31,7 @@ public class RoomConverter {
         .roomInfo(room.getRoomInfo())
         .roomType(room.getRoomType())
         .userId(room.getUserId())
-        .images(room.getImages())
+        .roomImages(room.getRoomImages())
         .build();
   }
 
@@ -43,8 +43,8 @@ public class RoomConverter {
         .name(room.getName())
         .roomType(room.getRoomType())
         .build();
-    if (room.getImages().size() > 0) {
-      roomSummaryResponse.setRoomImage(room.getImages().get(0));
+    if (room.getRoomImages().size() > 0) {
+      roomSummaryResponse.setRoomImage(room.getRoomImages().get(0));
     }
     return roomSummaryResponse;
   }

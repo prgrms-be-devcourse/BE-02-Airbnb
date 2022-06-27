@@ -65,10 +65,10 @@ class RoomTest {
       assertThat(room.getName()).isEqualTo(roomName);
       assertThat(room.getDescription()).isEqualTo(roomDescription);
       assertThat(room.getRoomInfo()).isEqualTo(roomInfo);
-      assertThat(room.getImages()).contains(roomImage1);
-      assertThat(room.getImages()).contains(roomImage2);
-      assertThat(room.getImages()).contains(roomImage3);
-      assertThat(room.getImages()).contains(roomImage4);
+      assertThat(room.getRoomImages()).contains(roomImage1);
+      assertThat(room.getRoomImages()).contains(roomImage2);
+      assertThat(room.getRoomImages()).contains(roomImage3);
+      assertThat(room.getRoomImages()).contains(roomImage4);
       assertThat(room.getUserId()).isEqualTo(hostId);
     }
 
@@ -96,7 +96,7 @@ class RoomTest {
           testImages, hostId);
 
       //then
-      assertThat(room.getImages().size()).isEqualTo(0);
+      assertThat(room.getRoomImages().size()).isEqualTo(0);
     }
 
     @Test
@@ -343,7 +343,7 @@ class RoomTest {
       room.setImage(newRoomImage);
 
       //then
-      assertThat(room.getImages()).contains(newRoomImage);
+      assertThat(room.getRoomImages()).contains(newRoomImage);
     }
 
     @Test
@@ -373,7 +373,7 @@ class RoomTest {
       room.deleteImage(roomImage4);
 
       //then
-      assertThat(room.getImages()).doesNotContain(roomImage4);
+      assertThat(room.getRoomImages()).doesNotContain(roomImage4);
     }
 
     @Test

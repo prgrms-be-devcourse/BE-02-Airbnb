@@ -1,8 +1,6 @@
 package com.prgrms.airbnb.domain.room.dto;
 
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
-import com.prgrms.airbnb.domain.room.entity.RoomInfo;
-import com.prgrms.airbnb.domain.room.entity.RoomType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +22,6 @@ public class UpdateRoomRequest {
   private Integer maxGuest;
   private Integer bedCount;
   @Builder.Default
-  private List<RoomImage> images = new ArrayList<>();
+  private List<RoomImage> roomImages = new ArrayList<>();
 
 }
