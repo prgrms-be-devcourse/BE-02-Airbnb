@@ -2,7 +2,6 @@ package com.prgrms.airbnb.domain.room.repository;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.room.entity.Room;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +12,7 @@ public interface RoomRepository extends JpaRepository<Room, Long>, RoomSearchRep
 
   Boolean existsByAddress(Address address);
 
-  Slice<Room> findByUserIdOrderByCreatedAt(Long userId, Pageable pageable);
+  Slice<Room> findAllByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
   @Query("select r from Room r where r.userId =:hostId order by r.reviewInfo.reviewRating desc")
   Slice<Room> findByHostIdOrderByRating(@Param("hostId") Long hostId, Pageable pageable);

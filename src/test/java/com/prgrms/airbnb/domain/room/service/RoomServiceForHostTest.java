@@ -7,11 +7,13 @@ import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
 import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
+import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.dto.UpdateRoomRequest;
 import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import com.prgrms.airbnb.domain.room.entity.RoomInfo;
 import com.prgrms.airbnb.domain.room.entity.RoomType;
+import com.prgrms.airbnb.domain.room.entity.SortTypeForHost;
 import com.prgrms.airbnb.domain.room.repository.RoomImageRepository;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.Group;
@@ -20,14 +22,16 @@ import com.prgrms.airbnb.domain.user.repository.GroupRepository;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -58,6 +62,7 @@ class RoomServiceForHostTest {
   String defaultRoomName;
   String defaultRoomDescription;
   RoomInfo defaultRoomInfo;
+  RoomType defaultRoomType;
   List<RoomImage> defaultImages;
   RoomImage defaultRoomImage1;
   RoomImage defaultRoomImage2;
@@ -80,6 +85,7 @@ class RoomServiceForHostTest {
     defaultRoomDescription = "default roomDescription";
     defaultRoomInfo = new RoomInfo(1, 1, 1, 1);
     defaultImages = new ArrayList<>();
+    defaultRoomType = RoomType.APARTMENT;
     defaultRoomImage1 = new RoomImage("default roomImage Path 1");
     defaultRoomImage2 = new RoomImage("default roomImage Path 2");
     defaultRoomImage3 = new RoomImage("default roomImage Path 3");
@@ -90,7 +96,7 @@ class RoomServiceForHostTest {
     defaultImages.add(defaultRoomImage4);
 
     Room room = new Room(defaultAddress, defaultCharge, defaultRoomName, defaultRoomDescription,
-        defaultRoomInfo, RoomType.APARTMENT, defaultImages, hostId);
+        defaultRoomInfo, defaultRoomType, defaultImages, hostId);
 
     defaultRoom = roomRepository.save(room);
     roomId = defaultRoom.getId();
@@ -149,7 +155,7 @@ class RoomServiceForHostTest {
           .name(roomName)
           .description(roomDescription)
           .roomInfo(roomInfo)
-          .roomType(RoomType.APARTMENT)
+          .roomType(defaultRoomType)
           .roomImages(images)
           .build();
 
@@ -187,7 +193,7 @@ class RoomServiceForHostTest {
           .name(roomName)
           .description(roomDescription)
           .roomInfo(roomInfo)
-          .roomType(RoomType.APARTMENT)
+          .roomType(defaultRoomType)
           .build();
 
       RoomDetailResponse createRoomResponse = roomServiceForHost.save(createRoomRequest, hostId);
@@ -226,7 +232,7 @@ class RoomServiceForHostTest {
           .name(roomName)
           .description(roomDescription)
           .roomInfo(roomInfo)
-          .roomType(RoomType.APARTMENT)
+          .roomType(defaultRoomType)
           .roomImages(images)
           .build();
 
@@ -262,7 +268,7 @@ class RoomServiceForHostTest {
           .name(roomName)
           .description(roomDescription)
           .roomInfo(roomInfo)
-          .roomType(RoomType.APARTMENT)
+          .roomType(defaultRoomType)
           .roomImages(images)
           .build();
 
@@ -758,5 +764,225 @@ class RoomServiceForHostTest {
     }
   }
 
+  @Nested
+  class 상세정보_조회_findDetailById {
 
+    @Test
+    @DisplayName("성공: 상세정보 조회 성공")
+    public void successFindDetailById() throws Exception {
+
+      //when
+      RoomDetailResponse roomDetailResponse = roomServiceForHost.findDetailById(roomId, hostId);
+
+      //then
+      assertThat(roomDetailResponse.getId()).isEqualTo(roomId);
+      assertThat(roomDetailResponse.getCharge()).isEqualTo(defaultCharge);
+      assertThat(roomDetailResponse.getName()).isEqualTo(defaultRoomName);
+      assertThat(roomDetailResponse.getDescription()).isEqualTo(defaultRoomDescription);
+      assertThat(roomDetailResponse.getAddress()).isEqualTo(defaultAddress);
+      assertThat(roomDetailResponse.getRoomInfo()).isEqualTo(defaultRoomInfo);
+      assertThat(roomDetailResponse.getRoomType()).isEqualTo(defaultRoomType);
+      assertThat(roomDetailResponse.getImages().size()).isEqualTo(defaultImages.size());
+      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage1);
+      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage2);
+      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage3);
+      assertThat(roomDetailResponse.getImages()).contains(defaultRoomImage4);
+      assertThat(roomDetailResponse.getUserId()).isEqualTo(hostId);
+    }
+
+    @Test
+    @DisplayName("실패: roomId는 존재하지만 hostId가 틀릴경우")
+    public void failWrongHostId() throws Exception {
+
+      //when
+      Long wrongHostId = 12311L;
+
+      //then
+      assertThrows(RuntimeException.class,
+          () -> roomServiceForHost.findDetailById(roomId, wrongHostId));
+    }
+
+    @Test
+    @DisplayName("실패: hostId는 존재하지만 roomId 틀릴경우")
+    public void failWrongRoomId() throws Exception {
+
+      //when
+      Long wrongRoomId = 12311L;
+
+      //then
+      assertThrows(RuntimeException.class,
+          () -> roomServiceForHost.findDetailById(wrongRoomId, hostId));
+    }
+
+    @Test
+    @DisplayName("실패: hostId, roomId 틀릴경우")
+    public void failWrongRoomIdAndWrongHostId() throws Exception {
+
+      //when
+      Long wrongRoomId = 12311L;
+      Long wrongHostId = 12312L;
+
+      //then
+      assertThrows(RuntimeException.class,
+          () -> roomServiceForHost.findDetailById(wrongRoomId, wrongHostId));
+    }
+  }
+
+  Long hostId1;
+  Long hostId2;
+  Long hostId3;
+
+  @BeforeEach
+  void setupForFindByHostId() {
+    defaultAddress = new Address("default address1", "default address2");
+    defaultCharge = 20000;
+    defaultRoomName = "default roomName";
+    defaultRoomDescription = "default roomDescription";
+    defaultRoomInfo = new RoomInfo(1, 1, 1, 1);
+    defaultImages = new ArrayList<>();
+    defaultRoomType = RoomType.APARTMENT;
+    defaultRoomImage1 = new RoomImage("default roomImage Path 1");
+    defaultRoomImage2 = new RoomImage("default roomImage Path 2");
+    defaultRoomImage3 = new RoomImage("default roomImage Path 3");
+    defaultRoomImage4 = new RoomImage("default roomImage Path 4");
+    defaultImages.add(defaultRoomImage1);
+    defaultImages.add(defaultRoomImage2);
+    defaultImages.add(defaultRoomImage3);
+    defaultImages.add(defaultRoomImage4);
+
+    Group group = groupRepository.findByName("USER_GROUP")
+        .orElseThrow(() -> new IllegalStateException("Could not found group for USER_GROUP"));
+
+    User user1 = userRepository.save(new User("user1", "provider1", "providerId1",
+        "profileImage1", group, new Email("aaa1@gmail.com")));
+
+    User user2 = userRepository.save(new User("user2", "provider2", "providerId2",
+        "profileImage2", group, new Email("aaa2@gmail.com")));
+
+    User user3 = userRepository.save(new User("user3", "provider3", "providerId3",
+        "profileImage3", group, new Email("aaa3@gmail.com")));
+
+    hostId1 = user1.getId();
+    hostId2 = user2.getId();
+    hostId3 = user3.getId();
+
+    for (int i = 0; i < 10; i++) {
+      Address address = new Address("address1" + i, "address2" + i);
+      CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
+          .address(address)
+          .charge(defaultCharge)
+          .name("userId1의 Room")
+          .description(defaultRoomDescription)
+          .roomInfo(defaultRoomInfo)
+          .roomType(defaultRoomType)
+          .roomImages(defaultImages)
+          .build();
+      roomServiceForHost.save(createRoomRequest, hostId1);
+    }
+    for (int i = 10; i < 20; i++) {
+      Address address = new Address("address1" + i, "address2" + i);
+      CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
+          .address(address)
+          .charge(defaultCharge)
+          .name("userId2의 Room")
+          .description(defaultRoomDescription)
+          .roomInfo(defaultRoomInfo)
+          .roomType(defaultRoomType)
+          .roomImages(defaultImages)
+          .build();
+      roomServiceForHost.save(createRoomRequest, hostId2);
+    }
+    for (int i = 20; i < 30; i++) {
+      Address address = new Address("address1" + i, "address2" + i);
+      CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
+          .address(address)
+          .charge(defaultCharge)
+          .name("userId3의 Room")
+          .description(defaultRoomDescription)
+          .roomInfo(defaultRoomInfo)
+          .roomType(defaultRoomType)
+          .roomImages(defaultImages)
+          .build();
+      roomServiceForHost.save(createRoomRequest, hostId3);
+    }
+  }
+
+  @Nested
+  @DisplayName("host가 등록한 room list 조회")
+  class findByHostId {
+
+    @Test
+    @DisplayName("성공: 최신순으로 조회")
+    public void successSortTypeIsRecently() throws Exception {
+
+      //given
+      int size = 5;
+      PageRequest pageable = PageRequest.of(0, size);
+
+      //when
+      Slice<RoomSummaryResponse> byHostId = roomServiceForHost.findByHostId(hostId1,
+          SortTypeForHost.RECENTLY, pageable);
+
+      //then
+      assertThat(byHostId.getSize()).isEqualTo(size);
+
+      for (RoomSummaryResponse roomSummaryResponse : byHostId) {
+        assertThat(roomSummaryResponse.getName()).contains("userId1");
+      }
+    }
+
+    @Test
+    @DisplayName("성공: 호스트가 등록한 Room이 없을 경우 요소 = 0")
+    public void successSortTypeIsRecentlyResultIsZero() throws Exception {
+
+      //given
+      int size = 5;
+      PageRequest pageable = PageRequest.of(0, size);
+      Long testHostId = 1234L;
+
+      //when
+      Slice<RoomSummaryResponse> byHostId = roomServiceForHost.findByHostId(testHostId,
+          SortTypeForHost.RECENTLY, pageable);
+
+      //then
+      assertThat(byHostId.getSize()).isEqualTo(size);
+      assertThat(byHostId.getNumberOfElements()).isEqualTo(0);
+    }
+  }
+
+  @Nested
+  class 삭제_remove {
+
+    @Test
+    @DisplayName("성공: 삭제 성공")
+    public void success() throws Exception {
+
+      //when
+      roomServiceForHost.remove(roomId, hostId);
+      Optional<Room> removedRoom = roomRepository.findById(roomId);
+
+      //then
+      assertThat(removedRoom.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("실패: roomId가 존재하지 않을경우")
+    public void failWrongRoomId() throws Exception {
+
+      //given
+      Long wrongRoomId = null;
+
+      //then
+      assertThrows(RuntimeException.class, () -> roomServiceForHost.remove(wrongRoomId, hostId));
+    }
+
+    @Test
+    @DisplayName("실패: hostId가 다를 경우")
+    public void failWrongHostId() throws Exception {
+
+      //then
+      assertThrows(RuntimeException.class, () -> roomServiceForHost.remove(roomId, hostId1));
+    }
+  }
 }
+
