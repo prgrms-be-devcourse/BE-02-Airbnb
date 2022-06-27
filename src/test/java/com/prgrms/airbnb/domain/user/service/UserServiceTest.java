@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -48,12 +49,53 @@ class UserServiceTest {
           mockOAuth2User(nickName, getAttributes(nickName, profileImage, email)),
           "kakao"
       );
-
       // Then
       assertThat(user).isNotNull();
       assertThat(user.getName()).isEqualTo(nickName);
       assertThat(user.getProfileImage()).isEqualTo(profileImage);
       assertThat(user.getEmail()).isEqualTo(new Email(email));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'", "'송무송', 'profile_image', 'real.purple@gmail.com'"})
+    @DisplayName("성공: 프로필이 널값이어도 정상적으로 생성됩니다.")
+    void successByProfileImage(String nickName, String profileImage, String email) {
+      // Given, When
+      User user = userService.join(
+          mockOAuth2User(nickName, getAttributes(nickName, null, email)),
+          "kakao"
+      );
+      // Then
+      assertThat(user).isNotNull();
+      assertThat(user.getName()).isEqualTo(nickName);
+      assertThat(user.getProfileImage()).isNull();
+      assertThat(user.getEmail()).isEqualTo(new Email(email));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"'무송', 'profile_image'", "'송무송', 'profile_image'"})
+    @DisplayName("실패: 이메일이 널값이면 예외를 반환합니다.")
+    void failByEmail(String nickName, String profileImage) {
+      // Given, When
+      Throwable response = catchThrowable(() -> userService.join(
+          mockOAuth2User(nickName, getAttributes(nickName, profileImage, null)),
+          "kakao"
+      ));
+      // Then
+      assertThat(response).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'", "'송무송', 'profile_image', 'real.purple@gmail.com'"})
+    @DisplayName("실패: 이름이 널값이면 예외를 반환합니다.")
+    void failByName(String nickName, String profileImage, String email) {
+      // Given, When
+      Throwable response = catchThrowable(() -> userService.join(
+          mockOAuth2User(nickName, getAttributes(null, profileImage, email)),
+          "kakao"
+      ));
+      // Then
+      assertThat(response).isInstanceOf(IllegalArgumentException.class);
     }
   }
 
