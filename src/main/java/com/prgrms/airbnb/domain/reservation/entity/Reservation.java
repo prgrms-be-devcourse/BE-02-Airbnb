@@ -62,14 +62,14 @@ public class Reservation extends BaseEntity {
   }
 
   public boolean canReviewed() {
-    if (endDate.plusDays(14).isBefore(LocalDate.now())) {
+    if (validateDateForReview()) {
       return false;
     }
     return reservationStatus.equals(ReservationStatus.WAIT_REVIEW);
   }
 
   public boolean canCancelled() {
-    if (startDate.isAfter(LocalDate.now()) || startDate.isEqual(LocalDate.now())) {
+    if (validateDateForCancel()) {
       //TODO: 환불 정책 필요, 에러 추가 필요
       throw new IllegalArgumentException();
     }
@@ -137,5 +137,13 @@ public class Reservation extends BaseEntity {
     if (startDate.isAfter(endDate)) {
       throw new IllegalArgumentException();
     }
+  }
+
+  private boolean validateDateForCancel(){
+    return startDate.isAfter(LocalDate.now()) || startDate.isEqual(LocalDate.now());
+  }
+
+  private boolean validateDateForReview(){
+    return endDate.plusDays(14).isBefore(LocalDate.now());
   }
 }
