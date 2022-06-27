@@ -9,6 +9,7 @@ import com.prgrms.airbnb.domain.review.dto.UpdateReviewRequest;
 import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.review.util.ReviewConverter;
+import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import org.springframework.stereotype.Service;
@@ -34,20 +35,25 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse save(String reservationId, CreateReviewRequest createReviewRequest) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(IllegalArgumentException::new);
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(IllegalArgumentException::new);
         if (!reservation.canReviewed()) {
+            //TODO: 리뷰를 남길 수 없는 경우.
             throw new IllegalArgumentException();
         }
         Review review = ReviewConverter.toReview(reservationId, createReviewRequest);
         Review savedReview = reviewRepository.save(review);
         reservation.changeStatus(ReservationStatus.COMPLETE);
+        Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(IllegalArgumentException::new);
+        room.getReviewInfo().updateReviewInfo(createReviewRequest.getRating());
         return ReviewConverter.of(savedReview);
     }
 
     @Transactional
     public ReviewResponse modify(Long reviewId, UpdateReviewRequest updateReviewRequest) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
+        Reservation reservation = reservationRepository.findById(review.getReservationId()).orElseThrow(IllegalArgumentException::new);
+        Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(IllegalArgumentException::new);
+        room.getReviewInfo().changeReviewInfo(review.getRating(), updateReviewRequest.getRating());
         review.changeComment(updateReviewRequest.getComment());
         review.changeRating(updateReviewRequest.getRating());
         review.changeVisible(updateReviewRequest.getVisible());
