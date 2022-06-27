@@ -14,6 +14,7 @@ import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewResponse save(String reservationId, CreateReviewRequest createReviewRequest) {
+    public ReviewResponse save(String reservationId, CreateReviewRequest createReviewRequest, List<MultipartFile> images) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(IllegalArgumentException::new);
         if (!reservation.canReviewed()) {
             //TODO: 리뷰를 남길 수 없는 경우.
@@ -49,7 +50,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewResponse modify(Long reviewId, UpdateReviewRequest updateReviewRequest) {
+    public ReviewResponse modify(Long reviewId, UpdateReviewRequest updateReviewRequest, List<MultipartFile> images) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
         Reservation reservation = reservationRepository.findById(review.getReservationId()).orElseThrow(IllegalArgumentException::new);
         Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(IllegalArgumentException::new);
@@ -57,7 +58,8 @@ public class ReviewService {
         review.changeComment(updateReviewRequest.getComment());
         review.changeRating(updateReviewRequest.getRating());
         review.changeVisible(updateReviewRequest.getVisible());
-        review.changeImage(updateReviewRequest.getImages());
+        review.getImages().removeIf(reviewImage -> !images.contains(reviewImage));
+        //images.forEach(review::changeImage);
         return ReviewConverter.of(review);
     }
 
