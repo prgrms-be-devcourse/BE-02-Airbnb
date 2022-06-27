@@ -29,6 +29,10 @@ public class RoomServiceForHost {
 
   @Transactional
   public RoomDetailResponse save(CreateRoomRequest createRoomRequest, Long hostId) {
+    //// TODO: 2022/06/24 같은 주소의 집이 새로 저장되면 안될것 같아 추가했습니다.
+    if (roomRepository.existsByAddress(createRoomRequest.getAddress())) {
+      throw new RuntimeException("기존에 등록된 주소가 있습니다.");
+    }
     User user = userRepository.findById(hostId)
         .orElseThrow(RuntimeException::new);
     Room room = RoomConverter.toRoom(createRoomRequest, user);
@@ -44,10 +48,14 @@ public class RoomServiceForHost {
 
     room.setName(updateRoomRequest.getName());
     room.setCharge(updateRoomRequest.getCharge());
-    room.getRoomInfo().setMaxGuest(updateRoomRequest.getRoomInfo().getMaxGuest());
-    room.getRoomInfo().setBedCount(updateRoomRequest.getRoomInfo().getBedCount());
-    updateRoomRequest.getImages().forEach(room::setImage);
     room.setDescription(updateRoomRequest.getDescription());
+
+    // TODO: 2022/06/24 새로 추가되는 이미지에 포함되지 않는 이미지의 연관관계 제거
+    room.getImages().removeIf(roomImage -> !updateRoomRequest.getImages().contains(roomImage));
+    updateRoomRequest.getImages().forEach(room::setImage);
+
+    room.getRoomInfo().setMaxGuest(updateRoomRequest.getMaxGuest());
+    room.getRoomInfo().setBedCount(updateRoomRequest.getBedCount());
     return RoomConverter.ofDetail(room);
   }
 

@@ -21,13 +21,9 @@ public class UpdateRoomRequest {
   private Integer charge;
   private String name;
   private String description;
-  private RoomInfo roomInfo;
-  private RoomType roomType;
+  private Integer maxGuest;
+  private Integer bedCount;
   @Builder.Default
   private List<RoomImage> images = new ArrayList<>();
-  private Long userId;
 
-  public void setUserId(Long userId) {
-    this.userId = userId;
-  }
 }
