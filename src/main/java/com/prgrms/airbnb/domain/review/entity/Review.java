@@ -2,15 +2,20 @@ package com.prgrms.airbnb.domain.review.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ObjectUtils;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "review")
@@ -71,7 +76,7 @@ public class Review extends BaseEntity {
         setVisible(visible);
     }
 
-    public void changeImage(ReviewImage reviewImage) {
+    public void addImage(ReviewImage reviewImage) {
         reviewImage.setReview(this);
     }
 
