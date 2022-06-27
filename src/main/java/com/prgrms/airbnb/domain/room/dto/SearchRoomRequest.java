@@ -12,9 +12,10 @@ public class SearchRoomRequest {
 
   private String keyword;
   private RoomType roomType;
-  private RoomInfo roomInfo;
+  private Integer maxGuest;
+  private Integer roomCount;
+  private Integer bedCount;
   private Integer minCharge;
   private Integer maxCharge;
   private Double rating;
-
 }
