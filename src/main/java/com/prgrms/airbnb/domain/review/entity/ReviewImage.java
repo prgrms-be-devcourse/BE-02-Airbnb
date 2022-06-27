@@ -1,7 +1,6 @@
 package com.prgrms.airbnb.domain.review.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
-import com.prgrms.airbnb.domain.room.entity.Room;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +29,7 @@ public class ReviewImage extends BaseEntity {
         this.path = path;
     }
 
-    public void setReview(Room room) {
+    public void setReview(Review review) {
         if (this.review != null) {
             this.review.getImages().remove(this);
         }

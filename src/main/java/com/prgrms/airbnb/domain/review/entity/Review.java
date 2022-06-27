@@ -1,6 +1,7 @@
 package com.prgrms.airbnb.domain.review.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,7 +43,7 @@ public class Review extends BaseEntity {
         setRating(rating);
         setReservationId(reservationId);
         setVisible(visible);
-        setImages(images);
+        images.forEach(this::setImage);
     }
 
     public Review(Long id, String comment, Integer rating, String reservationId, Boolean visible, List<ReviewImage> images) {
@@ -51,7 +52,7 @@ public class Review extends BaseEntity {
         setRating(rating);
         setReservationId(reservationId);
         setVisible(visible);
-        setImages(images);
+        images.forEach(this::setImage);
     }
 
     public Boolean isVisible() {
@@ -70,11 +71,12 @@ public class Review extends BaseEntity {
         setVisible(visible);
     }
 
-    public void changeImage(List<ReviewImage> images) {
-        if (!ObjectUtils.isEmpty(images)) {
-            images.clear();
-        }
-        setImages(images);
+    public void changeImage(ReviewImage reviewImage) {
+        reviewImage.setReview(this);
+    }
+
+    public void deleteImage(RoomImage roomImage) {
+        roomImage.deleteRoom();
     }
 
     private void setComment(String comment) {
@@ -105,7 +107,7 @@ public class Review extends BaseEntity {
         this.visible = visible;
     }
 
-    private void setImages(List<ReviewImage> images) {
-        this.images = images;
+    private void setImage(ReviewImage reviewImage) {
+        reviewImage.setReview(this);
     }
 }

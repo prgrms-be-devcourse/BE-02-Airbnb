@@ -139,8 +139,8 @@ public class Room extends BaseEntity {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public class ReviewInfo {
 
-        private Double reviewRating;
-        private Long reviewCount;
+        private Double reviewRating = 0.0;
+        private Long reviewCount = 0L;
 
         public ReviewInfo(Double reviewRating, Long reviewCount) {
             if (reviewCount < 0) {
