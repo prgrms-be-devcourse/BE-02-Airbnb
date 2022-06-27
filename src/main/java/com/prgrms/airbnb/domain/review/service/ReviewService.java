@@ -35,9 +35,9 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse save(String reservationId, CreateReviewRequest createReviewRequest) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(IllegalArgumentException::new);
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(IllegalArgumentException::new);
         if (!reservation.canReviewed()) {
+            //TODO: 리뷰를 남길 수 없는 경우.
             throw new IllegalArgumentException();
         }
         Review review = ReviewConverter.toReview(reservationId, createReviewRequest);
@@ -51,6 +51,9 @@ public class ReviewService {
     @Transactional
     public ReviewResponse modify(Long reviewId, UpdateReviewRequest updateReviewRequest) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
+        Reservation reservation = reservationRepository.findById(review.getReservationId()).orElseThrow(IllegalArgumentException::new);
+        Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(IllegalArgumentException::new);
+        room.getReviewInfo().changeReviewInfo(review.getRating(), updateReviewRequest.getRating());
         review.changeComment(updateReviewRequest.getComment());
         review.changeRating(updateReviewRequest.getRating());
         review.changeVisible(updateReviewRequest.getVisible());

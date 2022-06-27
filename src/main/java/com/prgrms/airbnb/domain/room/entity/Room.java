@@ -155,5 +155,10 @@ public class Room extends BaseEntity {
             reviewCount += 1;
             reviewRating = (totalRating + newRating) / reviewCount;
         }
+
+        public void changeReviewInfo(Integer oldRating, Integer newRating) {
+            double totalRating = reviewRating * reviewCount - oldRating;
+            reviewRating = (totalRating + newRating) / reviewCount;
+        }
     }
 }
