@@ -15,6 +15,7 @@ import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,15 +74,23 @@ public class ReviewService {
     review.changeComment(updateReviewRequest.getComment());
     review.changeRating(updateReviewRequest.getRating());
     review.changeVisible(updateReviewRequest.getVisible());
-    review.getImages().removeIf(reviewImage -> !images.contains(reviewImage));
-    //images.forEach(review::changeImage);
+    //HINT 기존 이미지에서 지워진 것들을 s3에서 삭제 및 연관 관계 제거
+    review.getImages().stream()
+        .filter(Predicate.not(updateReviewRequest.getImages()::contains))
+        .forEach(reviewImage -> {
+          uploadService.delete(reviewImage.getPath());
+          reviewImage.deleteReview();
+        });
+    //HINT 새로 업로드된 이미지들을 업로드
+    images.stream()
+        .map(image -> uploadService.uploadImg(image))
+        .map(path -> new ReviewImage(path))
+        .forEach(review::addImage);
     return ReviewConverter.of(review);
   }
 
   public List<ReviewResponse> findAllByRoomId(Long roomId, User user) {
     List<Review> reviewList = reviewRepository.findAllByRoomId(roomId);
-
-    //HINT 리뷰 작성자가 아니면서 익명 글일땐 List에 추가하지 않는다.
     return reviewList.stream()
         .filter(review -> {
           Reservation reservation = reservationRepository.findById(review.getReservationId())
@@ -100,6 +109,4 @@ public class ReviewService {
     review.getImages().forEach(reviewImage -> uploadService.delete(reviewImage.getPath()));
     reviewRepository.delete(review);
   }
-
-
 }
