@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
+import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.util.UserConverter;
 import java.util.ArrayList;
@@ -137,6 +138,82 @@ class UserServiceTest {
       Throwable response = catchThrowable(() -> userService.findById(0L).orElseThrow());
       // Then
       assertThat(response).isInstanceOf(Exception.class);
+    }
+  }
+
+  @Nested
+  @DisplayName("유저 정보 수정 테스트")
+  class ModifyTest {
+
+    List<User> userList;
+
+    @BeforeEach
+    void setUp() {
+      userList = new ArrayList<>();
+      User user = userService.join(
+          mockOAuth2User("moosong", getAttributes("moosong", "profileImage", "songe08@gmail.com")),
+          "kakao"
+      );
+      userList.add(user);
+      User user2 = userService.join(
+          mockOAuth2User("MS", getAttributes("MS", "profileImage", "real@gmail.com")),
+          "kakao"
+      );
+      userList.add(user2);
+    }
+
+    @Test
+    @DisplayName("성공 : 존재하는 ID를 수정하는 경우")
+    void success() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder()
+          .email("tiger@naver.com")
+          .name("tiger")
+          .build();
+      // When, Then
+      userList.forEach(user -> {
+        UserDetailResponse actual = userService.modify(user.getId(), request);
+        assertThat(actual).isEqualTo(UserConverter.from(user));
+      });
+    }
+
+    @Test
+    @DisplayName("실패 : 존재하지 않는 ID를 수정하는 경우 예외가 발생합니다.")
+    void fail() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder().build();
+      // When
+      Throwable response = catchThrowable(() -> userService.modify(0L, request));
+      // Then
+      assertThat(response).isInstanceOf(Exception.class);
+    }
+
+    @Test
+    @DisplayName("실패 : 변경하고자 하는 이름이 비어있는 경우 예외가 발생합니다.")
+    void failByNullName() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder()
+          .email("tiger@naver.com")
+          .build();
+      // When, Then
+      userList.forEach(user -> {
+        Throwable response = catchThrowable(()-> userService.modify(user.getId(), request));
+        assertThat(response).isInstanceOf(Exception.class);
+      });
+    }
+
+    @Test
+    @DisplayName("실패 : 변경하고자 하는 이메일이 비어있는 경우 예외가 발생합니다.")
+    void failByNullEmail() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder()
+          .name("tiger")
+          .build();
+      // When, Then
+      userList.forEach(user -> {
+        Throwable response = catchThrowable(()-> userService.modify(user.getId(), request));
+        assertThat(response).isInstanceOf(Exception.class);
+      });
     }
   }
 
