@@ -26,7 +26,7 @@ public class RoomDetailResponse {
   private RoomInfo roomInfo;
   private RoomType roomType;
   @Builder.Default
-  private List<RoomImage> images = new ArrayList<>();
+  private List<RoomImage> roomImages = new ArrayList<>();
   private Long userId;
 
 }

@@ -3,10 +3,11 @@ package com.prgrms.airbnb.domain.room.repository;
 import static com.prgrms.airbnb.domain.room.entity.QRoom.room;
 import static com.prgrms.airbnb.domain.room.entity.QRoomImage.roomImage;
 
-import com.prgrms.airbnb.domain.room.dto.QRoomSummaryResponse;
+import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.entity.RoomType;
 import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.dto.SearchRoomRequest;
+import com.prgrms.airbnb.domain.room.util.RoomConverter;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -15,6 +16,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -34,25 +36,17 @@ public class RoomSearchRepositoryImpl implements RoomSearchRepository {
   public Slice<RoomSummaryResponse> searchRoom(SearchRoomRequest searchRoomRequest,
       Pageable pageable) {
 
-    JPAQuery<RoomSummaryResponse> roomJPAQuery = jpaQueryFactory
-        .select(new QRoomSummaryResponse(
-            room.id,
-            room.address,
-            room.charge,
-            room.name,
-            room.roomType,
-            room.images
-        ))
-        .from(room)
-        .leftJoin(room.images, roomImage)
+    JPAQuery<Room> roomJPAQuery = jpaQueryFactory
+        .selectFrom(room)
+        .join(room.roomImages, roomImage).fetchJoin()
         .where(
             keywordListContains(searchRoomRequest.getKeyword()),
             roomTypeEq(searchRoomRequest.getRoomType()),
             minCharge(searchRoomRequest.getMinCharge()),
             maxCharge(searchRoomRequest.getMaxCharge()),
-            maxGuestNum(searchRoomRequest.getRoomInfo().getMaxGuest()),
-            minRoomCount(searchRoomRequest.getRoomInfo().getRoomCount()),
-            minBedCount(searchRoomRequest.getRoomInfo().getBedCount()),
+            maxGuestNum(searchRoomRequest.getMaxGuest()),
+            minRoomCount(searchRoomRequest.getRoomCount()),
+            minBedCount(searchRoomRequest.getBedCount()),
             minRating(searchRoomRequest.getRating())
         )
         .offset(pageable.getOffset())
@@ -65,7 +59,8 @@ public class RoomSearchRepositoryImpl implements RoomSearchRepository {
           pathBuilder.get(o.getProperty())));
     }
 
-    List<RoomSummaryResponse> roomList = roomJPAQuery.fetch();
+    List<RoomSummaryResponse> roomList = roomJPAQuery.fetch()
+        .stream().map(RoomConverter::ofSummary).collect(Collectors.toList());
     boolean hasNext = false;
 
     if (roomList.size() > pageable.getPageSize()) {
@@ -112,10 +107,8 @@ public class RoomSearchRepositoryImpl implements RoomSearchRepository {
     BooleanBuilder builder = new BooleanBuilder();
     String[] splitedKeyword = keyword.split(" ");
     for (String value : splitedKeyword) {
-      builder.and(room.name.contains(value));
+      builder.and(room.name.containsIgnoreCase(value));
     }
     return builder;
   }
-
-
 }

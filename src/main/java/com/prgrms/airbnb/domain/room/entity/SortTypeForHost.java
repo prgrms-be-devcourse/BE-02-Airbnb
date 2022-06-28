@@ -8,7 +8,7 @@ public enum SortTypeForHost {
 
   RECENTLY {
     public Slice<Room> findByHost(Long hostId, Pageable pageable, RoomRepository roomRepository) {
-      return roomRepository.findByUserIdOrderByCreatedAt(hostId, pageable);
+      return roomRepository.findAllByUserIdOrderByCreatedAtDesc(hostId, pageable);
     }
   },
   RATING {

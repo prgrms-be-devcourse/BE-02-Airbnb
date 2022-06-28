@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import org.springframework.util.ObjectUtils;
 
 @Entity
 @Table(name = "room_image")
@@ -32,14 +31,14 @@ public class RoomImage extends BaseEntity {
 
   public void setRoom(Room room) {
     if (this.room != null) {
-      this.room.getImages().remove(this);
+      this.room.getRoomImages().remove(this);
     }
     this.room = room;
-    room.getImages().add(this);
+    room.getRoomImages().add(this);
   }
 
   public void deleteRoom() {
-    this.room.getImages().remove(this);
+    this.room.getRoomImages().remove(this);
     this.room = null;
   }
 }
