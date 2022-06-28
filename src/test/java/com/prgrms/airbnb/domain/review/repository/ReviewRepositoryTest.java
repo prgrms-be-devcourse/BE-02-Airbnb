@@ -13,6 +13,7 @@ import com.prgrms.airbnb.domain.room.entity.RoomType;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -171,6 +172,31 @@ class ReviewRepositoryTest {
       reviewRepository.save(review);
       review.changeVisible(false);
       Assertions.assertThat(review.getVisible()).isEqualTo(false);
+    }
+  }
+
+  @Nested
+  @DisplayName("리뷰 삭제 테스트")
+  class deleteTest {
+
+    @Test
+    @DisplayName("성공: review를 삭제합니다.")
+    void deleteReview() {
+      Review review = new Review(comment, rating, "245325", true,
+          List.of(reviewImage1, reviewImage2));
+      reviewRepository.save(review);
+      reviewRepository.deleteById(review.getId());
+      Assertions.assertThat(reviewRepository.findById(review.getId())).isEqualTo(Optional.empty());
+    }
+
+    @Test
+    @DisplayName("실패: 없는 ID로 review를 삭제합니다.")
+    void faildeleteReview() {
+      Review review = new Review(comment, rating, "245325", true,
+          List.of(reviewImage1, reviewImage2));
+      reviewRepository.save(review);
+      reviewRepository.delete(review);
+      Assertions.assertThat(reviewRepository.existsById(review.getId())).isFalse();
     }
   }
 }
