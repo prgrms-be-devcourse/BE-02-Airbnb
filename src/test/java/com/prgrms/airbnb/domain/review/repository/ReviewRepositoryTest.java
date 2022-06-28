@@ -79,7 +79,7 @@ class ReviewRepositoryTest {
 
   @Nested
   @DisplayName("리뷰 저장 테스트")
-  class saveTest {
+  class SaveTest {
 
     @Test
     @DisplayName("성공: 빈 이미지인 경우 review를 저장합니다.")
@@ -143,7 +143,7 @@ class ReviewRepositoryTest {
 
   @Nested
   @DisplayName("리뷰 수정 테스트")
-  class changeTest {
+  class ChangeTest {
 
     @Test
     @DisplayName("성공: review comment 수정합니다.")
@@ -178,7 +178,7 @@ class ReviewRepositoryTest {
 
   @Nested
   @DisplayName("리뷰 삭제 테스트")
-  class deleteTest {
+  class DeleteTest {
 
     @Test
     @DisplayName("성공: review를 삭제합니다.")
