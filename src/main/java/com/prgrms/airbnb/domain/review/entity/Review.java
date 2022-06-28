@@ -97,6 +97,9 @@ public class Review extends BaseEntity {
     if (ObjectUtils.isEmpty(rating)) {
       throw new IllegalArgumentException();
     }
+    if (rating < 0 || rating > 5) {
+      throw new RuntimeException();
+    }
     this.rating = rating;
   }
 
