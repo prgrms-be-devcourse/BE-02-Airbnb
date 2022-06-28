@@ -1,6 +1,7 @@
 package com.prgrms.airbnb.domain.review.dto;
 
 import com.prgrms.airbnb.domain.review.entity.ReviewImage;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,5 +17,6 @@ public class UpdateReviewRequest {
   private String comment;
   private Integer rating;
   private Boolean visible;
-  private List<ReviewImage> images;
+  @Builder.Default
+  private List<ReviewImage> images = new ArrayList<>();
 }
