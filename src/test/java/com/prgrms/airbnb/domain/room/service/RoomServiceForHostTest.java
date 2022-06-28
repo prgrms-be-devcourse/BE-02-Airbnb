@@ -176,9 +176,11 @@ class RoomServiceForHostTest {
     }
   }
 
-  static public MockMultipartFile getMockMultipartFile(String fileName, String contentType, String path) throws IOException {
+  static public MockMultipartFile getMockMultipartFile(String fileName, String contentType,
+      String path) throws IOException {
     FileInputStream fileInputStream = new FileInputStream(new File(path));
-    return new MockMultipartFile(fileName, fileName + "." + contentType, contentType, fileInputStream);
+    return new MockMultipartFile(
+        fileName, fileName + "." + contentType, contentType, fileInputStream);
   }
 
   @AfterEach

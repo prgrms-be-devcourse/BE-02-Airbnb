@@ -23,8 +23,4 @@ public class CreateRoomRequest {
   private RoomType roomType;
   @Builder.Default
   private List<RoomImage> roomImages = new ArrayList<>();
-
-  public void setRoomImages(List<RoomImage> roomImages) {
-    this.roomImages = roomImages;
-  }
 }

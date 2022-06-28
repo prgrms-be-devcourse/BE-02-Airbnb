@@ -12,6 +12,7 @@ import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.room.util.RoomConverter;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -48,14 +49,15 @@ public class RoomServiceForHost {
       throw new RuntimeException("기존에 등록된 주소가 있습니다.");
     }
 
+    List<RoomImage> roomImages = new ArrayList<>();
     if (multipartFiles != null && multipartFiles.size() > 0) {
-      createRoomRequest.setRoomImages(multipartFiles.stream().map(
-          m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList()));
+      roomImages = multipartFiles.stream().map(
+          m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList());
     }
 
     User user = userRepository.findById(hostId)
         .orElseThrow(RuntimeException::new);
-    Room room = RoomConverter.toRoom(createRoomRequest, user);
+    Room room = RoomConverter.toRoom(createRoomRequest, roomImages, user);
     Room savedRoom = roomRepository.save(room);
 
     return RoomConverter.ofDetail(savedRoom);
@@ -76,12 +78,12 @@ public class RoomServiceForHost {
     room.setDescription(updateRoomRequest.getDescription());
 
     if (multipartFiles != null) {
-      List<RoomImage> updateRoomImageList = multipartFiles.stream().map(
+      List<RoomImage> newRoomImages = multipartFiles.stream().map(
           m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList());
 
       room.getRoomImages()
-          .removeIf(roomImage -> !updateRoomImageList.contains(roomImage));
-      updateRoomImageList.forEach(room::setImage);
+          .removeIf(roomImage -> !newRoomImages.contains(roomImage));
+      newRoomImages.forEach(room::setImage);
     }
 
     room.getRoomInfo().setMaxGuest(updateRoomRequest.getMaxGuest());
