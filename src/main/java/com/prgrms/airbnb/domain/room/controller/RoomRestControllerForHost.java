@@ -32,7 +32,10 @@ public class RoomRestControllerForHost {
             @AuthenticationPrincipal JwtAuthentication authentication,
             @RequestPart(value = "room") CreateRoomRequest createRoomRequest,
             @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) {
-        RoomDetailResponse response = roomService.save(createRoomRequest, authentication.userId);
+
+        RoomDetailResponse response
+            = roomService.save(createRoomRequest, multipartFiles, authentication.userId);
+
         return ResponseEntity.created(URI.create("/api/v1/room/" + response.getId()))
                 .body(response);
     }
@@ -44,7 +47,8 @@ public class RoomRestControllerForHost {
             @AuthenticationPrincipal JwtAuthentication authentication) {
 
         Long userId = authentication.userId;
-        RoomDetailResponse modifiedRoom = roomService.modify(updateRoomRequest, userId);
+        RoomDetailResponse modifiedRoom
+            = roomService.modify(updateRoomRequest, multipartFiles, userId);
 
         return ResponseEntity.ok(modifiedRoom);
     }
@@ -56,7 +60,8 @@ public class RoomRestControllerForHost {
             Pageable pageable) {
 
         Long hostId = authentication.userId;
-        Slice<RoomSummaryResponse> pagesHostId = roomService.findByHostId(hostId, sortType, pageable);
+        Slice<RoomSummaryResponse> pagesHostId
+            = roomService.findByHostId(hostId, sortType, pageable);
 
         return ResponseEntity.ok(pagesHostId);
     }
@@ -64,18 +69,17 @@ public class RoomRestControllerForHost {
     @GetMapping("/{roomId}")
     public ResponseEntity<RoomDetailResponse> getDetail(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable("roomId") Long roomId
-    ) {
-        RoomDetailResponse roomDetailInfo = roomService.findDetailById(roomId, authentication.userId);
+            @PathVariable("roomId") Long roomId) {
 
+        RoomDetailResponse roomDetailInfo
+            = roomService.findDetailById(roomId, authentication.userId);
         return ResponseEntity.ok(roomDetailInfo);
     }
 
     @DeleteMapping("/{roomId}")
     public ResponseEntity<Object> delete(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable("roomId") Long roomId
-    ) {
+            @PathVariable("roomId") Long roomId) {
 
         roomService.remove(roomId, authentication.userId);
         return ResponseEntity.noContent().build();
