@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateReviewRequest {
-    private String comment;
-    private Integer rating;
-    private Boolean visible;
+
+  private String comment;
+  private Integer rating;
+  private Boolean visible;
 }
