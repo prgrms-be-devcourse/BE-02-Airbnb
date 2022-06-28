@@ -111,7 +111,7 @@ public class Review extends BaseEntity {
   }
 
   private void setVisible(Boolean visible) {
-    if (ObjectUtils.isEmpty(reservationId)) {
+    if (ObjectUtils.isEmpty(visible)) {
       throw new IllegalArgumentException();
     }
     this.visible = visible;

@@ -16,6 +16,7 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -49,33 +50,6 @@ class ReviewRepositoryTest {
   }
 
   @Test
-  @DisplayName("성공: 빈 이미지인 경우")
-  void empty_image_save() {
-    Review review = new Review(comment, rating, "245325", true, List.of());
-    reviewRepository.save(review);
-    Assertions.assertThat(review.getId()).isNotNull();
-    Assertions.assertThat(review.getImages()).isEmpty();
-  }
-
-  @Test
-  @DisplayName("성공: 여러 이미지인 경우")
-  void review_save() {
-    Review review = new Review(comment, rating, "245325", true,
-        List.of(reviewImage1, reviewImage2));
-    reviewRepository.save(review);
-    Assertions.assertThat(review.getId()).isNotNull();
-    Assertions.assertThat(review.getImages()).isNotEmpty();
-  }
-
-  @Test
-  @DisplayName("실패: comment = nll -> 예외 발생")
-  void failCommentIsNull() {
-    Assertions.assertThatThrownBy(
-            () -> new Review("", rating, "245325", true, List.of(reviewImage1, reviewImage2)))
-        .isInstanceOf(IllegalArgumentException.class);
-  }
-
-  @Test
   @DisplayName("성공: roomId를 통해 review를 최신순으로 검색합니다.")
   void findAllByRoomId() {
     room = new Room(new Address("1", "2"), 30000, "담양 떡갈비", "뷰가 좋습니다", new RoomInfo(1, 2, 3, 4),
@@ -97,6 +71,106 @@ class ReviewRepositoryTest {
     reviewRepository.save(review2);
     List<Review> reviewListOrderByCreatedAtDesc = reviewRepository.findAllByRoomId(room.getId());
     Assertions.assertThat(reviewListOrderByCreatedAtDesc.size()).isEqualTo(2);
-    Assertions.assertThat(reviewListOrderByCreatedAtDesc.get(0).getId()).isNotEqualTo(review1.getId());
+    Assertions.assertThat(reviewListOrderByCreatedAtDesc.get(0).getId())
+        .isNotEqualTo(review1.getId());
+  }
+
+  @Nested
+  @DisplayName("리뷰 저장 테스트")
+  class saveTest {
+
+    @Test
+    @DisplayName("성공: 빈 이미지인 경우 review를 저장합니다.")
+    void empty_image_save() {
+      Review review = new Review(comment, rating, "245325", true, List.of());
+      reviewRepository.save(review);
+      Assertions.assertThat(review.getId()).isNotNull();
+      Assertions.assertThat(review.getImages()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("성공: 여러 이미지인 경우 review를 저장합니다.")
+    void review_save() {
+      Review review = new Review(comment, rating, "245325", true,
+          List.of(reviewImage1, reviewImage2));
+      reviewRepository.save(review);
+      Assertions.assertThat(review.getId()).isNotNull();
+      Assertions.assertThat(review.getImages()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("실패: comment이 null일때 예외가 발생합니다.")
+    void failCommentIsNull() {
+      Assertions.assertThatThrownBy(
+              () -> new Review("", rating, "245325", true, List.of(reviewImage1, reviewImage2)))
+          .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("실패: rating이 null일때 예외가 발생합니다.")
+    void failRatingIsNull() {
+      Assertions.assertThatThrownBy(
+              () -> new Review(comment, null, "245325", true, List.of(reviewImage1, reviewImage2)))
+          .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("실패: rating이 0~5 범위를 벗어났을때 예외가 발생합니다.")
+    void failRatingIsOutOfBoundary() {
+      Assertions.assertThatThrownBy(
+              () -> new Review(comment, 7, "245325", true, List.of(reviewImage1, reviewImage2)))
+          .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    @DisplayName("실패: reservationId가 null일때 예외가 발생합니다.")
+    void failReservationIsNull() {
+      Assertions.assertThatThrownBy(
+              () -> new Review(comment, rating, null, true, List.of(reviewImage1, reviewImage2)))
+          .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("실패: visible이 null일때 예외가 발생합니다.")
+    void failVisibleIsNull() {
+      Assertions.assertThatThrownBy(
+              () -> new Review(comment, rating, "245325", null, List.of(reviewImage1, reviewImage2)))
+          .isInstanceOf(IllegalArgumentException.class);
+    }
+  }
+
+  @Nested
+  @DisplayName("리뷰 수정 테스트")
+  class changeTest {
+
+    @Test
+    @DisplayName("성공: review comment 수정합니다.")
+    void changeComment() {
+      Review review = new Review(comment, rating, "245325", true,
+          List.of(reviewImage1, reviewImage2));
+      reviewRepository.save(review);
+      review.changeComment("change");
+      Assertions.assertThat(review.getComment()).isEqualTo("change");
+    }
+
+    @Test
+    @DisplayName("성공: review rating을 수정합니다.")
+    void changeRating() {
+      Review review = new Review(comment, rating, "245325", true,
+          List.of(reviewImage1, reviewImage2));
+      reviewRepository.save(review);
+      review.changeRating(3);
+      Assertions.assertThat(review.getRating()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("성공: review visible을 수정합니다.")
+    void changeVisible() {
+      Review review = new Review(comment, rating, "245325", true,
+          List.of(reviewImage1, reviewImage2));
+      reviewRepository.save(review);
+      review.changeVisible(false);
+      Assertions.assertThat(review.getVisible()).isEqualTo(false);
+    }
   }
 }
