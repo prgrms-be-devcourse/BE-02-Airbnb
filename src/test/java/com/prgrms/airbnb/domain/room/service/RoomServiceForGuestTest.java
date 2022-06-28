@@ -10,7 +10,6 @@ import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
 import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.dto.SearchRoomRequest;
 import com.prgrms.airbnb.domain.room.entity.Room;
-import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import com.prgrms.airbnb.domain.room.entity.RoomInfo;
 import com.prgrms.airbnb.domain.room.entity.RoomType;
 import com.prgrms.airbnb.domain.room.repository.RoomImageRepository;
@@ -19,9 +18,6 @@ import com.prgrms.airbnb.domain.user.entity.Group;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.GroupRepository;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,10 +84,14 @@ class RoomServiceForGuestTest {
     defaultRoomType = RoomType.APARTMENT;
     defaultMultipartFiles = new ArrayList<>();
 
-    mockMultipartFile1 = getMockMultipartFile("testCustomerUpload1", "png",
-        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerUpload1.png");
-    mockMultipartFile2 = getMockMultipartFile("testCustomerUpload2", "png",
-        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerUpload2.png");
+    String testCustomerUpload1 = "testCustomerUpload1";
+    String png = "png";
+    String path1 = "src/test/resources/uploadFile/testCustomerUpload1.png";
+    mockMultipartFile1 = getMockMultipartFile(testCustomerUpload1, png, path1);
+
+    String testCustomerUpload2 = "testCustomerUpload2";
+    String path2 = "src/test/resources/uploadFile/testCustomerUpload2.png";
+    mockMultipartFile2 = getMockMultipartFile(testCustomerUpload2, png, path2);
 
     defaultMultipartFiles.add(mockMultipartFile1);
     defaultMultipartFiles.add(mockMultipartFile2);

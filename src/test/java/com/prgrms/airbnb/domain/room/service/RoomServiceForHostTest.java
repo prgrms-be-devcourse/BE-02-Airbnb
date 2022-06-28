@@ -100,10 +100,14 @@ class RoomServiceForHostTest {
     defaultRoomType = RoomType.APARTMENT;
     defaultMultipartFiles = new ArrayList<>();
 
-    mockMultipartFile1 = getMockMultipartFile("testCustomerUpload1", "png",
-        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerUpload1.png");
-    mockMultipartFile2 = getMockMultipartFile("testCustomerUpload2", "png",
-        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerUpload2.png");
+    String testCustomerUpload1 = "testCustomerUpload1";
+    String uploadPath1 = "src/test/resources/uploadFile/testCustomerUpload1.png";
+    String png = "png";
+    mockMultipartFile1 = getMockMultipartFile(testCustomerUpload1, png, uploadPath1);
+
+    String testCustomerUpload2 = "testCustomerUpload2";
+    String uploadPath2 = "src/test/resources/uploadFile//testCustomerUpload2.png";
+    mockMultipartFile2 = getMockMultipartFile(testCustomerUpload2, png, uploadPath2);
 
     defaultMultipartFiles.add(mockMultipartFile1);
     defaultMultipartFiles.add(mockMultipartFile2);
@@ -330,12 +334,18 @@ class RoomServiceForHostTest {
     changedBedCount = 2;
     changedMultipartFiles = new ArrayList<>();
 
-    changedMockMultipartFile1 = getMockMultipartFile("testCustomerChange1", "png",
-        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerChange1.png");
-    changedMockMultipartFile2 = getMockMultipartFile("testCustomerChange2", "png",
-        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerChange2.png");
-    changedMockMultipartFile3 = getMockMultipartFile("testCustomerChange3", "png",
-        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerChange3.png");
+    String testCustomerChange1 = "testCustomerChange1";
+    String changePath1 = "src/test/resources/uploadFile/testCustomerChange1.png";
+    String png = "png";
+    changedMockMultipartFile1 = getMockMultipartFile(testCustomerChange1, png, changePath1);
+
+    String testCustomerChange2 = "testCustomerChange2";
+    String changePath2 = "src/test/resources/uploadFile/testCustomerChange2.png";
+    changedMockMultipartFile2 = getMockMultipartFile(testCustomerChange2, png, changePath2);
+
+    String testCustomerChange3 = "testCustomerChange3";
+    String changePath3 = "src/test/resources/uploadFile/testCustomerChange3.png";
+    changedMockMultipartFile3 = getMockMultipartFile(testCustomerChange3, png, changePath3);
 
     changedMultipartFiles.add(changedMockMultipartFile1);
     changedMultipartFiles.add(changedMockMultipartFile2);
