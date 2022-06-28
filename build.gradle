@@ -109,7 +109,9 @@ jacocoTestCoverageVerification {
 				minimum = 0.85
 			}
 
-			excludes = []
+			excludes = [
+			        '*.Q*'
+			]
 		}
 	}
 }

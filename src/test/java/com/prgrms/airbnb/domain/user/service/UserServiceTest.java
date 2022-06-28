@@ -1,7 +1,15 @@
 package com.prgrms.airbnb.domain.user.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
 import com.prgrms.airbnb.domain.common.entity.Email;
+import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
+import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;
 import com.prgrms.airbnb.domain.user.entity.User;
+import com.prgrms.airbnb.domain.user.util.UserConverter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,18 +17,14 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
@@ -33,15 +37,10 @@ class UserServiceTest {
   @Nested
   @DisplayName("사용자 가입 테스트")
   class JoinTest {
-    List<User> userList;
-
-    @BeforeEach
-    void setUp() {
-      userList = new ArrayList<>();
-    }
 
     @ParameterizedTest
-    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'", "'송무송', 'profile_image', 'real.purple@gmail.com'"})
+    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'",
+        "'송무송', 'profile_image', 'real.purple@gmail.com'"})
     @DisplayName("성공: 각 항목에 알맞은 값이 기입되면 정상적으로 사용자가 가입됩니다.")
     void success(String nickName, String profileImage, String email) {
       // Given, When
@@ -57,7 +56,8 @@ class UserServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'", "'송무송', 'profile_image', 'real.purple@gmail.com'"})
+    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'",
+        "'송무송', 'profile_image', 'real.purple@gmail.com'"})
     @DisplayName("성공: 프로필이 널값이어도 정상적으로 생성됩니다.")
     void successByProfileImage(String nickName, String profileImage, String email) {
       // Given, When
@@ -86,7 +86,8 @@ class UserServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'", "'송무송', 'profile_image', 'real.purple@gmail.com'"})
+    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'",
+        "'송무송', 'profile_image', 'real.purple@gmail.com'"})
     @DisplayName("실패: 이름이 널값이면 예외를 반환합니다.")
     void failByName(String nickName, String profileImage, String email) {
       // Given, When
@@ -96,6 +97,123 @@ class UserServiceTest {
       ));
       // Then
       assertThat(response).isInstanceOf(IllegalArgumentException.class);
+    }
+  }
+
+  @Nested
+  @DisplayName("유저 정보 ID로 조회 테스트")
+  class FindByIdTest {
+
+    List<User> userList;
+
+    @BeforeEach
+    void setUp() {
+      userList = new ArrayList<>();
+      User user = userService.join(
+          mockOAuth2User("moosong", getAttributes("moosong", "profileImage", "songe08@gmail.com")),
+          "kakao"
+      );
+      userList.add(user);
+      User user2 = userService.join(
+          mockOAuth2User("MS", getAttributes("MS", "profileImage", "real@gmail.com")),
+          "kakao"
+      );
+      userList.add(user2);
+    }
+
+    @Test
+    @DisplayName("성공 : 존재하는 ID를 조회하는 경우")
+    void success() {
+      // Given, When, Then
+      userList.forEach(user -> {
+        UserDetailResponse actual = userService.findById(user.getId()).orElseThrow();
+        assertThat(actual).isEqualTo(UserConverter.from(user));
+      });
+    }
+
+    @Test
+    @DisplayName("실패 : 존재하지 않는 ID를 조회하는 경우")
+    void fail() {
+      // Given, When
+      Throwable response = catchThrowable(() -> userService.findById(0L).orElseThrow());
+      // Then
+      assertThat(response).isInstanceOf(Exception.class);
+    }
+  }
+
+  @Nested
+  @DisplayName("유저 정보 수정 테스트")
+  class ModifyTest {
+
+    List<User> userList;
+
+    @BeforeEach
+    void setUp() {
+      userList = new ArrayList<>();
+      User user = userService.join(
+          mockOAuth2User("moosong", getAttributes("moosong", "profileImage", "songe08@gmail.com")),
+          "kakao"
+      );
+      userList.add(user);
+      User user2 = userService.join(
+          mockOAuth2User("MS", getAttributes("MS", "profileImage", "real@gmail.com")),
+          "kakao"
+      );
+      userList.add(user2);
+    }
+
+    @Test
+    @DisplayName("성공 : 존재하는 ID를 수정하는 경우")
+    void success() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder()
+          .email("tiger@naver.com")
+          .name("tiger")
+          .build();
+      // When, Then
+      userList.forEach(user -> {
+        UserDetailResponse actual = userService.modify(user.getId(), request);
+        assertThat(actual).isEqualTo(UserConverter.from(user));
+      });
+    }
+
+    @Test
+    @DisplayName("실패 : 존재하지 않는 ID를 수정하는 경우 예외가 발생합니다.")
+    void fail() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder().build();
+      // When
+      Throwable response = catchThrowable(() -> userService.modify(0L, request));
+      // Then
+      assertThat(response).isInstanceOf(Exception.class);
+    }
+
+    @Test
+    @DisplayName("실패 : 변경하고자 하는 이름이 비어있는 경우 예외가 발생합니다.")
+    void failByNullName() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder()
+          .email("tiger@naver.com")
+          .build();
+      // When, Then
+      userList.forEach(user -> {
+        Throwable response = catchThrowable(()-> userService.modify(user.getId(), request));
+        assertThat(response).isInstanceOf(Exception.class);
+      });
+    }
+
+    @Test
+    @DisplayName("실패 : 변경하고자 하는 이메일이 비어있는 경우 예외가 발생합니다.")
+    void failByNullEmail() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder()
+          .name("tiger")
+          .build();
+      // When, Then
+      userList.forEach(user -> {
+        Throwable response = catchThrowable(()-> userService.modify(user.getId(), request));
+        assertThat(response).isInstanceOf(Exception.class);
+      });
     }
   }
 

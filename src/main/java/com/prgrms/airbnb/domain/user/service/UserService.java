@@ -60,10 +60,6 @@ public class UserService {
     return userRepository.findById(userId).map(UserConverter::from);
   }
 
-  public Optional<User> findByUsername(String username) {
-    return userRepository.findByUsername(username);
-  }
-
   public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
     return userRepository.findByProviderAndProviderId(provider, providerId);
   }
