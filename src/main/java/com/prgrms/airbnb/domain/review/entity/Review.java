@@ -1,15 +1,21 @@
 package com.prgrms.airbnb.domain.review.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import com.prgrms.airbnb.domain.room.entity.RoomImage;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ObjectUtils;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "review")
@@ -42,7 +48,7 @@ public class Review extends BaseEntity {
         setRating(rating);
         setReservationId(reservationId);
         setVisible(visible);
-        setImages(images);
+        images.forEach(this::setImage);
     }
 
     public Review(Long id, String comment, Integer rating, String reservationId, Boolean visible, List<ReviewImage> images) {
@@ -51,7 +57,7 @@ public class Review extends BaseEntity {
         setRating(rating);
         setReservationId(reservationId);
         setVisible(visible);
-        setImages(images);
+        images.forEach(this::setImage);
     }
 
     public Boolean isVisible() {
@@ -70,13 +76,13 @@ public class Review extends BaseEntity {
         setVisible(visible);
     }
 
-    public void changeImage(List<ReviewImage> images) {
-        if (!ObjectUtils.isEmpty(images)) {
-            images.clear();
-        }
-        setImages(images);
+    public void addImage(ReviewImage reviewImage) {
+        reviewImage.setReview(this);
     }
 
+    public void deleteImage(RoomImage roomImage) {
+        roomImage.deleteRoom();
+    }
 
     private void setComment(String comment) {
         if (StringUtils.isBlank(comment)) {
@@ -106,7 +112,7 @@ public class Review extends BaseEntity {
         this.visible = visible;
     }
 
-    private void setImages(List<ReviewImage> images) {
-        this.images = images;
+    private void setImage(ReviewImage reviewImage) {
+        reviewImage.setReview(this);
     }
 }

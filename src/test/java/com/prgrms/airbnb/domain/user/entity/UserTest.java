@@ -15,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 class UserTest {
 
   @Nested
-  class 생성 {
-
+  class SaveTest {
     @Test
     @DisplayName("성공: 유저 생성에 성공합니다.")
     public void success() throws Exception {

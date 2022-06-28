@@ -99,4 +99,12 @@ public class User extends BaseEntity {
       throw new IllegalArgumentException();
     }
   }
+
+  public void changeName(String name) {
+    setName(name);
+  }
+
+  public void changeEmail(String email) {
+    setEmail(new Email(email));
+  }
 }
