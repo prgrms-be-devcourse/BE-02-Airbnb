@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
@@ -195,8 +196,9 @@ class ReviewRepositoryTest {
       Review review = new Review(comment, rating, "245325", true,
           List.of(reviewImage1, reviewImage2));
       reviewRepository.save(review);
-      reviewRepository.delete(review);
-      Assertions.assertThat(reviewRepository.existsById(review.getId())).isFalse();
+      Assertions.assertThatThrownBy(
+              () -> reviewRepository.deleteById(3L))
+          .isInstanceOf(EmptyResultDataAccessException.class);
     }
   }
 }
