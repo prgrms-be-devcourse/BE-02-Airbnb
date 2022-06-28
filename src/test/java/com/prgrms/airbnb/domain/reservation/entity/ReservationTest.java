@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ReservationTest {
 
   String id;
+
   LocalDate startDate;
 
   LocalDate endDate;
@@ -46,7 +47,7 @@ class ReservationTest {
 
   @Nested
   @DisplayName("생성 테스트")
-  class create {
+  class Create {
 
     @Test
     @DisplayName("성공: 모든 조건 만족")
@@ -307,7 +308,7 @@ class ReservationTest {
 
   @Nested
   @DisplayName("수정 테스트")
-  class update {
+  class Update {
 
     @Test
     @DisplayName("성공: ReservationStatus 변경 가능")
