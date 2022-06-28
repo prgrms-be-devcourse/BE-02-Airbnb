@@ -63,14 +63,17 @@ class ReservationTest {
           roomId
       );
 
-      assertThat(reservation.getId()).isEqualTo(id);
-      assertThat(reservation.getReservationStatus()).isEqualTo(ReservationStatus.WAITED_OK);
-      assertThat(reservation.getStartDate()).isEqualTo(startDate);
-      assertThat(reservation.getEndDate()).isEqualTo(endDate);
-      assertThat(reservation.getTerm()).isEqualTo(term);
-      assertThat(reservation.getTotalPrice()).isEqualTo(term * oneDayCharge);
-      assertThat(reservation.getUserId()).isEqualTo(userId);
-      assertThat(reservation.getRoomId()).isEqualTo(roomId);
+      Reservation reservationDto = new Reservation(
+          id,
+          ReservationStatus.WAITED_OK,
+          startDate,
+          endDate,
+          term,
+          oneDayCharge,
+          userId,
+          roomId
+      );
+      assertThat(reservation).usingRecursiveComparison().isEqualTo(reservationDto);
     }
 
     @Test
