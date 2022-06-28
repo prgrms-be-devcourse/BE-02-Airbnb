@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateReviewRequest {
+
   private String comment;
   private Integer rating;
   private Boolean visible;
