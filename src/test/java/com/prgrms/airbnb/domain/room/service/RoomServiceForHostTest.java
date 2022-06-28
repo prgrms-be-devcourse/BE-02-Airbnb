@@ -3,14 +3,17 @@ package com.prgrms.airbnb.domain.room.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.prgrms.airbnb.domain.common.service.UploadService;
+import com.prgrms.airbnb.domain.room.entity.RoomImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
 import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
 import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.dto.UpdateRoomRequest;
-import com.prgrms.airbnb.domain.room.entity.Room;
-import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import com.prgrms.airbnb.domain.room.entity.RoomInfo;
 import com.prgrms.airbnb.domain.room.entity.RoomType;
 import com.prgrms.airbnb.domain.room.entity.SortTypeForHost;
@@ -22,19 +25,23 @@ import com.prgrms.airbnb.domain.user.repository.GroupRepository;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 @Transactional
 class RoomServiceForHostTest {
 
@@ -53,7 +60,10 @@ class RoomServiceForHostTest {
   @Autowired
   RoomServiceForHost roomServiceForHost;
 
-  Room defaultRoom;
+  @Autowired
+  UploadService uploadService;
+
+  RoomDetailResponse defaultRoomResponse;
   Long hostId;
   Long roomId;
 
@@ -63,14 +73,17 @@ class RoomServiceForHostTest {
   String defaultRoomDescription;
   RoomInfo defaultRoomInfo;
   RoomType defaultRoomType;
-  List<RoomImage> defaultImages;
-  RoomImage defaultRoomImage1;
-  RoomImage defaultRoomImage2;
-  RoomImage defaultRoomImage3;
-  RoomImage defaultRoomImage4;
+  List<MultipartFile> defaultMultipartFiles;
+
+  MockMultipartFile mockMultipartFile1;
+  MockMultipartFile mockMultipartFile2;
+
+  Long hostId1;
+  Long hostId2;
+  Long hostId3;
 
   @BeforeEach
-  void setup() {
+  void setup() throws IOException {
     Group group = groupRepository.findByName("USER_GROUP")
         .orElseThrow(() -> new IllegalStateException("Could not found group for USER_GROUP"));
 
@@ -84,22 +97,84 @@ class RoomServiceForHostTest {
     defaultRoomName = "default roomName";
     defaultRoomDescription = "default roomDescription";
     defaultRoomInfo = new RoomInfo(1, 1, 1, 1);
-    defaultImages = new ArrayList<>();
     defaultRoomType = RoomType.APARTMENT;
-    defaultRoomImage1 = new RoomImage("default roomImage Path 1");
-    defaultRoomImage2 = new RoomImage("default roomImage Path 2");
-    defaultRoomImage3 = new RoomImage("default roomImage Path 3");
-    defaultRoomImage4 = new RoomImage("default roomImage Path 4");
-    defaultImages.add(defaultRoomImage1);
-    defaultImages.add(defaultRoomImage2);
-    defaultImages.add(defaultRoomImage3);
-    defaultImages.add(defaultRoomImage4);
+    defaultMultipartFiles = new ArrayList<>();
 
-    Room room = new Room(defaultAddress, defaultCharge, defaultRoomName, defaultRoomDescription,
-        defaultRoomInfo, defaultRoomType, defaultImages, hostId);
+    mockMultipartFile1 = getMockMultipartFile("testCustomerUpload1", "png",
+        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerUpload1.png");
+    mockMultipartFile2 = getMockMultipartFile("testCustomerUpload2", "png",
+        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerUpload2.png");
 
-    defaultRoom = roomRepository.save(room);
-    roomId = defaultRoom.getId();
+    defaultMultipartFiles.add(mockMultipartFile1);
+    defaultMultipartFiles.add(mockMultipartFile2);
+
+    CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
+        .address(defaultAddress)
+        .charge(defaultCharge)
+        .name(defaultRoomName)
+        .description(defaultRoomDescription)
+        .roomInfo(defaultRoomInfo)
+        .roomType(defaultRoomType)
+        .build();
+
+    defaultRoomResponse = roomServiceForHost.save(createRoomRequest, defaultMultipartFiles, hostId);
+
+    roomId = defaultRoomResponse.getId();
+
+    User user1 = userRepository.save(new User("user1", "provider1", "providerId1",
+        "profileImage1", group, new Email("aaa1@gmail.com")));
+
+    User user2 = userRepository.save(new User("user2", "provider2", "providerId2",
+        "profileImage2", group, new Email("aaa2@gmail.com")));
+
+    User user3 = userRepository.save(new User("user3", "provider3", "providerId3",
+        "profileImage3", group, new Email("aaa3@gmail.com")));
+
+    hostId1 = user1.getId();
+    hostId2 = user2.getId();
+    hostId3 = user3.getId();
+
+    for (int i = 0; i < 10; i++) {
+      Address address = new Address("address1" + i, "address2" + i);
+      CreateRoomRequest createRoomRequest1 = CreateRoomRequest.builder()
+          .address(address)
+          .charge(defaultCharge)
+          .name("userId1의 Room")
+          .description(defaultRoomDescription)
+          .roomInfo(defaultRoomInfo)
+          .roomType(defaultRoomType)
+          .build();
+      roomServiceForHost.save(createRoomRequest1, defaultMultipartFiles, hostId1);
+    }
+    for (int i = 10; i < 20; i++) {
+      Address address = new Address("address1" + i, "address2" + i);
+      CreateRoomRequest createRoomRequest2 = CreateRoomRequest.builder()
+          .address(address)
+          .charge(defaultCharge)
+          .name("userId2의 Room")
+          .description(defaultRoomDescription)
+          .roomInfo(defaultRoomInfo)
+          .roomType(defaultRoomType)
+          .build();
+      roomServiceForHost.save(createRoomRequest2, defaultMultipartFiles, hostId2);
+    }
+    for (int i = 20; i < 30; i++) {
+      Address address = new Address("address1" + i, "address2" + i);
+      CreateRoomRequest createRoomRequest3 = CreateRoomRequest.builder()
+          .address(address)
+          .charge(defaultCharge)
+          .name("userId3의 Room")
+          .description(defaultRoomDescription)
+          .roomInfo(defaultRoomInfo)
+          .roomType(defaultRoomType)
+          .build();
+      roomServiceForHost.save(createRoomRequest3, defaultMultipartFiles, hostId3);
+    }
+  }
+
+  static public MockMultipartFile getMockMultipartFile(String fileName, String contentType, String path) throws IOException {
+    FileInputStream fileInputStream = new FileInputStream(new File(path));
+    return new MockMultipartFile(fileName, fileName + "." + contentType, contentType, fileInputStream);
   }
 
   @AfterEach
@@ -114,11 +189,6 @@ class RoomServiceForHostTest {
   String roomName;
   String roomDescription;
   RoomInfo roomInfo;
-  List<RoomImage> images;
-  RoomImage roomImage1;
-  RoomImage roomImage2;
-  RoomImage roomImage3;
-  RoomImage roomImage4;
 
   @BeforeEach
   void setupForSave() {
@@ -128,23 +198,13 @@ class RoomServiceForHostTest {
     roomName = "roomName";
     roomDescription = "roomDescription";
     roomInfo = new RoomInfo(1, 1, 1, 1);
-    images = new ArrayList<>();
-    roomImage1 = new RoomImage("roomImage Path 1");
-    roomImage2 = new RoomImage("roomImage Path 2");
-    roomImage3 = new RoomImage("roomImage Path 3");
-    roomImage4 = new RoomImage("roomImage Path 4");
-
-    images.add(roomImage1);
-    images.add(roomImage2);
-    images.add(roomImage3);
-    images.add(roomImage4);
   }
 
   @Nested
   class 저장_save {
 
     @Test
-    @DisplayName("성공: room 저장에 성공합니다. roomImage도 관련 repo에 저장됩니다.")
+    @DisplayName("성공: room 저장에 성공합니다.")
     public void success() throws Exception {
 
       //when
@@ -155,10 +215,10 @@ class RoomServiceForHostTest {
           .description(roomDescription)
           .roomInfo(roomInfo)
           .roomType(defaultRoomType)
-          .roomImages(images)
           .build();
 
-      RoomDetailResponse createRoomResponse = roomServiceForHost.save(createRoomRequest, hostId);
+      RoomDetailResponse createRoomResponse
+          = roomServiceForHost.save(createRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(createRoomResponse)
@@ -168,14 +228,10 @@ class RoomServiceForHostTest {
 
       assertThat(createRoomResponse.getId()).isNotNull();
       assertThat(createRoomResponse.getUserId()).isEqualTo(hostId);
-
-      List<RoomImage> allRoomImages = roomImageRepository.findAll();
-
-      assertThat(allRoomImages).contains(roomImage1, roomImage2, roomImage3, roomImage4);
     }
 
     @Test
-    @DisplayName("성공: room 저장에 성공합니다. roomImage가 없다면 image들은 RoomImageRepo에 저장되지 않습니다.")
+    @DisplayName("성공: room 저장에 성공합니다.")
     public void successWithoutImage() throws Exception {
 
       //when
@@ -188,7 +244,10 @@ class RoomServiceForHostTest {
           .roomType(defaultRoomType)
           .build();
 
-      RoomDetailResponse createRoomResponse = roomServiceForHost.save(createRoomRequest, hostId);
+      RoomDetailResponse createRoomResponse = roomServiceForHost.save(
+          createRoomRequest,
+          defaultMultipartFiles,
+          hostId);
 
       //then
       assertThat(createRoomResponse)
@@ -198,9 +257,6 @@ class RoomServiceForHostTest {
 
       assertThat(createRoomResponse.getId()).isNotNull();
       assertThat(createRoomResponse.getUserId()).isEqualTo(hostId);
-
-      List<RoomImage> allRoomImages = roomImageRepository.findAll();
-      assertThat(allRoomImages).doesNotContain(roomImage1, roomImage2, roomImage3, roomImage4);
     }
 
     @Test
@@ -217,12 +273,11 @@ class RoomServiceForHostTest {
           .description(roomDescription)
           .roomInfo(roomInfo)
           .roomType(defaultRoomType)
-          .roomImages(images)
           .build();
 
       //then
       assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.save(createRoomRequest, hostId));
+          () -> roomServiceForHost.save(createRoomRequest, defaultMultipartFiles, hostId));
     }
 
     @Test
@@ -230,33 +285,20 @@ class RoomServiceForHostTest {
     public void success3() throws Exception {
 
       //given
-      Integer charge = 10000;
-      String roomName = "default roomName";
-      String roomDescription = "default roomDescription";
-      RoomInfo roomInfo = new RoomInfo(1, 1, 1, 1);
-      List<RoomImage> images = new ArrayList<>();
-      RoomImage roomImage1 = new RoomImage("default roomImage Path 1");
-      images.add(roomImage1);
-      RoomImage roomImage2 = new RoomImage("default roomImage Path 2");
-      images.add(roomImage2);
-      RoomImage roomImage3 = new RoomImage("default roomImage Path 3");
-      images.add(roomImage3);
-      RoomImage roomImage4 = new RoomImage("default roomImage Path 4");
-      images.add(roomImage4);
+      Address diffAddress = new Address("address1", "address2");
 
       //when
-      Address address = new Address("address1", "address2");
       CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
-          .address(address)
-          .charge(charge)
-          .name(roomName)
-          .description(roomDescription)
-          .roomInfo(roomInfo)
+          .address(diffAddress)
+          .charge(defaultCharge)
+          .name(defaultRoomName)
+          .description(defaultRoomDescription)
+          .roomInfo(defaultRoomInfo)
           .roomType(defaultRoomType)
-          .roomImages(images)
           .build();
 
-      RoomDetailResponse createRoomResponse = roomServiceForHost.save(createRoomRequest, hostId);
+      RoomDetailResponse createRoomResponse
+          = roomServiceForHost.save(createRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(createRoomResponse)
@@ -266,10 +308,6 @@ class RoomServiceForHostTest {
 
       assertThat(createRoomResponse.getId()).isNotNull();
       assertThat(createRoomResponse.getUserId()).isEqualTo(hostId);
-
-      List<RoomImage> allRoomImages = roomImageRepository.findAll();
-
-      assertThat(allRoomImages).contains(roomImage1, roomImage2, roomImage3, roomImage4);
     }
   }
 
@@ -278,21 +316,32 @@ class RoomServiceForHostTest {
   String changedDescription;
   Integer changedMaxGuest;
   Integer changedBedCount;
-  List<RoomImage> changedRoomImages;
-  RoomImage changedRoomImage1;
+  List<MultipartFile> changedMultipartFiles;
+  MockMultipartFile changedMockMultipartFile1;
+  MockMultipartFile changedMockMultipartFile2;
+  MockMultipartFile changedMockMultipartFile3;
 
   @BeforeEach
-  void setupForModify() {
+  void setupForModify() throws IOException {
     changedCharge = 5000;
     changedRoomName = "영업 안해요";
     changedDescription = "영업 안합니다";
     changedMaxGuest = 2;
     changedBedCount = 2;
-    changedRoomImages = new ArrayList<>();
-    changedRoomImage1 = new RoomImage("roomImage path");
-    changedRoomImages.add(changedRoomImage1);
+    changedMultipartFiles = new ArrayList<>();
 
+    changedMockMultipartFile1 = getMockMultipartFile("testCustomerChange1", "png",
+        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerChange1.png");
+    changedMockMultipartFile2 = getMockMultipartFile("testCustomerChange2", "png",
+        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerChange2.png");
+    changedMockMultipartFile3 = getMockMultipartFile("testCustomerChange3", "png",
+        "/Users/hyunggeunpark/Desktop/uploadTest/testCustomerChange3.png");
+
+    changedMultipartFiles.add(changedMockMultipartFile1);
+    changedMultipartFiles.add(changedMockMultipartFile2);
+    changedMultipartFiles.add(changedMockMultipartFile3);
   }
+
   @Nested
   class 수정_modify {
 
@@ -308,21 +357,25 @@ class RoomServiceForHostTest {
           .description(changedDescription)
           .maxGuest(changedMaxGuest)
           .bedCount(changedBedCount)
-          .roomImages(changedRoomImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, changedMultipartFiles, hostId);
 
       //then
       assertThat(modify)
           .usingRecursiveComparison()
-          .ignoringFields("address", "roomInfo", "roomType", "userId")
+          .ignoringFields("address", "roomInfo", "roomImages", "roomType", "userId")
           .isEqualTo(updateRoomRequest);
 
       assertThat(modify.getRoomInfo().getMaxGuest()).isEqualTo(changedMaxGuest);
       assertThat(modify.getRoomInfo().getBedCount()).isEqualTo(changedBedCount);
+      assertThat(modify.getRoomImages().size()).isEqualTo(3);
       assertThat(modify.getUserId()).isEqualTo(hostId);
+
+      List<RoomImage> changeRoomImagesList = changedMultipartFiles.stream().map(
+          m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList());
     }
 
     @Test
@@ -337,11 +390,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(modify.getCharge()).isEqualTo(changedCharge);
@@ -360,11 +413,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(modify.getCharge()).isEqualTo(zero);
@@ -382,12 +435,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //then
       assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.modify(updateRoomRequest, hostId));
+          () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
     @Test
@@ -402,12 +454,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //then
       assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.modify(updateRoomRequest, hostId));
+          () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
     @Test
@@ -422,11 +473,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(modify.getName()).isEqualTo(changedRoomName);
@@ -444,12 +495,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //then
       assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.modify(updateRoomRequest, hostId));
+          () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
     @Test
@@ -464,12 +514,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //then
       assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.modify(updateRoomRequest, hostId));
+          () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
     @Test
@@ -484,12 +533,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //then
       assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.modify(updateRoomRequest, hostId));
+          () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
     @Test
@@ -504,11 +552,11 @@ class RoomServiceForHostTest {
           .description(changedDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(modify.getDescription()).isEqualTo(changedDescription);
@@ -526,11 +574,11 @@ class RoomServiceForHostTest {
           .description(null)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(modify.getDescription()).isNull();
@@ -548,11 +596,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(changedMaxGuest)
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(modify.getRoomInfo().getMaxGuest()).isEqualTo(changedMaxGuest);
@@ -570,12 +618,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(0)
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //then
       assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.modify(updateRoomRequest, hostId));
+          () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
 
@@ -591,12 +638,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(-1)
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(defaultImages)
           .build();
 
       //then
       assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.modify(updateRoomRequest, hostId));
+          () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
     @Test
@@ -611,11 +657,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(changedBedCount)
-          .roomImages(defaultImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(modify.getRoomInfo().getBedCount()).isEqualTo(changedBedCount);
@@ -635,11 +681,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(zero)
-          .roomImages(defaultImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId);
 
       //then
       assertThat(modify.getRoomInfo().getBedCount()).isEqualTo(zero);
@@ -659,12 +705,11 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(negative)
-          .roomImages(defaultImages)
           .build();
 
       //then
       assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.modify(updateRoomRequest, hostId));
+          () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
     @Test
@@ -672,15 +717,6 @@ class RoomServiceForHostTest {
     public void successChangeImages() throws Exception {
 
       //given
-      RoomImage roomImage1 = new RoomImage("new path1");
-      RoomImage roomImage2 = new RoomImage("new path2");
-      RoomImage roomImage3 = new RoomImage("new path3");
-      changedRoomImages.add(roomImage1);
-      changedRoomImages.add(roomImage2);
-      changedRoomImages.add(roomImage3);
-      changedRoomImages.add(defaultRoomImage2);
-      changedRoomImages.add(defaultRoomImage3);
-
       UpdateRoomRequest updateRoomRequest = UpdateRoomRequest.builder()
           .id(roomId)
           .charge(defaultCharge)
@@ -688,36 +724,46 @@ class RoomServiceForHostTest {
           .description(defaultRoomDescription)
           .maxGuest(defaultRoomInfo.getMaxGuest())
           .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(changedRoomImages)
           .build();
 
       //when
-      RoomDetailResponse modify = roomServiceForHost.modify(updateRoomRequest, hostId);
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, changedMultipartFiles, hostId);
 
       //then
-      assertThat(modify.getRoomImages().size()).isEqualTo(changedRoomImages.size());
+      assertThat(modify.getRoomImages().size()).isEqualTo(changedMultipartFiles.size());
     }
 
     @Test
-    @DisplayName("실패: 수정할 Room 이미지 목록은 null이 아니어야합니다")
+    @DisplayName("성공: 수정할 Room 이미지 목록이 null이라면 roomImage를 제외하고 수정이 이뤄집니다.")
     public void failChangeImagesToNull() throws Exception {
 
       //given
-      changedRoomImages = null;
+      changedMultipartFiles = null;
 
       UpdateRoomRequest updateRoomRequest = UpdateRoomRequest.builder()
           .id(roomId)
-          .charge(defaultCharge)
-          .name(defaultRoomName)
+          .charge(changedCharge)
+          .name(changedRoomName)
           .description(defaultRoomDescription)
-          .maxGuest(defaultRoomInfo.getMaxGuest())
-          .bedCount(defaultRoomInfo.getBedCount())
-          .roomImages(changedRoomImages)
+          .maxGuest(changedMaxGuest)
+          .bedCount(changedBedCount)
           .build();
 
+      //when
+      RoomDetailResponse modify
+          = roomServiceForHost.modify(updateRoomRequest, changedMultipartFiles, hostId);
+
       //then
-      assertThrows(RuntimeException.class,
-          () -> roomServiceForHost.modify(updateRoomRequest, hostId));
+      assertThat(modify)
+          .usingRecursiveComparison()
+          .ignoringFields("address", "roomInfo", "roomImages", "roomType", "userId")
+          .isEqualTo(updateRoomRequest);
+
+      assertThat(modify.getRoomInfo().getMaxGuest()).isEqualTo(changedMaxGuest);
+      assertThat(modify.getRoomInfo().getBedCount()).isEqualTo(changedBedCount);
+      assertThat(modify.getRoomImages()).isEqualTo(defaultRoomResponse.getRoomImages());
+      assertThat(modify.getUserId()).isEqualTo(hostId);
     }
   }
 
@@ -734,7 +780,7 @@ class RoomServiceForHostTest {
       //then
       assertThat(roomDetailResponse)
           .usingRecursiveComparison()
-          .isEqualTo(defaultRoom);
+          .isEqualTo(defaultRoomResponse);
     }
 
     @Test
@@ -775,85 +821,6 @@ class RoomServiceForHostTest {
     }
   }
 
-  Long hostId1;
-  Long hostId2;
-  Long hostId3;
-
-  @BeforeEach
-  void setupForFindByHostId() {
-    defaultAddress = new Address("default address1", "default address2");
-    defaultCharge = 20000;
-    defaultRoomName = "default roomName";
-    defaultRoomDescription = "default roomDescription";
-    defaultRoomInfo = new RoomInfo(1, 1, 1, 1);
-    defaultImages = new ArrayList<>();
-    defaultRoomType = RoomType.APARTMENT;
-    defaultRoomImage1 = new RoomImage("default roomImage Path 1");
-    defaultRoomImage2 = new RoomImage("default roomImage Path 2");
-    defaultRoomImage3 = new RoomImage("default roomImage Path 3");
-    defaultRoomImage4 = new RoomImage("default roomImage Path 4");
-    defaultImages.add(defaultRoomImage1);
-    defaultImages.add(defaultRoomImage2);
-    defaultImages.add(defaultRoomImage3);
-    defaultImages.add(defaultRoomImage4);
-
-    Group group = groupRepository.findByName("USER_GROUP")
-        .orElseThrow(() -> new IllegalStateException("Could not found group for USER_GROUP"));
-
-    User user1 = userRepository.save(new User("user1", "provider1", "providerId1",
-        "profileImage1", group, new Email("aaa1@gmail.com")));
-
-    User user2 = userRepository.save(new User("user2", "provider2", "providerId2",
-        "profileImage2", group, new Email("aaa2@gmail.com")));
-
-    User user3 = userRepository.save(new User("user3", "provider3", "providerId3",
-        "profileImage3", group, new Email("aaa3@gmail.com")));
-
-    hostId1 = user1.getId();
-    hostId2 = user2.getId();
-    hostId3 = user3.getId();
-
-    for (int i = 0; i < 10; i++) {
-      Address address = new Address("address1" + i, "address2" + i);
-      CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
-          .address(address)
-          .charge(defaultCharge)
-          .name("userId1의 Room")
-          .description(defaultRoomDescription)
-          .roomInfo(defaultRoomInfo)
-          .roomType(defaultRoomType)
-          .roomImages(defaultImages)
-          .build();
-      roomServiceForHost.save(createRoomRequest, hostId1);
-    }
-    for (int i = 10; i < 20; i++) {
-      Address address = new Address("address1" + i, "address2" + i);
-      CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
-          .address(address)
-          .charge(defaultCharge)
-          .name("userId2의 Room")
-          .description(defaultRoomDescription)
-          .roomInfo(defaultRoomInfo)
-          .roomType(defaultRoomType)
-          .roomImages(defaultImages)
-          .build();
-      roomServiceForHost.save(createRoomRequest, hostId2);
-    }
-    for (int i = 20; i < 30; i++) {
-      Address address = new Address("address1" + i, "address2" + i);
-      CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
-          .address(address)
-          .charge(defaultCharge)
-          .name("userId3의 Room")
-          .description(defaultRoomDescription)
-          .roomInfo(defaultRoomInfo)
-          .roomType(defaultRoomType)
-          .roomImages(defaultImages)
-          .build();
-      roomServiceForHost.save(createRoomRequest, hostId3);
-    }
-  }
-
   @Nested
   @DisplayName("host가 등록한 room list 조회")
   class findByHostId {
@@ -867,8 +834,8 @@ class RoomServiceForHostTest {
       PageRequest pageable = PageRequest.of(0, size);
 
       //when
-      Slice<RoomSummaryResponse> byHostId = roomServiceForHost.findByHostId(hostId1,
-          SortTypeForHost.RECENTLY, pageable);
+      Slice<RoomSummaryResponse> byHostId
+          = roomServiceForHost.findByHostId(hostId1, SortTypeForHost.RECENTLY, pageable);
 
       //then
       assertThat(byHostId.getSize()).isEqualTo(size);
@@ -888,8 +855,8 @@ class RoomServiceForHostTest {
       Long testHostId = -1L;
 
       //when
-      Slice<RoomSummaryResponse> byHostId = roomServiceForHost.findByHostId(testHostId,
-          SortTypeForHost.RECENTLY, pageable);
+      Slice<RoomSummaryResponse> byHostId
+          = roomServiceForHost.findByHostId(testHostId, SortTypeForHost.RECENTLY, pageable);
 
       //then
       assertThat(byHostId.getSize()).isEqualTo(size);
@@ -906,10 +873,9 @@ class RoomServiceForHostTest {
 
       //when
       roomServiceForHost.remove(roomId, hostId);
-      Optional<Room> removedRoom = roomRepository.findById(roomId);
 
       //then
-      assertThat(removedRoom.isEmpty()).isTrue();
+      assertThat(roomRepository.findById(roomId).isEmpty()).isTrue();
     }
 
     @Test
