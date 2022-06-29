@@ -7,6 +7,8 @@ import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.reservation.dto.CreateReservationRequest;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForGuest;
+import com.prgrms.airbnb.domain.reservation.dto.ReservationSummaryResponse;
+import com.prgrms.airbnb.domain.reservation.entity.Reservation;
 import com.prgrms.airbnb.domain.reservation.entity.ReservationStatus;
 import com.prgrms.airbnb.domain.reservation.repository.ReservationRepository;
 import com.prgrms.airbnb.domain.room.entity.Room;
@@ -21,7 +23,6 @@ import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,9 +30,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @SpringBootTest
 @Transactional
 class ReservationServiceForGuestTest {
@@ -58,6 +60,8 @@ class ReservationServiceForGuestTest {
 
   User host;
 
+  CreateReservationRequest createReservationRequest;
+
   @Autowired
   private UserRepository userRepository;
 
@@ -80,7 +84,6 @@ class ReservationServiceForGuestTest {
     Group group = groupRepository.findByName("USER_GROUP")
         .orElseThrow(() -> new IllegalStateException("Could not found group for USER_GROUP"));
 
-    log.info("group 완료");
     //host 만들기
     host = new User("범석",
         "provider",
@@ -90,7 +93,6 @@ class ReservationServiceForGuestTest {
         new Email("qjatjr@gmail.com")
     );
     User saveHost = userRepository.save(host);
-    log.info("host 완료");
     //room 만들기
     address = new Address("address1", "address2");
     charge = 1000;
@@ -114,7 +116,6 @@ class ReservationServiceForGuestTest {
     );
     Room saveRoom = roomRepository.save(room);
     roomId = saveRoom.getId();
-    log.info("room 완료");
     //User 만들기
     User user1 = new User("짱구",
         "provider1",
@@ -143,10 +144,22 @@ class ReservationServiceForGuestTest {
     userId1 = user1.getId();
     userId2 = user2.getId();
     userId3 = user3.getId();
-    log.info("users 완료");
+
     //예약 필드 준비
     reservationStatus = ReservationStatus.WAITED_OK;
-    log.info("status 완료");
+    startDate = LocalDate.of(2023, 5, 3);
+    endDate = LocalDate.of(2023, 5, 5);
+    term = 3;
+
+    createReservationRequest = CreateReservationRequest.builder()
+        .reservationStatus(reservationStatus)
+        .startDate(startDate)
+        .endDate(endDate)
+        .period(term)
+        .oneDayCharge(charge)
+        .userId(userId1)
+        .roomId(roomId)
+        .build();
   }
 
   @AfterEach
@@ -163,55 +176,218 @@ class ReservationServiceForGuestTest {
     @Test
     @DisplayName("성공: reservation 생성 성공")
     void success() {
-
-      startDate = LocalDate.of(2022, 5, 3);
-      endDate = LocalDate.of(2022, 5, 5);
-      term = 3;
-      CreateReservationRequest createReservationRequest = CreateReservationRequest.builder()
-          .reservationStatus(reservationStatus)
-          .startDate(startDate)
-          .endDate(endDate)
-          .period(term)
-          .oneDayCharge(charge)
-          .userId(userId1)
-          .roomId(roomId)
-          .build();
-
-      Room getRoom = roomRepository.findById(createReservationRequest.getRoomId()).orElseThrow(IllegalArgumentException::new);
-      ReservationDetailResponseForGuest responseForGuest = reservationServiceForGuest.save(createReservationRequest);
+      Room getRoom = roomRepository.findById(createReservationRequest.getRoomId())
+          .orElseThrow(IllegalArgumentException::new);
+      ReservationDetailResponseForGuest responseForGuest = reservationServiceForGuest
+          .save(createReservationRequest);
 
       assertThat(responseForGuest)
           .usingRecursiveComparison()
-          .ignoringFields("host","roomResponseForReservation","totalPrice","id")
+          .ignoringFields("host", "roomResponseForReservation", "totalPrice", "id")
           .isEqualTo(createReservationRequest);
-      assertThat(responseForGuest.getTotalPrice()).isEqualTo((createReservationRequest.getOneDayCharge() * createReservationRequest.getPeriod()));
-      assertThat(responseForGuest.getRoomResponseForReservation().getId()).isEqualTo(createReservationRequest.getRoomId());
+      assertThat(responseForGuest.getTotalPrice()).isEqualTo(
+          (createReservationRequest.getOneDayCharge() * createReservationRequest.getPeriod()));
+      assertThat(responseForGuest.getRoomResponseForReservation().getId())
+          .isEqualTo(createReservationRequest.getRoomId());
       assertThat(responseForGuest.getHost().getId()).isEqualTo(getRoom.getUserId());
     }
 
     @Test
+    @DisplayName("실패: 이미 지나간 날짜를 예약하려고 함")
+    void failPassedByDate() {
+      createReservationRequest = CreateReservationRequest.builder()
+          .reservationStatus(reservationStatus)
+          .startDate(LocalDate.of(2020, 4, 4))
+          .endDate(LocalDate.of(2020, 4, 7))
+          .period(term)
+          .oneDayCharge(charge)
+          .userId(userId1)
+          .roomId(roomId)
+          .build();
+      assertThatThrownBy(() -> reservationServiceForGuest.save(createReservationRequest))
+          .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     @DisplayName("실패: 이미 숙소에 같은날짜의 예약이 존재함")
-    void failExistReservation(){
-      
-      //먼저 예약
-      startDate = LocalDate.of(2022, 5, 3);
-      endDate = LocalDate.of(2022, 5, 5);
-      term = 3;
-      CreateReservationRequest createReservationRequest = CreateReservationRequest.builder()
+    void failExistReservationByDate() {
+      ReservationDetailResponseForGuest responseForGuest = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      assertThatThrownBy(() -> reservationServiceForGuest.save(createReservationRequest))
+          .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("실패: 존재하지 않는 숙소가 입력 됨")
+    void failWrongRoomId() {
+      createReservationRequest = CreateReservationRequest.builder()
           .reservationStatus(reservationStatus)
           .startDate(startDate)
           .endDate(endDate)
           .period(term)
           .oneDayCharge(charge)
           .userId(userId1)
-          .roomId(roomId)
+          .roomId(Long.MAX_VALUE)
           .build();
-      ReservationDetailResponseForGuest responseForGuest = reservationServiceForGuest.save(createReservationRequest);
+      assertThatThrownBy(() -> reservationServiceForGuest.save(createReservationRequest))
+          .isInstanceOf(IllegalArgumentException.class);
+    }
+  }
 
-      assertThatThrownBy(()-> reservationServiceForGuest.save(createReservationRequest))
+  @Nested
+  @DisplayName("자세한 예약 내용 보여주기")
+  class FindDetailById {
+
+    @Test
+    @DisplayName("성공: 주어진 id값으로 예약 가져오기")
+    void success() {
+      ReservationDetailResponseForGuest save = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      ReservationDetailResponseForGuest detailById = reservationServiceForGuest
+          .findDetailById(save.getId());
+
+      assertThat(save).usingRecursiveComparison().isEqualTo(detailById);
+    }
+
+    @Test
+    @DisplayName("실패: 존재하지않는 예약번호 입력")
+    void failWrongReservationId() {
+      reservationServiceForGuest.save(createReservationRequest);
+      assertThatThrownBy(() -> reservationServiceForGuest.findDetailById("abcd1234"))
+          .isInstanceOf(IllegalArgumentException.class);
+    }
+  }
+
+  @Nested
+  @DisplayName("취소 가능한지 보여주기")
+  class Cancel {
+
+    @Test
+    @DisplayName("성공: 취소 성공")
+    void success() {
+
+      ReservationDetailResponseForGuest save = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      reservationServiceForGuest.cancel(save.getId());
+      ReservationDetailResponseForGuest detailById = reservationServiceForGuest
+          .findDetailById(save.getId());
+      assertThat(detailById.getReservationStatus()).isEqualTo(ReservationStatus.GUEST_CANCELLED);
+    }
+
+    @Test
+    @DisplayName("실패: 존재하지않는 예약번호 입력 됨")
+    void failWrongReservation() {
+      ReservationDetailResponseForGuest save = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      assertThatThrownBy(() -> reservationServiceForGuest.cancel("abcd1234"))
           .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    @DisplayName("실패: 취소할 수 없는 상태")
+    void failCancelByReservationStatus() {
+      ReservationDetailResponseForGuest save = reservationServiceForGuest
+          .save(createReservationRequest);
+      Reservation reservation = reservationRepository.findById(save.getId()).orElse(null);
 
+      //WAIT_OK 와 ACCEPTED 상태일때만 취소 가능
+      reservation.changeStatus(ReservationStatus.ACCEPTED);
+      reservation.changeStatus(ReservationStatus.WAIT_REVIEW);
+
+      assertThatThrownBy(() -> reservationServiceForGuest.cancel(reservation.getId()))
+          .isInstanceOf(IllegalArgumentException.class);
+    }
+  }
+
+  @Nested
+  @DisplayName("유저 id로 예약 리스트 가져오기")
+  class FindByUserId {
+
+    @Test
+    @DisplayName("성공: 예약 리스트 가져오기 성공")
+    void success() {
+
+      //예약 추가
+      ReservationDetailResponseForGuest save1 = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      createReservationRequest = CreateReservationRequest.builder()
+          .reservationStatus(reservationStatus)
+          .startDate(LocalDate.of(2023, 1, 3))
+          .endDate(LocalDate.of(2023, 1, 7))
+          .period(term)
+          .oneDayCharge(charge)
+          .userId(userId2)
+          .roomId(roomId)
+          .build();
+      ReservationDetailResponseForGuest save2 = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      createReservationRequest = CreateReservationRequest.builder()
+          .reservationStatus(reservationStatus)
+          .startDate(LocalDate.of(2023, 4, 3))
+          .endDate(LocalDate.of(2023, 4, 7))
+          .period(term)
+          .oneDayCharge(charge)
+          .userId(userId2)
+          .roomId(roomId)
+          .build();
+      ReservationDetailResponseForGuest save3 = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      PageRequest pageable = PageRequest.of(0, 5);
+      Slice<ReservationSummaryResponse> list = reservationServiceForGuest
+          .findByUserId(userId2, pageable);
+
+      assertThat(list).hasSize(2);
+      assertThat(list.get().anyMatch(v -> v.getId().equals(save2.getId()))).isTrue();
+      assertThat(list.get().anyMatch(v -> v.getId().equals(save3.getId()))).isTrue();
+    }
+
+    @Test
+    @DisplayName("성공: 해당 유저는 예약한 일이 없음")
+    void failNotExistReservationByUserId() {
+
+      //예약 추가
+      ReservationDetailResponseForGuest save1 = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      createReservationRequest = CreateReservationRequest.builder()
+          .reservationStatus(reservationStatus)
+          .startDate(LocalDate.of(2023, 1, 3))
+          .endDate(LocalDate.of(2023, 1, 7))
+          .period(term)
+          .oneDayCharge(charge)
+          .userId(userId2)
+          .roomId(roomId)
+          .build();
+      ReservationDetailResponseForGuest save2 = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      createReservationRequest = CreateReservationRequest.builder()
+          .reservationStatus(reservationStatus)
+          .startDate(LocalDate.of(2023, 4, 3))
+          .endDate(LocalDate.of(2023, 4, 7))
+          .period(term)
+          .oneDayCharge(charge)
+          .userId(userId2)
+          .roomId(roomId)
+          .build();
+      ReservationDetailResponseForGuest save3 = reservationServiceForGuest
+          .save(createReservationRequest);
+
+      PageRequest pageable = PageRequest.of(0, 5);
+      Slice<ReservationSummaryResponse> list = reservationServiceForGuest
+          .findByUserId(userId3, pageable);
+
+      assertThat(list).hasSize(0);
+      assertThat(list.get().anyMatch(v -> v.getId().equals(save1.getId()))).isFalse();
+      assertThat(list.get().anyMatch(v -> v.getId().equals(save2.getId()))).isFalse();
+      assertThat(list.get().anyMatch(v -> v.getId().equals(save3.getId()))).isFalse();
+    }
   }
 }
