@@ -3,7 +3,6 @@ package com.prgrms.airbnb.domain.review.service;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-import com.prgrms.airbnb.config.jwt.JwtAuthentication;
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.reservation.entity.Reservation;
 import com.prgrms.airbnb.domain.reservation.entity.ReservationStatus;
@@ -39,7 +38,6 @@ class HostReviewServiceTest {
   Room room;
   Reservation reservation1, reservation2;
   Review review1, review2;
-  JwtAuthentication authentication;
 
   @InjectMocks
   private HostReviewService hostReviewService;
@@ -61,7 +59,6 @@ class HostReviewServiceTest {
     reservation2 = new Reservation("reservationRepository.createReservationId()",
         ReservationStatus.WAITED_OK, LocalDate.of(2022, 6, 10), LocalDate.of(2022, 6, 15), 3, 30000,
         1L, room.getId());
-    authentication = new JwtAuthentication("token", "dhkstn", "dhkstn@naver.com", 2L);
     review1 = new Review("comment", 5, "245325", true,
         List.of(new ReviewImage("Path 1"), new ReviewImage("Path 2")));
     review2 = new Review("comment", 5, "245325", true,
@@ -86,8 +83,7 @@ class HostReviewServiceTest {
       when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
       when(reviewRepository.findAllByRoomId(anyLong())).thenReturn(List.of(review1, review2));
       //when
-      List<ReviewResponse> reviewList = hostReviewService.findAllByRoomId(authentication,
-          anyLong());
+      List<ReviewResponse> reviewList = hostReviewService.findAllByRoomId(anyLong(), anyLong());
       //then
       Assertions.assertThat(reviewList.get(0)).usingRecursiveComparison().isEqualTo(review1);
     }
@@ -99,8 +95,7 @@ class HostReviewServiceTest {
       when(roomRepository.findById(anyLong())).thenThrow(new IllegalArgumentException());
       //when
       //then
-      Assertions.assertThatThrownBy(
-              () -> hostReviewService.findAllByRoomId(authentication, anyLong()))
+      Assertions.assertThatThrownBy(() -> hostReviewService.findAllByRoomId(anyLong(), anyLong()))
           .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -111,8 +106,7 @@ class HostReviewServiceTest {
       when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
       //when
       //then
-      List<ReviewResponse> reviewList = hostReviewService.findAllByRoomId(authentication,
-          anyLong());
+      List<ReviewResponse> reviewList = hostReviewService.findAllByRoomId(anyLong(), anyLong());
     }
   }
 }
