@@ -1,18 +1,25 @@
 package com.prgrms.airbnb.domain.user.entity;
 
+import com.prgrms.airbnb.domain.common.converter.EmailConverter;
+import com.prgrms.airbnb.domain.common.converter.PhoneConverter;
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.common.entity.Phone;
-import com.prgrms.airbnb.domain.common.converter.EmailConverter;
-import com.prgrms.airbnb.domain.common.converter.PhoneConverter;
+import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -106,5 +113,17 @@ public class User extends BaseEntity {
 
   public void changeEmail(String email) {
     setEmail(new Email(email));
+  }
+
+  public void changeProfileImage(String imageUrl) {
+    setProfileImage(imageUrl);
+  }
+
+  public void changePhone(String phone) {
+    if (Objects.isNull(phone)) {
+      setPhone(null);
+    } else {
+      setPhone(new Phone(phone));
+    }
   }
 }
