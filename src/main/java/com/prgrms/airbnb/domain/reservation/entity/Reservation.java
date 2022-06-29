@@ -68,6 +68,10 @@ public class Reservation extends BaseEntity {
     return reservationStatus.equals(ReservationStatus.WAIT_REVIEW);
   }
 
+  public boolean canReservation(LocalDate newStartDate, LocalDate newEndDate){
+    return validateDateForReservation(newStartDate, newEndDate);
+  }
+
   public boolean canCancelled() {
     if (validateDateForCancel()) {
       //TODO: 환불 정책 필요, 에러 추가 필요
@@ -145,5 +149,9 @@ public class Reservation extends BaseEntity {
 
   private boolean validateDateForReview(){
     return endDate.plusDays(14).isBefore(LocalDate.now());
+  }
+
+  private boolean validateDateForReservation(LocalDate newStartDate, LocalDate newEndDate){
+    return endDate.isBefore(newStartDate) || newEndDate.isBefore(startDate);
   }
 }
