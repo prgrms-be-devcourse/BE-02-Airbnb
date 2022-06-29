@@ -200,7 +200,7 @@ class ReviewRepositoryTest {
 
     @Test
     @DisplayName("실패: 없는 ID로 review를 삭제합니다.")
-    void faildeleteReview() {
+    void failDeleteReview() {
       Review review = new Review(comment, rating, "245325", true,
           List.of(reviewImage1, reviewImage2));
       reviewRepository.save(review);
