@@ -13,6 +13,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, String
 
     Slice<Reservation> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
+    //TODO: hostId로 찾는 Slice 위 메소드가 필요함
+    Slice<Reservation> findByRoomIdOrderByCreatedAtDesc(Long roomId, Pageable pageable);
+
     Optional<Reservation> findByUserId(Long userId);
 
     default String createReservationId() {
