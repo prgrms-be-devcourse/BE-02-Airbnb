@@ -1,6 +1,5 @@
 package com.prgrms.airbnb.domain.review.service;
 
-import com.prgrms.airbnb.config.jwt.JwtAuthentication;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.reservation.entity.Reservation;
 import com.prgrms.airbnb.domain.reservation.entity.ReservationStatus;
@@ -18,7 +17,6 @@ import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,11 +43,11 @@ public class GuestReviewService {
   }
 
   @Transactional
-  public ReviewResponse save(@AuthenticationPrincipal JwtAuthentication authentication,
-      String reservationId, CreateReviewRequest createReviewRequest, List<MultipartFile> images) {
+  public ReviewResponse save(Long userId, String reservationId,
+      CreateReviewRequest createReviewRequest, List<MultipartFile> images) {
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(IllegalArgumentException::new);
-    validateAuthority(authentication, reservation.getUserId());
+    validateAuthority(userId, reservation.getUserId());
     if (!reservation.canReviewed()) {
       //TODO: 리뷰를 남길 수 없는 경우.
       throw new IllegalArgumentException();
@@ -66,15 +64,14 @@ public class GuestReviewService {
   }
 
   @Transactional
-  public ReviewResponse modify(@AuthenticationPrincipal JwtAuthentication authentication,
-      Long reviewId, UpdateReviewRequest updateReviewRequest, List<MultipartFile> images) {
+  public ReviewResponse modify(Long userId, Long reviewId, UpdateReviewRequest updateReviewRequest,
+      List<MultipartFile> images) {
     Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
     Reservation reservation = reservationRepository.findById(review.getReservationId())
         .orElseThrow(IllegalArgumentException::new);
     Room room = roomRepository.findById(reservation.getRoomId())
         .orElseThrow(IllegalArgumentException::new);
-    validateAuthority(authentication, reservation.getUserId());
-    room.getReviewInfo().changeReviewInfo(review.getRating(), updateReviewRequest.getRating());
+    validateAuthority(userId, reservation.getUserId());
     review.changeComment(updateReviewRequest.getComment());
     review.changeRating(updateReviewRequest.getRating());
     review.changeVisible(updateReviewRequest.getVisible());
@@ -85,16 +82,16 @@ public class GuestReviewService {
         });
     images.stream().map(image -> uploadService.uploadImg(image)).map(path -> new ReviewImage(path))
         .forEach(review::addImage);
+    room.getReviewInfo().changeReviewInfo(review.getRating(), updateReviewRequest.getRating());
     return ReviewConverter.of(review);
   }
 
-  public List<ReviewResponse> findAllByRoomId(
-      @AuthenticationPrincipal JwtAuthentication authentication, Long roomId) {
+  public List<ReviewResponse> findAllByRoomId(Long userId, Long roomId) {
     List<Review> reviewList = reviewRepository.findAllByRoomId(roomId);
     return reviewList.stream().filter(review -> {
       Reservation reservation = reservationRepository.findById(review.getReservationId())
           .orElseThrow(IllegalArgumentException::new);
-      if (!review.isVisible() && !reservation.getUserId().equals(authentication.userId)) {
+      if (!review.isVisible() && !reservation.getUserId().equals(userId)) {
         return false;
       }
       return true;
@@ -102,18 +99,17 @@ public class GuestReviewService {
   }
 
   @Transactional
-  public void remove(@AuthenticationPrincipal JwtAuthentication authentication, Long reviewId) {
+  public void remove(Long userId, Long reviewId) {
     Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
     Reservation reservation = reservationRepository.findById(review.getReservationId())
         .orElseThrow(IllegalArgumentException::new);
-    validateAuthority(authentication, reservation.getUserId());
+    validateAuthority(userId, reservation.getUserId());
     review.getImages().forEach(reviewImage -> uploadService.delete(reviewImage.getPath()));
     reviewRepository.delete(review);
   }
 
-  private void validateAuthority(@AuthenticationPrincipal JwtAuthentication authentication,
-      Long userId) {
-    if (!authentication.userId.equals(userId)) {
+  private void validateAuthority(Long authenticationUserId, Long userId) {
+    if (!authenticationUserId.equals(userId)) {
       throw new IllegalArgumentException();
     }
   }
