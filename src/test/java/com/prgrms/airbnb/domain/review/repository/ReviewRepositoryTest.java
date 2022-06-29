@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
@@ -35,6 +37,7 @@ class ReviewRepositoryTest {
   Reservation reservation1, reservation2;
   Room room;
   ReviewImage reviewImage1, reviewImage2;
+  PageRequest pageRequest;
   @Autowired
   private ReviewRepository reviewRepository;
   @Autowired
@@ -50,6 +53,7 @@ class ReviewRepositoryTest {
     closed = false;
     reviewImage1 = new ReviewImage("Path 1");
     reviewImage2 = new ReviewImage("Path 1");
+    pageRequest = PageRequest.of(0, 2);
   }
 
   @AfterEach
@@ -79,9 +83,10 @@ class ReviewRepositoryTest {
         List.of(reviewImage1, reviewImage2));
     reviewRepository.save(review1);
     reviewRepository.save(review2);
-    List<Review> reviewListOrderByCreatedAtDesc = reviewRepository.findAllByRoomId(room.getId());
-    Assertions.assertThat(reviewListOrderByCreatedAtDesc.size()).isEqualTo(2);
-    Assertions.assertThat(reviewListOrderByCreatedAtDesc.get(0).getId())
+    Slice<Review> reviewListOrderByCreatedAtDesc = reviewRepository.findAllByRoomId(room.getId(),
+        pageRequest);
+    Assertions.assertThat(reviewListOrderByCreatedAtDesc.getContent().size()).isEqualTo(2);
+    Assertions.assertThat(reviewListOrderByCreatedAtDesc.getContent().get(0).getId())
         .isNotEqualTo(review1.getId());
   }
 
@@ -204,8 +209,7 @@ class ReviewRepositoryTest {
       Review review = new Review(comment, rating, "245325", true,
           List.of(reviewImage1, reviewImage2));
       reviewRepository.save(review);
-      Assertions.assertThatThrownBy(
-              () -> reviewRepository.deleteById(3L))
+      Assertions.assertThatThrownBy(() -> reviewRepository.deleteById(3L))
           .isInstanceOf(EmptyResultDataAccessException.class);
     }
   }

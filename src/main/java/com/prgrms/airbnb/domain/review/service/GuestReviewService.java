@@ -17,6 +17,8 @@ import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,16 +88,18 @@ public class GuestReviewService {
     return ReviewConverter.of(review);
   }
 
-  public List<ReviewResponse> findAllByRoomId(Long authenticationUserId, Long roomId) {
-    List<Review> reviewList = reviewRepository.findAllByRoomId(roomId);
-    return reviewList.stream().filter(review -> {
+  public Slice<ReviewResponse> findAllByRoomId(Long authenticationUserId, Long roomId,
+      Pageable pageable) {
+    Slice<Review> reviewList = reviewRepository.findAllByRoomId(roomId, pageable);
+    reviewList.getContent().removeIf(review -> {
       Reservation reservation = reservationRepository.findById(review.getReservationId())
           .orElseThrow(IllegalArgumentException::new);
       if (!review.isVisible() && !reservation.getUserId().equals(authenticationUserId)) {
-        return false;
+        return true;
       }
-      return true;
-    }).map(ReviewConverter::of).collect(Collectors.toList());
+      return false;
+    });
+    return reviewList.map(ReviewConverter::of);
   }
 
   @Transactional
