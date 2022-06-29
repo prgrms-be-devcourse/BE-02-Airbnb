@@ -11,9 +11,8 @@ import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.stream.Collectors;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -55,17 +54,19 @@ public class ReservationServiceForGuest {
     User host = userRepository.findById(room.getUserId())
         .orElseThrow(IllegalArgumentException::new);
 
+    if (LocalDate.now().isAfter(createReservationRequest.getStartDate())) {
+      throw new IllegalArgumentException();
+    }
     //TODO: 저장하기전에 앞서 예약이 존재하는지 확인해야함
-    if(reservationRepository.findAll()
+    if (reservationRepository.findAll()
         .stream()
         .anyMatch(v ->
             !v.canReservation(
                 createReservationRequest.getStartDate(),
                 createReservationRequest.getEndDate())
-        )){
+        )) {
       throw new IllegalArgumentException();
     }
-
     String reservationId = reservationRepository.createReservationId();
     Reservation reservation = ReservationConverter.toReservation(reservationId,
         createReservationRequest);
