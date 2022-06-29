@@ -199,6 +199,22 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("성공 : 비어있는 이미지로 프로필을 수정하는 경우")
+    void successByNullImage() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder()
+          .email("tiger@naver.com")
+          .name("tiger")
+          .phone("010-1234-5678")
+          .build();
+      // When, Then
+      userList.forEach(user -> {
+        UserDetailResponse actual = userService.modify(user.getId(), request, null);
+        assertThat(actual).isEqualTo(UserConverter.from(user));
+      });
+    }
+
+    @Test
     @DisplayName("실패 : 존재하지 않는 ID를 수정하는 경우 예외가 발생합니다.")
     void fail() {
       // Given
