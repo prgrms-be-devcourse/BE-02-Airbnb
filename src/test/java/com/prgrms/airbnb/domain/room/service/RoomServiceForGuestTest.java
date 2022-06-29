@@ -1,5 +1,6 @@
 package com.prgrms.airbnb.domain.room.service;
 
+import static com.prgrms.airbnb.domain.room.service.RoomServiceForHostTest.getMockMultipartFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
@@ -9,7 +10,6 @@ import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
 import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.dto.SearchRoomRequest;
 import com.prgrms.airbnb.domain.room.entity.Room;
-import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import com.prgrms.airbnb.domain.room.entity.RoomInfo;
 import com.prgrms.airbnb.domain.room.entity.RoomType;
 import com.prgrms.airbnb.domain.room.repository.RoomImageRepository;
@@ -18,6 +18,7 @@ import com.prgrms.airbnb.domain.user.entity.Group;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.GroupRepository;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -30,7 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @Transactional
@@ -64,31 +67,34 @@ class RoomServiceForGuestTest {
   String defaultRoomDescription;
   RoomInfo defaultRoomInfo;
   RoomType defaultRoomType;
-  List<RoomImage> defaultImages;
-  RoomImage defaultRoomImage1;
-  RoomImage defaultRoomImage2;
-  RoomImage defaultRoomImage3;
-  RoomImage defaultRoomImage4;
+  List<MultipartFile> defaultMultipartFiles;
+
+  MockMultipartFile mockMultipartFile1;
+  MockMultipartFile mockMultipartFile2;
 
   Long roomId;
 
   @BeforeEach
-  void setupForFindByHostId() {
+  void setupForFindByHostId() throws IOException {
     defaultAddress = new Address("default address1", "default address2");
     defaultCharge = 1000;
     defaultRoomName = "default roomName";
     defaultRoomDescription = "default roomDescription";
     defaultRoomInfo = new RoomInfo(1, 1, 1, 1);
-    defaultImages = new ArrayList<>();
     defaultRoomType = RoomType.APARTMENT;
-    defaultRoomImage1 = new RoomImage("default roomImage Path 1");
-    defaultRoomImage2 = new RoomImage("default roomImage Path 2");
-    defaultRoomImage3 = new RoomImage("default roomImage Path 3");
-    defaultRoomImage4 = new RoomImage("default roomImage Path 4");
-    defaultImages.add(defaultRoomImage1);
-    defaultImages.add(defaultRoomImage2);
-    defaultImages.add(defaultRoomImage3);
-    defaultImages.add(defaultRoomImage4);
+    defaultMultipartFiles = new ArrayList<>();
+
+    String testCustomerUpload1 = "testCustomerUpload1";
+    String png = "png";
+    String path1 = "src/test/resources/uploadFile/testCustomerUpload1.png";
+    mockMultipartFile1 = getMockMultipartFile(testCustomerUpload1, png, path1);
+
+    String testCustomerUpload2 = "testCustomerUpload2";
+    String path2 = "src/test/resources/uploadFile/testCustomerUpload2.png";
+    mockMultipartFile2 = getMockMultipartFile(testCustomerUpload2, png, path2);
+
+    defaultMultipartFiles.add(mockMultipartFile1);
+    defaultMultipartFiles.add(mockMultipartFile2);
 
     Group group = groupRepository.findByName("USER_GROUP")
         .orElseThrow(() -> new IllegalStateException("Could not found group for USER_GROUP"));
@@ -110,9 +116,6 @@ class RoomServiceForGuestTest {
 
     for (int i = 1; i < 11; i++) {
       Address address = new Address("address1" + i, "address2" + i);
-      List<RoomImage> images = new ArrayList<>();
-      images.add(new RoomImage("room path" + i));
-      images.add(new RoomImage("room path" + 2 * i));
       CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
           .address(address)
           .charge(defaultCharge * i)
@@ -120,16 +123,12 @@ class RoomServiceForGuestTest {
           .description(defaultRoomDescription)
           .roomInfo(new RoomInfo(i, i, i, i))
           .roomType(roomTypes[i % roomTypes.length])
-          .roomImages(images)
           .build();
-      roomServiceForHost.save(createRoomRequest, hostId1);
+      roomServiceForHost.save(createRoomRequest, defaultMultipartFiles, hostId1);
     }
 
     for (int i = 11; i < 21; i++) {
       Address address = new Address("address1" + i, "address2" + i);
-      List<RoomImage> images = new ArrayList<>();
-      images.add(new RoomImage("room path" + i));
-      images.add(new RoomImage("room path" + 2 * i));
       CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
           .address(address)
           .charge(defaultCharge * i)
@@ -137,16 +136,12 @@ class RoomServiceForGuestTest {
           .description(defaultRoomDescription)
           .roomInfo(new RoomInfo(i, i, i, i))
           .roomType(roomTypes[i % roomTypes.length])
-          .roomImages(images)
           .build();
-      roomServiceForHost.save(createRoomRequest, hostId2);
+      roomServiceForHost.save(createRoomRequest, defaultMultipartFiles, hostId2);
     }
 
     for (int i = 21; i < 31; i++) {
       Address address = new Address("address1" + i, "address2" + i);
-      List<RoomImage> images = new ArrayList<>();
-      images.add(new RoomImage("room path" + i));
-      images.add(new RoomImage("room path" + 2 * i));
       CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
           .address(address)
           .charge(defaultCharge * i)
@@ -154,9 +149,8 @@ class RoomServiceForGuestTest {
           .description(defaultRoomDescription)
           .roomInfo(new RoomInfo(i, i, i, i))
           .roomType(roomTypes[i % roomTypes.length])
-          .roomImages(images)
           .build();
-      roomServiceForHost.save(createRoomRequest, hostId3);
+      roomServiceForHost.save(createRoomRequest, defaultMultipartFiles, hostId3);
     }
 
     CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
@@ -166,10 +160,9 @@ class RoomServiceForGuestTest {
         .description(defaultRoomDescription)
         .roomInfo(defaultRoomInfo)
         .roomType(defaultRoomType)
-        .roomImages(defaultImages)
         .build();
 
-    roomId = roomServiceForHost.save(createRoomRequest, hostId1).getId();
+    roomId = roomServiceForHost.save(createRoomRequest, defaultMultipartFiles, hostId1).getId();
   }
 
   @AfterEach
@@ -237,8 +230,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements())
@@ -258,8 +251,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(10);
@@ -282,8 +275,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(10);
@@ -306,8 +299,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(10);
@@ -329,8 +322,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements())
@@ -350,8 +343,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       for (RoomSummaryResponse roomSummaryResponse : sliceOfRoomSummary) {
@@ -372,8 +365,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       for (RoomSummaryResponse roomSummaryResponse : sliceOfRoomSummary) {
@@ -396,8 +389,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       for (RoomSummaryResponse roomSummaryResponse : sliceOfRoomSummary) {
@@ -422,8 +415,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(0);
@@ -442,8 +435,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       for (RoomSummaryResponse roomSummaryResponse : sliceOfRoomSummary) {
@@ -464,8 +457,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(2);
@@ -484,8 +477,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(10);
@@ -504,8 +497,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(10);
@@ -531,8 +524,8 @@ class RoomServiceForGuestTest {
       PageRequest pageable = PageRequest.of(0, 100);
 
       //when
-      Slice<RoomSummaryResponse> sliceOfRoomSummary = roomServiceForGuest.findAll(searchRoomRequest,
-          pageable);
+      Slice<RoomSummaryResponse> sliceOfRoomSummary
+          = roomServiceForGuest.findAll(searchRoomRequest, pageable);
 
       //then
       assertThat(sliceOfRoomSummary.getNumberOfElements()).isEqualTo(4);

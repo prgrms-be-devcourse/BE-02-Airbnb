@@ -18,16 +18,17 @@ public class RoomRestControllerForGuest {
 
   private final RoomServiceForGuest roomService;
 
-  public RoomRestControllerForGuest(
-      RoomServiceForGuest roomService) {
+  public RoomRestControllerForGuest(RoomServiceForGuest roomService) {
     this.roomService = roomService;
   }
 
   @GetMapping
-  public ResponseEntity<Slice<RoomSummaryResponse>> getAllRoom(SearchRoomRequest searchRoomRequest,
+  public ResponseEntity<Slice<RoomSummaryResponse>> getAllRoom(
+      SearchRoomRequest searchRoomRequest,
       Pageable pageable) {
 
-    Slice<RoomSummaryResponse> searchRoomSummarySlice = roomService.findAll(searchRoomRequest, pageable);
+    Slice<RoomSummaryResponse> searchRoomSummarySlice
+        = roomService.findAll(searchRoomRequest, pageable);
 
     return ResponseEntity.ok(searchRoomSummarySlice);
   }
