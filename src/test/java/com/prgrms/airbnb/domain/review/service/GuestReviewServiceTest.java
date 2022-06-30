@@ -68,8 +68,7 @@ class GuestReviewServiceTest {
         ReservationStatus.WAITED_OK, LocalDate.now().minusDays(5), LocalDate.now().minusDays(3), 3,
         30000, 1L, 10L);
     review1 = new Review("comment", 5, "245325", true,
-        List.of(new ReviewImage("Path 1"), new ReviewImage("Path 2")));
-    review2 = new Review("comment", 5, "245325", true, List.of());
+        List.of(new ReviewImage(11L, "Path 1"), new ReviewImage(12L, "Path 2")));
     pageRequest = PageRequest.of(0, 2);
   }
 
@@ -152,7 +151,7 @@ class GuestReviewServiceTest {
       List<MultipartFile> multipartFiles = new ArrayList<>();
       multipartFiles.add(new MockMultipartFile("img", "img", "text/plain", "img".getBytes()));
       UpdateReviewRequest request = new UpdateReviewRequest("hello", 0, true,
-          List.of(new ReviewImage("PATH")));
+          List.of(new ReviewImage(12L, "PATH")));
       reservation1.changeStatus(ReservationStatus.ACCEPTED);
       reservation1.changeStatus(ReservationStatus.WAIT_REVIEW);
       reservation1.changeStatus(ReservationStatus.COMPLETE);
@@ -176,12 +175,12 @@ class GuestReviewServiceTest {
       List<MultipartFile> multipartFiles = new ArrayList<>();
       multipartFiles.add(new MockMultipartFile("img", "img", "text/plain", "img".getBytes()));
       UpdateReviewRequest request = new UpdateReviewRequest("hello", 0, true,
-          List.of(new ReviewImage("PATH")));
+          List.of(new ReviewImage(11L, "PATH"),new ReviewImage(12L, "PATH")));
       reservation1.changeStatus(ReservationStatus.ACCEPTED);
       reservation1.changeStatus(ReservationStatus.WAIT_REVIEW);
       reservation1.changeStatus(ReservationStatus.COMPLETE);
       when(uploadService.uploadImg(any())).thenReturn("path");
-      when(reviewRepository.findById(any())).thenReturn(Optional.of(review2));
+      when(reviewRepository.findById(any())).thenReturn(Optional.of(review1));
       when(reservationRepository.findById(any())).thenReturn(Optional.of(reservation1));
       when(roomRepository.findById(10L)).thenReturn(Optional.of(room));
       //when
@@ -199,11 +198,11 @@ class GuestReviewServiceTest {
       List<MultipartFile> multipartFiles = new ArrayList<>();
       multipartFiles.add(new MockMultipartFile("img", "img", "text/plain", "img".getBytes()));
       UpdateReviewRequest request = new UpdateReviewRequest("hello", 0, true,
-          List.of(new ReviewImage("PATH")));
+          List.of(new ReviewImage(12L, "PATH")));
       reservation1.changeStatus(ReservationStatus.ACCEPTED);
       reservation1.changeStatus(ReservationStatus.WAIT_REVIEW);
       reservation1.changeStatus(ReservationStatus.COMPLETE);
-      when(reviewRepository.findById(any())).thenReturn(Optional.of(review2));
+      when(reviewRepository.findById(any())).thenReturn(Optional.of(review1));
       when(reservationRepository.findById(any())).thenReturn(Optional.of(reservation1));
       when(roomRepository.findById(10L)).thenReturn(Optional.of(room));
       //when
@@ -221,7 +220,7 @@ class GuestReviewServiceTest {
       List<MultipartFile> multipartFiles = new ArrayList<>();
       multipartFiles.add(new MockMultipartFile("img", "img", "text/plain", "img".getBytes()));
       UpdateReviewRequest request = new UpdateReviewRequest("hello", 0, true,
-          List.of(new ReviewImage("PATH")));
+          List.of(new ReviewImage(12L, "PATH")));
       reservation1.changeStatus(ReservationStatus.ACCEPTED);
       reservation1.changeStatus(ReservationStatus.WAIT_REVIEW);
       reservation1.changeStatus(ReservationStatus.COMPLETE);

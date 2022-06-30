@@ -118,8 +118,10 @@ public class GuestReviewService {
   }
 
   private void deleteImages(UpdateReviewRequest updateReviewRequest, Review review) {
-    Optional.ofNullable(review.getImages()).orElseGet(Collections::emptyList).stream()
-        .filter(Predicate.not(updateReviewRequest.getImages()::contains)).filter(Objects::nonNull)
+    Optional.ofNullable(review.getImages()).orElseGet(Collections::emptyList).stream().filter(
+            Predicate.not(reviewImage -> Optional.ofNullable(updateReviewRequest.getImages())
+                .orElseGet(Collections::emptyList).stream().map(ReviewImage::getId)
+                .anyMatch(imageId -> imageId.equals(reviewImage.getId())))).filter(Objects::nonNull)
         .collect(Collectors.toList()).forEach(reviewImage -> {
           uploadService.delete(reviewImage.getPath());
           reviewImage.deleteReview();
