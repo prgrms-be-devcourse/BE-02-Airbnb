@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Responsive navbar-->
+<nav class="navbar navbar-expand-lg sticky-top bg-light shadow-sm" th:fragment="navbarFragment">
+  <div class="container-fluid">
+    <a class="" href="/">
+      <img src="/assets/logo.png" alt="logo" height="38">
+    </a>
+    <form class="d-flex" role="search" style="width: 400px">
+      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+    <span>
+        호스트 되기
+    </span>
+    <div>
+      <button type="button" class="btn btn-success" data-bs-toggle="dropdown" aria-expanded="false">
+        User
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" style="margin-right: 12px; width: 200px">
+        <li>
+          <button class="dropdown-item" type="button">메시지</button>
+        </li>
+        <li>
+          <button class="dropdown-item" type="button">알림</button>
+        </li>
+        <li>
+          <button class="dropdown-item" type="button">여행</button>
+        </li>
+        <li>
+          <button class="dropdown-item" type="button">위시 리스트</button>
+        </li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li>
+          <button class="dropdown-item" type="button">숙소 호스트 되기</button>
+        </li>
+        <li>
+          <button class="dropdown-item" type="button">체험 호스팅하기</button>
+        </li>
+        <li>
+          <a class="dropdown-item" type="button" href="/user">계정</a>
+        </li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li>
+          <button class="dropdown-item" type="button">도움말</button>
+        </li>
+        <li>
+          <button class="dropdown-item" type="button">로그아웃</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
