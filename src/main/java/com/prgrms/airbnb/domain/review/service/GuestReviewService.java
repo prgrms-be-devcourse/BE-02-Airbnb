@@ -13,7 +13,10 @@ import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.review.util.ReviewConverter;
 import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
@@ -73,12 +76,14 @@ public class GuestReviewService {
     review.changeComment(updateReviewRequest.getComment());
     review.changeRating(updateReviewRequest.getRating());
     review.changeVisible(updateReviewRequest.getVisible());
-    review.getImages().stream().filter(Predicate.not(updateReviewRequest.getImages()::contains))
-        .forEach(reviewImage -> {
+    Optional.ofNullable(review.getImages()).orElseGet(Collections::emptyList).stream()
+        .filter(Predicate.not(updateReviewRequest.getImages()::contains)).filter(Objects::nonNull)
+        .collect(Collectors.toList()).forEach(reviewImage -> {
           uploadService.delete(reviewImage.getPath());
           reviewImage.deleteReview();
         });
-    images.stream().map(image -> uploadService.uploadImg(image)).map(path -> new ReviewImage(path))
+    Optional.ofNullable(images).orElseGet(Collections::emptyList).stream()
+        .map(image -> uploadService.uploadImg(image)).map(path -> new ReviewImage(path))
         .forEach(review::addImage);
     room.getReviewInfo().changeReviewInfo(review.getRating(), updateReviewRequest.getRating());
     return ReviewConverter.of(review);
