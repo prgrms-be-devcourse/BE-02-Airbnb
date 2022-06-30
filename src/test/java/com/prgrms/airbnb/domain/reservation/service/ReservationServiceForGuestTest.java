@@ -93,6 +93,7 @@ class ReservationServiceForGuestTest {
         new Email("qjatjr@gmail.com")
     );
     User saveHost = userRepository.save(host);
+
     //room 만들기
     address = new Address("address1", "address2");
     charge = 1000;
@@ -116,6 +117,7 @@ class ReservationServiceForGuestTest {
     );
     Room saveRoom = roomRepository.save(room);
     roomId = saveRoom.getId();
+
     //User 만들기
     User user1 = new User("짱구",
         "provider1",
@@ -236,7 +238,7 @@ class ReservationServiceForGuestTest {
   }
 
   @Nested
-  @DisplayName("자세한 예약 내용 보여주기")
+  @DisplayName("게스트 입장으로 자세한 예약 내용 보여주기")
   class FindDetailById {
 
     @Test
@@ -344,8 +346,8 @@ class ReservationServiceForGuestTest {
           .findByUserId(userId2, pageable);
 
       assertThat(list).hasSize(2);
-      assertThat(list.get().anyMatch(v -> v.getId().equals(save2.getId()))).isTrue();
-      assertThat(list.get().anyMatch(v -> v.getId().equals(save3.getId()))).isTrue();
+      assertThat(list.map(ReservationSummaryResponse::getId))
+          .containsOnly(save2.getId(), save3.getId());
     }
 
     @Test
@@ -385,9 +387,7 @@ class ReservationServiceForGuestTest {
           .findByUserId(userId3, pageable);
 
       assertThat(list).hasSize(0);
-      assertThat(list.get().anyMatch(v -> v.getId().equals(save1.getId()))).isFalse();
-      assertThat(list.get().anyMatch(v -> v.getId().equals(save2.getId()))).isFalse();
-      assertThat(list.get().anyMatch(v -> v.getId().equals(save3.getId()))).isFalse();
+      assertThat(list.map(ReservationSummaryResponse::getId)).isEmpty();
     }
   }
 }
