@@ -13,7 +13,9 @@ import com.prgrms.airbnb.domain.room.util.RoomConverter;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -49,10 +51,14 @@ public class RoomServiceForHost {
       throw new RuntimeException("기존에 등록된 주소가 있습니다.");
     }
 
-    if (multipartFiles != null && multipartFiles.size() > 0) {
-      createRoomRequest.setRoomImages(multipartFiles.stream().map(
-          m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList()));
-    }
+    createRoomRequest.setRoomImages(
+        Optional.ofNullable(multipartFiles)
+            .orElseGet(Collections::emptyList)
+        .stream().sequential().map(
+            m -> new RoomImage(uploadService.uploadImg(m))
+            )
+            .collect(Collectors.toList())
+    );
 
     User user = userRepository.findById(hostId)
         .orElseThrow(RuntimeException::new);
@@ -76,14 +82,17 @@ public class RoomServiceForHost {
     room.setCharge(updateRoomRequest.getCharge());
     room.setDescription(updateRoomRequest.getDescription());
 
-    if (multipartFiles != null) {
-      List<RoomImage> updateRoomImageList = multipartFiles.stream().map(
-          m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList());
+    List<RoomImage> updateImageList =
+        Optional.ofNullable(multipartFiles).orElseGet(Collections::emptyList)
+        .stream().sequential().map(
+            m -> new RoomImage(uploadService.uploadImg(m))
+            )
+        .collect(Collectors.toList());
 
-      room.getRoomImages()
-          .removeIf(roomImage -> !updateRoomImageList.contains(roomImage));
-      updateRoomImageList.forEach(room::setImage);
-    }
+    room.getRoomImages()
+        .removeIf(roomImage -> !updateImageList.contains(roomImage));
+
+    updateImageList.forEach(room::setImage);
 
     room.getRoomInfo().setMaxGuest(updateRoomRequest.getMaxGuest());
     room.getRoomInfo().setBedCount(updateRoomRequest.getBedCount());
