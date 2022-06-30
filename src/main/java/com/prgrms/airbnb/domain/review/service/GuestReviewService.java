@@ -13,7 +13,6 @@ import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.review.util.ReviewConverter;
 import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
-import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -29,19 +28,16 @@ public class GuestReviewService {
 
   private final ReviewRepository reviewRepository;
   private final ReservationRepository reservationRepository;
-
   private final RoomRepository roomRepository;
-  private final UserRepository userRepository;
   private final UploadService uploadService;
 
   public GuestReviewService(ReviewRepository reviewRepository,
       ReservationRepository reservationRepository, RoomRepository roomRepository,
-      UserRepository userRepository, UploadService uploadService) {
+      UploadService uploadService) {
     this.reviewRepository = reviewRepository;
     this.reservationRepository = reservationRepository;
     this.roomRepository = roomRepository;
     this.uploadService = uploadService;
-    this.userRepository = userRepository;
   }
 
   @Transactional

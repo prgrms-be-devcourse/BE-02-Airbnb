@@ -17,7 +17,6 @@ import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -54,12 +53,6 @@ class HostReviewServiceTest {
     review2 = new Review("comment", 5, "245325", true,
         List.of(new ReviewImage("Path 1"), new ReviewImage("Path 2")));
     pageRequest = PageRequest.of(0, 2);
-  }
-
-  @AfterEach
-  void clear() {
-    roomRepository.deleteAll();
-    reviewRepository.deleteAll();
   }
 
   @Nested
