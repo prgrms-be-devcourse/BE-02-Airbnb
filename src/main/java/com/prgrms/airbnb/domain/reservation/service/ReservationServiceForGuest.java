@@ -12,10 +12,8 @@ import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import java.time.LocalDate;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,11 +86,6 @@ public class ReservationServiceForGuest {
   public Slice<ReservationSummaryResponse> findByUserId(Long userId, Pageable pageable) {
     Slice<Reservation> reservationList = reservationRepository.findByUserIdOrderByCreatedAtDesc(
         userId, pageable);
-    return new SliceImpl<>(
-        reservationList.getContent().stream()
-            .map(
-                ReservationConverter::ofSummary).collect(Collectors.toList()),
-        pageable,
-        reservationList.hasNext());
+    return reservationList.map(ReservationConverter::ofSummary);
   }
 }
