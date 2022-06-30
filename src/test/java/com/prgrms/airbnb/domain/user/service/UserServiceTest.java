@@ -2,8 +2,11 @@ package com.prgrms.airbnb.domain.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.common.service.UploadService;
@@ -25,11 +28,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @Transactional
@@ -39,7 +44,7 @@ class UserServiceTest {
   @Autowired
   private UserService userService;
 
-  @Autowired
+  @Mock
   private UploadService uploadService;
 
   @Nested
@@ -64,17 +69,15 @@ class UserServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'",
-        "'송무송', 'profile_image', 'real.purple@gmail.com'"})
+    @CsvSource(value = {"'무송', 'songe08@gmail.com'", "'송무송', 'real.purple@gmail.com'"})
     @DisplayName("성공: 프로필이 널값이어도 정상적으로 생성됩니다.")
-    void successByProfileImage(String nickName, String profileImage, String email) {
+    void successByProfileImage(String nickName, String email) {
       // Given, When
       User user = userService.join(
           mockOAuth2User(nickName, getAttributes(nickName, null, email)),
           "kakao"
       );
       // Then
-      assertThat(user).isNotNull();
       assertThat(user.getName()).isEqualTo(nickName);
       assertThat(user.getProfileImage()).isNull();
       assertThat(user.getEmail()).isEqualTo(new Email(email));
@@ -82,15 +85,16 @@ class UserServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"'무송', 'profile_image'", "'송무송', 'profile_image'"})
-    @DisplayName("실패: 이메일이 널값이면 예외를 반환합니다.")
+    @DisplayName("성공: 이메일이 널값이어도 정상적으로 생성됩니다.")
     void failByEmail(String nickName, String profileImage) {
       // Given, When
-      Throwable response = catchThrowable(() -> userService.join(
+      User user = userService.join(
           mockOAuth2User(nickName, getAttributes(nickName, profileImage, null)),
-          "kakao"
-      ));
+          "kakao");
       // Then
-      assertThat(response).isInstanceOf(IllegalArgumentException.class);
+      assertThat(user.getName()).isEqualTo(nickName);
+      assertThat(user.getProfileImage()).isEqualTo(profileImage);
+      assertThat(user.getEmail()).isNull();
     }
 
     @ParameterizedTest
@@ -191,6 +195,10 @@ class UserServiceTest {
           .name("tiger")
           .phone("010-1234-5678")
           .build();
+
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
+
       // When, Then
       userList.forEach(user -> {
         UserDetailResponse actual = userService.modify(user.getId(), request, mockMultipartFile);
@@ -207,6 +215,8 @@ class UserServiceTest {
           .name("tiger")
           .phone("010-1234-5678")
           .build();
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
       // When, Then
       userList.forEach(user -> {
         UserDetailResponse actual = userService.modify(user.getId(), request, null);
@@ -219,6 +229,8 @@ class UserServiceTest {
     void fail() {
       // Given
       UserUpdateRequest request = UserUpdateRequest.builder().build();
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
       // When
       Throwable response = catchThrowable(
           () -> userService.modify(0L, request, mockMultipartFile));
@@ -233,6 +245,8 @@ class UserServiceTest {
       UserUpdateRequest request = UserUpdateRequest.builder()
           .email("tiger@naver.com")
           .build();
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
       // When, Then
       userList.forEach(user -> {
         Throwable response = catchThrowable(
@@ -248,6 +262,8 @@ class UserServiceTest {
       UserUpdateRequest request = UserUpdateRequest.builder()
           .name("tiger")
           .build();
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
       // When, Then
       userList.forEach(user -> {
         Throwable response = catchThrowable(
