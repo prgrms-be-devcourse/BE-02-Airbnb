@@ -83,8 +83,8 @@ class ReviewRepositoryTest {
         List.of(reviewImage1, reviewImage2));
     reviewRepository.save(review1);
     reviewRepository.save(review2);
-    Slice<Review> reviewListOrderByCreatedAtDesc = reviewRepository.findAllByRoomId(room.getId(),
-        pageRequest);
+    Slice<Review> reviewListOrderByCreatedAtDesc = reviewRepository.findAllByRoomIdForHost(
+        room.getId(), pageRequest);
     Assertions.assertThat(reviewListOrderByCreatedAtDesc.getContent().size()).isEqualTo(2);
     Assertions.assertThat(reviewListOrderByCreatedAtDesc.getContent().get(0).getId())
         .isNotEqualTo(review1.getId());

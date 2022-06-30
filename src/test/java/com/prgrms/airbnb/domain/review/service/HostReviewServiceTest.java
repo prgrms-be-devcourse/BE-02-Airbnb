@@ -65,7 +65,7 @@ class HostReviewServiceTest {
       //given
       when(roomRepository.findById(10L)).thenReturn(Optional.of(room));
       PageRequest pageRequest = PageRequest.of(0, 2);
-      when(reviewRepository.findAllByRoomId(10L, pageRequest)).thenReturn(
+      when(reviewRepository.findAllByRoomIdForHost(10L, pageRequest)).thenReturn(
           new SliceImpl<>(List.of(review1, review2), pageRequest, true));
       //when
       Slice<ReviewResponse> reviewList = hostReviewService.findAllByRoomId(1L, 10L, pageRequest);

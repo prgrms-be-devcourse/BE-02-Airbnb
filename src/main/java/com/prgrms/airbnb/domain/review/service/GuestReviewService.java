@@ -83,15 +83,8 @@ public class GuestReviewService {
 
   public Slice<ReviewResponse> findAllByRoomId(Long authenticationUserId, Long roomId,
       Pageable pageable) {
-    Slice<Review> reviewList = reviewRepository.findAllByRoomId(roomId, pageable);
-    reviewList.getContent().removeIf(review -> {
-      Reservation reservation = reservationRepository.findById(review.getReservationId())
-          .orElseThrow(IllegalArgumentException::new);
-      if (!review.isVisible() && !reservation.getUserId().equals(authenticationUserId)) {
-        return true;
-      }
-      return false;
-    });
+    Slice<Review> reviewList = reviewRepository.findAllByRoomIdForGuest(roomId,
+        authenticationUserId, pageable);
     return reviewList.map(ReviewConverter::of);
   }
 

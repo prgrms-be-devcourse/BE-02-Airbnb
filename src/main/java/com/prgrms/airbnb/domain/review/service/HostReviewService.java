@@ -30,10 +30,8 @@ public class HostReviewService {
   public Slice<ReviewResponse> findAllByRoomId(Long authenticationUserId, Long roomId,
       Pageable pageable) {
     Room room = roomRepository.findById(roomId).orElseThrow(IllegalArgumentException::new);
-    System.out.println(authenticationUserId);
-    System.out.println(room.getUserId());
     validateAuthority(authenticationUserId, room.getUserId());
-    Slice<Review> reviewList = reviewRepository.findAllByRoomId(roomId, pageable);
+    Slice<Review> reviewList = reviewRepository.findAllByRoomIdForHost(roomId, pageable);
     return reviewList.map(ReviewConverter::of);
   }
 

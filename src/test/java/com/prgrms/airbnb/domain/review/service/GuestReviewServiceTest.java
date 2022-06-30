@@ -37,6 +37,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -70,7 +72,7 @@ class GuestReviewServiceTest {
         30000, 1L, 10L);
     review1 = new Review("comment", 5, "245325", true,
         List.of(new ReviewImage(11L, "Path 1"), new ReviewImage(12L, "Path 2")));
-    review2 = new Review("comment", 5, "245325", true, null);
+    review2 = new Review("comment", 5, "245325", false, null);
     pageRequest = PageRequest.of(0, 2);
   }
 
@@ -94,7 +96,6 @@ class GuestReviewServiceTest {
       when(uploadService.uploadImg(any())).thenReturn("path");
       when(roomRepository.findById(10L)).thenReturn(Optional.of(room));
       when(reviewRepository.save(any())).thenReturn(review1);
-      doNothing().when(uploadService).delete(any());
       //when
       ReviewResponse reviewResponse = guestReviewService.save(1L, reservation1.getId(), request,
           multipartFiles);
@@ -229,6 +230,25 @@ class GuestReviewServiceTest {
       Assertions.assertThatThrownBy(
               () -> guestReviewService.modify(2L, 3L, request, multipartFiles))
           .isInstanceOf(IllegalArgumentException.class);
+    }
+  }
+
+  @Nested
+  @DisplayName("리뷰 조회 테스트")
+  class Find {
+
+    @Test
+    public void findAllByRoomIdWithMyReview() {
+      //given
+      Slice<Review> reviews = new SliceImpl<>(List.of(review2, review1), PageRequest.of(0, 2),
+          false);
+      when(reviewRepository.findAllByRoomIdForGuest(room.getId(), 1L,
+          PageRequest.of(0, 2))).thenReturn(reviews);
+      //when
+      Slice<ReviewResponse> reviewResponses = guestReviewService.findAllByRoomId(1L, 10L,
+          PageRequest.of(0, 2));
+      //then
+
     }
   }
 
