@@ -53,9 +53,8 @@ public class GuestReviewService {
       //TODO: 리뷰를 남길 수 없는 경우.
       throw new IllegalArgumentException();
     }
-    List<ReviewImage> imageList = images.stream().map(image -> uploadService.uploadImg(image))
-        .map(path -> new ReviewImage(path)).collect(Collectors.toList());
-    Review review = ReviewConverter.toReview(reservationId, createReviewRequest, imageList);
+    Review review = ReviewConverter.toReview(reservationId, createReviewRequest);
+    uploadNewImages(images, review);
     Review savedReview = reviewRepository.save(review);
     reservation.changeStatus(ReservationStatus.COMPLETE);
     Room room = roomRepository.findById(reservation.getRoomId())
@@ -70,21 +69,14 @@ public class GuestReviewService {
     Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
     Reservation reservation = reservationRepository.findById(review.getReservationId())
         .orElseThrow(IllegalArgumentException::new);
-    Room room = roomRepository.findById(reservation.getRoomId())
-        .orElseThrow(IllegalArgumentException::new);
     validateAuthority(authenticationUserId, reservation.getUserId());
     review.changeComment(updateReviewRequest.getComment());
     review.changeRating(updateReviewRequest.getRating());
     review.changeVisible(updateReviewRequest.getVisible());
-    Optional.ofNullable(review.getImages()).orElseGet(Collections::emptyList).stream()
-        .filter(Predicate.not(updateReviewRequest.getImages()::contains)).filter(Objects::nonNull)
-        .collect(Collectors.toList()).forEach(reviewImage -> {
-          uploadService.delete(reviewImage.getPath());
-          reviewImage.deleteReview();
-        });
-    Optional.ofNullable(images).orElseGet(Collections::emptyList).stream()
-        .map(image -> uploadService.uploadImg(image)).map(path -> new ReviewImage(path))
-        .forEach(review::addImage);
+    deleteImages(updateReviewRequest, review);
+    uploadNewImages(images, review);
+    Room room = roomRepository.findById(reservation.getRoomId())
+        .orElseThrow(IllegalArgumentException::new);
     room.getReviewInfo().changeReviewInfo(review.getRating(), updateReviewRequest.getRating());
     return ReviewConverter.of(review);
   }
@@ -117,5 +109,20 @@ public class GuestReviewService {
     if (!authenticationUserId.equals(userId)) {
       throw new IllegalArgumentException();
     }
+  }
+
+  private void uploadNewImages(List<MultipartFile> images, Review review) {
+    Optional.ofNullable(images).orElseGet(Collections::emptyList).stream()
+        .map(image -> uploadService.uploadImg(image)).map(path -> new ReviewImage(path))
+        .forEach(review::addImage);
+  }
+
+  private void deleteImages(UpdateReviewRequest updateReviewRequest, Review review) {
+    Optional.ofNullable(review.getImages()).orElseGet(Collections::emptyList).stream()
+        .filter(Predicate.not(updateReviewRequest.getImages()::contains)).filter(Objects::nonNull)
+        .collect(Collectors.toList()).forEach(reviewImage -> {
+          uploadService.delete(reviewImage.getPath());
+          reviewImage.deleteReview();
+        });
   }
 }

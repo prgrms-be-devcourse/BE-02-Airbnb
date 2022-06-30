@@ -43,6 +43,13 @@ public class Review extends BaseEntity {
   @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<ReviewImage> images = new ArrayList<>();
 
+  public Review(String comment, Integer rating, String reservationId, Boolean visible) {
+    setComment(comment);
+    setRating(rating);
+    setReservationId(reservationId);
+    setVisible(visible);
+  }
+
   public Review(String comment, Integer rating, String reservationId, Boolean visible,
       List<ReviewImage> images) {
     setComment(comment);
