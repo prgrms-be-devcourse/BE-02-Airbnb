@@ -2,6 +2,8 @@ package com.prgrms.airbnb.domain.review.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
@@ -63,12 +65,12 @@ class GuestReviewServiceTest {
     room = new Room(10L, new Address("1", "2"), 30000, "담양 떡갈비", "뷰가 좋습니다",
         new RoomInfo(1, 2, 3, 4), RoomType.HOUSE, reviewInfo, List.of(new RoomImage("room path1")),
         1L);
-
     reservation1 = new Reservation("reservationRepository.createReservationId()",
         ReservationStatus.WAITED_OK, LocalDate.now().minusDays(5), LocalDate.now().minusDays(3), 3,
         30000, 1L, 10L);
     review1 = new Review("comment", 5, "245325", true,
         List.of(new ReviewImage(11L, "Path 1"), new ReviewImage(12L, "Path 2")));
+    review2 = new Review("comment", 5, "245325", true, null);
     pageRequest = PageRequest.of(0, 2);
   }
 
@@ -92,6 +94,7 @@ class GuestReviewServiceTest {
       when(uploadService.uploadImg(any())).thenReturn("path");
       when(roomRepository.findById(10L)).thenReturn(Optional.of(room));
       when(reviewRepository.save(any())).thenReturn(review1);
+      doNothing().when(uploadService).delete(any());
       //when
       ReviewResponse reviewResponse = guestReviewService.save(1L, reservation1.getId(), request,
           multipartFiles);
@@ -221,31 +224,39 @@ class GuestReviewServiceTest {
       multipartFiles.add(new MockMultipartFile("img", "img", "text/plain", "img".getBytes()));
       UpdateReviewRequest request = new UpdateReviewRequest("hello", 0, true,
           List.of(new ReviewImage(12L, "PATH")));
-      reservation1.changeStatus(ReservationStatus.ACCEPTED);
-      reservation1.changeStatus(ReservationStatus.WAIT_REVIEW);
-      reservation1.changeStatus(ReservationStatus.COMPLETE);
       //when
       //then
       Assertions.assertThatThrownBy(
               () -> guestReviewService.modify(2L, 3L, request, multipartFiles))
           .isInstanceOf(IllegalArgumentException.class);
     }
+  }
+
+  @Nested
+  @DisplayName("리뷰 삭제 테스트")
+  class Remove {
 
     @Test
-    @DisplayName("실패: 리뷰 수정 권한이 없습니다.")
+    @DisplayName("성공: 리뷰를 삭제합니다.")
+    public void remove() {
+      //given
+      when(reviewRepository.findById(any())).thenReturn(Optional.of(review2));
+      when(reservationRepository.findById(any())).thenReturn(Optional.of(reservation1));
+      //when
+      guestReviewService.remove(1L, 3L);
+      //then
+      verify(reviewRepository, times(1)).delete(any(Review.class));
+    }
+
+    @Test
+    @DisplayName("실패: 리뷰 삭제 권한이 없습니다.")
     public void failAuthentication() {
       //given
-      List<MultipartFile> multipartFiles = new ArrayList<>();
-      multipartFiles.add(new MockMultipartFile("img", "img", "text/plain", "img".getBytes()));
-      UpdateReviewRequest request = new UpdateReviewRequest("hello", 0, true,
-          List.of(new ReviewImage(12L, "PATH")));
-      reservation1.changeStatus(ReservationStatus.ACCEPTED);
-      reservation1.changeStatus(ReservationStatus.WAIT_REVIEW);
-      reservation1.changeStatus(ReservationStatus.COMPLETE);
+      when(reviewRepository.findById(any())).thenReturn(Optional.of(review2));
+      when(reservationRepository.findById(any())).thenReturn(Optional.of(reservation1));
       //when
       //then
-      Assertions.assertThatThrownBy(
-              () -> guestReviewService.modify(2L, 3L, request, multipartFiles))
+      Assertions.assertThatThrownBy(() -> guestReviewService.remove(2L, 3L))
           .isInstanceOf(IllegalArgumentException.class);
     }
   }

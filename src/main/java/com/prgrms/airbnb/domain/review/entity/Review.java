@@ -3,7 +3,9 @@ package com.prgrms.airbnb.domain.review.entity;
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -56,7 +58,7 @@ public class Review extends BaseEntity {
     setRating(rating);
     setReservationId(reservationId);
     setVisible(visible);
-    images.forEach(this::setImage);
+    Optional.ofNullable(images).orElseGet(Collections::emptyList).forEach(this::setImage);
   }
 
   public Review(Long id, String comment, Integer rating, String reservationId, Boolean visible,
