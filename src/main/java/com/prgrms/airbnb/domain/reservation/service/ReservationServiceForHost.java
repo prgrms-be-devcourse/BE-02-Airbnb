@@ -10,10 +10,10 @@ import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,29 +44,37 @@ public class ReservationServiceForHost {
     return ReservationConverter.ofDetailForHost(reservation, guest, room);
   }
 
-  public Slice<ReservationSummaryResponse> findByHostId(Long userId, Pageable pageable) {
-    //TODO: 호스트의 ID 입력시 예약 list 가져오기 수정 필요함
-    Slice<Reservation> reservationList = reservationRepository.findByUserIdOrderByCreatedAtDesc(
-        userId, pageable);
-    return new SliceImpl<>(
-        reservationList.getContent().stream()
-            .map(
-                ReservationConverter::ofSummary).collect(Collectors.toList()),
-        pageable,
-        reservationList.hasNext());
+  public Slice<ReservationSummaryResponse> findByHostId(Long hostId, Pageable pageable) {
+    List<Long> collect = roomRepository.findAllByUserId(hostId)
+        .stream()
+        .map(Room::getId)
+        .collect(Collectors.toList());
+
+    if (collect.isEmpty()) {
+      throw new IllegalArgumentException();
+    }
+
+    Slice<Reservation> reservationList = reservationRepository.findByRoomIdOrderByCreatedAtDesc(
+        collect, pageable);
+
+    return reservationList.map(ReservationConverter::ofSummary);
   }
 
   @Transactional
-  public void approval(String reservationId, Long userId, ReservationStatus reservationStatus) {
+  public ReservationDetailResponseForHost approval(String reservationId, Long userId,
+      ReservationStatus reservationStatus) {
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(IllegalArgumentException::new);
-    Long hostId = roomRepository.findById(reservation.getRoomId())
-        .orElseThrow(IllegalArgumentException::new).getUserId();
-    if (userId != hostId) {
+    Room room = roomRepository.findById(reservation.getRoomId())
+        .orElseThrow(IllegalArgumentException::new);
+    User guest = userRepository.findById(reservation.getUserId())
+        .orElseThrow(IllegalArgumentException::new);
+    if (!userId.equals(room.getUserId())) {
       //TODO 권한 없음 에러 처리 필요
       throw new IllegalArgumentException();
     }
     reservation.changeStatus(reservationStatus);
+    return ReservationConverter.ofDetailForHost(reservation, guest, room);
   }
 
 }
