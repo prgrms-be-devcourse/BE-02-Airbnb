@@ -49,15 +49,14 @@ public class RoomServiceForHost {
       throw new RuntimeException("기존에 등록된 주소가 있습니다.");
     }
 
-    List<RoomImage> roomImages = new ArrayList<>();
     if (multipartFiles != null && multipartFiles.size() > 0) {
-      roomImages = multipartFiles.stream().map(
-          m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList());
+      createRoomRequest.setRoomImages(multipartFiles.stream().map(
+          m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList()));
     }
 
     User user = userRepository.findById(hostId)
         .orElseThrow(RuntimeException::new);
-    Room room = RoomConverter.toRoom(createRoomRequest, roomImages, user);
+    Room room = RoomConverter.toRoom(createRoomRequest, user);
     Room savedRoom = roomRepository.save(room);
 
     return RoomConverter.ofDetail(savedRoom);
@@ -78,12 +77,12 @@ public class RoomServiceForHost {
     room.setDescription(updateRoomRequest.getDescription());
 
     if (multipartFiles != null) {
-      List<RoomImage> newRoomImages = multipartFiles.stream().map(
+      List<RoomImage> updateRoomImageList = multipartFiles.stream().map(
           m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList());
 
       room.getRoomImages()
-          .removeIf(roomImage -> !newRoomImages.contains(roomImage));
-      newRoomImages.forEach(room::setImage);
+          .removeIf(roomImage -> !updateRoomImageList.contains(roomImage));
+      updateRoomImageList.forEach(room::setImage);
     }
 
     room.getRoomInfo().setMaxGuest(updateRoomRequest.getMaxGuest());

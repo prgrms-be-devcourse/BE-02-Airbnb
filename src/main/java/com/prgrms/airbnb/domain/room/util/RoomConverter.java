@@ -10,7 +10,7 @@ import java.util.List;
 
 public class RoomConverter {
 
-  public static Room toRoom(CreateRoomRequest createRoomRequest, List<RoomImage> roomImages, User user) {
+  public static Room toRoom(CreateRoomRequest createRoomRequest, User user) {
     return new Room(
         createRoomRequest.getAddress(),
         createRoomRequest.getCharge(),
@@ -18,7 +18,7 @@ public class RoomConverter {
         createRoomRequest.getDescription(),
         createRoomRequest.getRoomInfo(),
         createRoomRequest.getRoomType(),
-        roomImages,
+        createRoomRequest.getRoomImages(),
         user.getId()
     );
   }
