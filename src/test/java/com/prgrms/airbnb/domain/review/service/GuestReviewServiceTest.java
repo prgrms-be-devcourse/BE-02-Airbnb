@@ -175,7 +175,7 @@ class GuestReviewServiceTest {
       List<MultipartFile> multipartFiles = new ArrayList<>();
       multipartFiles.add(new MockMultipartFile("img", "img", "text/plain", "img".getBytes()));
       UpdateReviewRequest request = new UpdateReviewRequest("hello", 0, true,
-          List.of(new ReviewImage(11L, "PATH"),new ReviewImage(12L, "PATH")));
+          List.of(new ReviewImage(11L, "PATH"), new ReviewImage(12L, "PATH")));
       reservation1.changeStatus(ReservationStatus.ACCEPTED);
       reservation1.changeStatus(ReservationStatus.WAIT_REVIEW);
       reservation1.changeStatus(ReservationStatus.COMPLETE);
@@ -229,7 +229,24 @@ class GuestReviewServiceTest {
       Assertions.assertThatThrownBy(
               () -> guestReviewService.modify(2L, 3L, request, multipartFiles))
           .isInstanceOf(IllegalArgumentException.class);
+    }
 
+    @Test
+    @DisplayName("실패: 리뷰 수정 권한이 없습니다.")
+    public void failAuthentication() {
+      //given
+      List<MultipartFile> multipartFiles = new ArrayList<>();
+      multipartFiles.add(new MockMultipartFile("img", "img", "text/plain", "img".getBytes()));
+      UpdateReviewRequest request = new UpdateReviewRequest("hello", 0, true,
+          List.of(new ReviewImage(12L, "PATH")));
+      reservation1.changeStatus(ReservationStatus.ACCEPTED);
+      reservation1.changeStatus(ReservationStatus.WAIT_REVIEW);
+      reservation1.changeStatus(ReservationStatus.COMPLETE);
+      //when
+      //then
+      Assertions.assertThatThrownBy(
+              () -> guestReviewService.modify(2L, 3L, request, multipartFiles))
+          .isInstanceOf(IllegalArgumentException.class);
     }
   }
 }
