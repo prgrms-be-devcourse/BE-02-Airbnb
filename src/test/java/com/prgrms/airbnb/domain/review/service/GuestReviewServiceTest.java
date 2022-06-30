@@ -238,7 +238,8 @@ class GuestReviewServiceTest {
   class Find {
 
     @Test
-    public void findAllByRoomIdWithMyReview() {
+    @DisplayName("성공: 리뷰를 조회합니다.")
+    public void findAllByRoomIdWithReview() {
       //given
       Slice<Review> reviews = new SliceImpl<>(List.of(review2, review1), PageRequest.of(0, 2),
           false);
@@ -248,7 +249,22 @@ class GuestReviewServiceTest {
       Slice<ReviewResponse> reviewResponses = guestReviewService.findAllByRoomId(1L, 10L,
           PageRequest.of(0, 2));
       //then
+      Assertions.assertThat(reviewResponses.getContent().size()).isEqualTo(2);
+    }
 
+    @Test
+    @DisplayName("성공: 익명글인 타인의 리뷰를 조회합니다.")
+    public void findAllByRoomIdWithOtherReviewAndVisibleFalse() {
+      //given
+      Slice<Review> reviews = new SliceImpl<>(List.of(review2), PageRequest.of(0, 2),
+          false);
+      when(reviewRepository.findAllByRoomIdForGuest(room.getId(), 2L,
+          PageRequest.of(0, 2))).thenReturn(reviews);
+      //when
+      Slice<ReviewResponse> reviewResponses = guestReviewService.findAllByRoomId(2L, 10L,
+          PageRequest.of(0, 2));
+      //then
+      Assertions.assertThat(reviewResponses.getContent().size()).isEqualTo(1);
     }
   }
 

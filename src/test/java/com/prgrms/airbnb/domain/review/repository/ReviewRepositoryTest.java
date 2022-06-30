@@ -64,8 +64,8 @@ class ReviewRepositoryTest {
   }
 
   @Test
-  @DisplayName("성공: roomId를 통해 review를 최신순으로 검색합니다.")
-  void findAllByRoomId() {
+  @DisplayName("성공: 호스트는 객실의 리뷰를 전부 검색합니다.")
+  void findAllByRoomIdForHost() {
     room = new Room(new Address("1", "2"), 30000, "담양 떡갈비", "뷰가 좋습니다", new RoomInfo(1, 2, 3, 4),
         RoomType.HOUSE, List.of(new RoomImage("room path1")), 1L);
     roomRepository.save(room);
@@ -88,6 +88,30 @@ class ReviewRepositoryTest {
     Assertions.assertThat(reviewListOrderByCreatedAtDesc.getContent().size()).isEqualTo(2);
     Assertions.assertThat(reviewListOrderByCreatedAtDesc.getContent().get(0).getId())
         .isNotEqualTo(review1.getId());
+  }
+
+  @Test
+  @DisplayName("성공: 익명글인 타인의 리뷰가 제거되어 최신순으로 검색합니다.")
+  void findAllByRoomIdForGuest() {
+    room = new Room(new Address("1", "2"), 30000, "담양 떡갈비", "뷰가 좋습니다", new RoomInfo(1, 2, 3, 4),
+        RoomType.HOUSE, List.of(new RoomImage("room path1")), 1L);
+    roomRepository.save(room);
+    reservation1 = new Reservation(reservationRepository.createReservationId(),
+        ReservationStatus.WAITED_OK, LocalDate.of(2022, 6, 5), LocalDate.of(2022, 6, 8), 3, 30000,
+        1L, room.getId());
+    reservation2 = new Reservation(reservationRepository.createReservationId(),
+        ReservationStatus.WAITED_OK, LocalDate.of(2022, 6, 10), LocalDate.of(2022, 6, 15), 3, 30000,
+        2L, room.getId());
+    reservationRepository.save(reservation1);
+    reservationRepository.save(reservation2);
+    Review review1 = new Review(comment, rating, reservation1.getId(), false,
+        List.of(reviewImage1, reviewImage2));
+    Review review2 = new Review(comment, rating, reservation2.getId(), true,
+        List.of(reviewImage1, reviewImage2));
+    reviewRepository.save(review1);
+    reviewRepository.save(review2);
+    Slice<Review> reviews = reviewRepository.findAllByRoomIdForGuest(room.getId(), 2L, pageRequest);
+    Assertions.assertThat(reviews.getContent().size()).isEqualTo(1);
   }
 
   @Nested
