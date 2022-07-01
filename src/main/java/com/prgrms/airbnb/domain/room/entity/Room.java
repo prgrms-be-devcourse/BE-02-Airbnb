@@ -64,7 +64,7 @@ public class Room extends BaseEntity {
         setAddress(address);
         setCharge(charge);
         setName(name);
-        changeDescription(description);
+        this.description = description;
         this.roomInfo = roomInfo;
         setRoomType(roomType);
         images.forEach(this::setImage);
@@ -79,7 +79,7 @@ public class Room extends BaseEntity {
         setAddress(address);
         setCharge(charge);
         setName(name);
-        changeDescription(description);
+        this.description = description;
         this.roomInfo = roomInfo;
         setRoomType(roomType);
         this.reviewInfo = reviewInfo;
