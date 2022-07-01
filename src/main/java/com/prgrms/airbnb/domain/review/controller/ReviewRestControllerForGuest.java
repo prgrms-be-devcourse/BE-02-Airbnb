@@ -5,6 +5,7 @@ import com.prgrms.airbnb.domain.review.dto.CreateReviewRequest;
 import com.prgrms.airbnb.domain.review.dto.ReviewResponse;
 import com.prgrms.airbnb.domain.review.dto.UpdateReviewRequest;
 import com.prgrms.airbnb.domain.review.service.GuestReviewService;
+import java.net.URI;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -35,10 +36,11 @@ public class ReviewRestControllerForGuest {
       @AuthenticationPrincipal JwtAuthentication authentication, @PathVariable String reservationId,
       @RequestPart(value = "review") CreateReviewRequest createReviewRequest,
       @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) {
-    Long hostId = authentication.userId;
-    ReviewResponse reviewResponse = guestReviewService.save(hostId, reservationId,
+    Long userId = authentication.userId;
+    ReviewResponse reviewResponse = guestReviewService.save(userId, reservationId,
         createReviewRequest, multipartFiles);
-    return ResponseEntity.ok(reviewResponse);
+    return ResponseEntity.created(URI.create("/api/v1/guest/reviews/" + reviewResponse.getId()))
+        .body(reviewResponse);
   }
 
   @PutMapping("/{reviewId}")
@@ -46,8 +48,8 @@ public class ReviewRestControllerForGuest {
       @AuthenticationPrincipal JwtAuthentication authentication, @PathVariable Long reviewId,
       @RequestPart(value = "review") UpdateReviewRequest updateReviewRequest,
       @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) {
-    Long hostId = authentication.userId;
-    ReviewResponse reviewResponse = guestReviewService.modify(hostId, reviewId, updateReviewRequest,
+    Long userId = authentication.userId;
+    ReviewResponse reviewResponse = guestReviewService.modify(userId, reviewId, updateReviewRequest,
         multipartFiles);
     return ResponseEntity.ok(reviewResponse);
   }
@@ -56,8 +58,8 @@ public class ReviewRestControllerForGuest {
   public ResponseEntity<Slice<ReviewResponse>> getByRoomId(
       @AuthenticationPrincipal JwtAuthentication authentication, @PathVariable Long roomId,
       Pageable pageable) {
-    Long hostId = authentication.userId;
-    Slice<ReviewResponse> reviewResponses = guestReviewService.findAllByRoomId(hostId, roomId,
+    Long userId = authentication.userId;
+    Slice<ReviewResponse> reviewResponses = guestReviewService.findAllByRoomId(userId, roomId,
         pageable);
     return ResponseEntity.ok(reviewResponses);
   }
@@ -65,8 +67,8 @@ public class ReviewRestControllerForGuest {
   @DeleteMapping("/{reviewId}")
   public ResponseEntity<Void> delete(@AuthenticationPrincipal JwtAuthentication authentication,
       @PathVariable Long reviewId) {
-    Long hostId = authentication.userId;
-    guestReviewService.remove(hostId, reviewId);
-    return ResponseEntity.ok().build();
+    Long userId = authentication.userId;
+    guestReviewService.remove(userId, reviewId);
+    return ResponseEntity.noContent().build();
   }
 }
