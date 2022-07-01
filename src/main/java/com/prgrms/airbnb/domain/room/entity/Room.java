@@ -62,8 +62,8 @@ public class Room extends BaseEntity {
                 RoomInfo roomInfo, RoomType roomType, List<RoomImage> images, Long userId) {
 
         setAddress(address);
-        changeCharge(charge);
-        changeName(name);
+        setCharge(charge);
+        setName(name);
         changeDescription(description);
         this.roomInfo = roomInfo;
         setRoomType(roomType);
@@ -90,6 +90,10 @@ public class Room extends BaseEntity {
 
     public void enrollRoomImages(List<RoomImage> roomImages) {
         roomImages.forEach(roomImage -> roomImage.setRoom(this));
+    }
+
+    public void deleteRoomImages(List<RoomImage> deleteRoomImages) {
+        this.roomImages.removeIf(deleteRoomImages::contains);
     }
 
     public void changeCharge(Integer charge) {

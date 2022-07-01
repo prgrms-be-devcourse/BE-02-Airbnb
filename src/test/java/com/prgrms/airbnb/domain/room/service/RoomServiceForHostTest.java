@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.localStack.LocalStackS3Config;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
@@ -240,6 +239,7 @@ class RoomServiceForHostTest {
           .isEqualTo(createRoomRequest);
 
       assertThat(createRoomResponse.getId()).isNotNull();
+      assertThat(createRoomResponse.getRoomImages().size()).isEqualTo(2);
       assertThat(createRoomResponse.getUserId()).isEqualTo(hostId);
     }
 
@@ -265,7 +265,7 @@ class RoomServiceForHostTest {
       //then
       assertThat(createRoomResponse)
           .usingRecursiveComparison()
-          .ignoringFields("id", "userId")
+          .ignoringFields("id", "roomImages", "userId")
           .isEqualTo(createRoomRequest);
 
       assertThat(createRoomResponse.getId()).isNotNull();
@@ -316,7 +316,7 @@ class RoomServiceForHostTest {
       //then
       assertThat(createRoomResponse)
           .usingRecursiveComparison()
-          .ignoringFields("id", "userId")
+          .ignoringFields("id", "roomImages", "userId")
           .isEqualTo(createRoomRequest);
 
       assertThat(createRoomResponse.getId()).isNotNull();

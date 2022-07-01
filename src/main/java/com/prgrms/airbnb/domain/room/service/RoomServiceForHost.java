@@ -79,9 +79,8 @@ public class RoomServiceForHost {
 
     List<RoomImage> deleteRoomImageList =
         getDeleteRoomImageList(updateRoomRequest, room);
-
     deleteRoomImageList.forEach(roomImage -> uploadService.delete(roomImage.getPath()));
-    deleteRoomImageList.forEach(RoomImage::deleteRoom);
+    room.deleteRoomImages(deleteRoomImageList);
 
     List<RoomImage> updateRoomImageList = uploadImages(multipartFiles);
     room.enrollRoomImages(updateRoomImageList);
