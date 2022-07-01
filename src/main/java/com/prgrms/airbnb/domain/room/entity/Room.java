@@ -2,6 +2,19 @@ package com.prgrms.airbnb.domain.room.entity;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,10 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.util.ObjectUtils;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "room")
@@ -71,6 +80,8 @@ public class Room extends BaseEntity {
         setUserId(userId);
         this.isDeleted = Boolean.FALSE;
     }
+    this.charge = charge;
+  }
 
     public Room(Long id, Address address, Integer charge, String name, String description,
                 RoomInfo roomInfo, RoomType roomType, ReviewInfo reviewInfo, List<RoomImage> images,
@@ -87,6 +98,8 @@ public class Room extends BaseEntity {
         setUserId(userId);
         this.isDeleted = Boolean.FALSE;
     }
+    this.name = newName;
+  }
 
     public void enrollRoomImages(List<RoomImage> roomImages) {
         roomImages.forEach(roomImage -> roomImage.setRoom(this));
@@ -104,13 +117,19 @@ public class Room extends BaseEntity {
         this.description = description;
     }
 
-    public void setImage(RoomImage roomImage) {
-        roomImage.setRoom(this);
+  private void setRoomType(RoomType roomType) {
+    if (ObjectUtils.isEmpty(roomType)) {
+      throw new IllegalArgumentException();
     }
+    this.roomType = roomType;
+  }
 
-    public void deleteImage(RoomImage roomImage) {
-        roomImage.deleteRoom();
+  private void setUserId(Long userId) {
+    if (ObjectUtils.isEmpty(userId)) {
+      throw new IllegalArgumentException();
     }
+    this.userId = userId;
+  }
 
     private void setCharge(Integer charge) {
         if (charge < 0) {
@@ -133,44 +152,23 @@ public class Room extends BaseEntity {
         this.roomType = roomType;
     }
 
-    private void setUserId(Long userId) {
-        if (ObjectUtils.isEmpty(userId)) {
-            throw new IllegalArgumentException();
-        }
-        this.userId = userId;
+    public void updateReviewInfo(Integer newRating) {
+      double totalRating = reviewRating * reviewCount;
+      reviewCount += 1;
+      reviewRating = (totalRating + newRating) / reviewCount;
     }
 
-    private void setAddress(Address address) {
-        if (ObjectUtils.isEmpty(address)) {
-            throw new IllegalArgumentException();
-        }
-        this.address = address;
+    public void changeReviewInfo(Integer oldRating, Integer newRating) {
+      checkRange(oldRating);
+      checkRange(newRating);
+      double totalRating = reviewRating * reviewCount - oldRating;
+      reviewRating = (totalRating + newRating) / reviewCount;
     }
 
-    @Embeddable
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    public class ReviewInfo {
-
-        private Double reviewRating = 0.0;
-        private Long reviewCount = 0L;
-
-        public ReviewInfo(Double reviewRating, Long reviewCount) {
-            if (reviewCount < 0) {
-                throw new IllegalArgumentException();
-            }
-            this.reviewRating = reviewRating;
-            this.reviewCount = reviewCount;
-        }
-
-        public void updateReviewInfo(Integer newRating) {
-            double totalRating = reviewRating * reviewCount;
-            reviewCount += 1;
-            reviewRating = (totalRating + newRating) / reviewCount;
-        }
-
-        public void changeReviewInfo(Integer oldRating, Integer newRating) {
-            double totalRating = reviewRating * reviewCount - oldRating;
-            reviewRating = (totalRating + newRating) / reviewCount;
-        }
+    private void checkRange(Integer rating) {
+      if (rating < 0 || rating >= 5) {
+        throw new IllegalArgumentException();
+      }
     }
+  }
 }

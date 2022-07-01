@@ -2,37 +2,54 @@ package com.prgrms.airbnb.domain.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.prgrms.airbnb.domain.common.entity.Email;
+import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
 import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.util.UserConverter;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @Transactional
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-  @Autowired
+  @InjectMocks
   private UserService userService;
+
+  @Mock
+  private UploadService uploadService;
 
   @Nested
   @DisplayName("사용자 가입 테스트")
@@ -56,17 +73,15 @@ class UserServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"'무송', 'profile_image', 'songe08@gmail.com'",
-        "'송무송', 'profile_image', 'real.purple@gmail.com'"})
+    @CsvSource(value = {"'무송', 'songe08@gmail.com'", "'송무송', 'real.purple@gmail.com'"})
     @DisplayName("성공: 프로필이 널값이어도 정상적으로 생성됩니다.")
-    void successByProfileImage(String nickName, String profileImage, String email) {
+    void successByProfileImage(String nickName, String email) {
       // Given, When
       User user = userService.join(
           mockOAuth2User(nickName, getAttributes(nickName, null, email)),
           "kakao"
       );
       // Then
-      assertThat(user).isNotNull();
       assertThat(user.getName()).isEqualTo(nickName);
       assertThat(user.getProfileImage()).isNull();
       assertThat(user.getEmail()).isEqualTo(new Email(email));
@@ -74,15 +89,16 @@ class UserServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"'무송', 'profile_image'", "'송무송', 'profile_image'"})
-    @DisplayName("실패: 이메일이 널값이면 예외를 반환합니다.")
+    @DisplayName("성공: 이메일이 널값이어도 정상적으로 생성됩니다.")
     void failByEmail(String nickName, String profileImage) {
       // Given, When
-      Throwable response = catchThrowable(() -> userService.join(
+      User user = userService.join(
           mockOAuth2User(nickName, getAttributes(nickName, profileImage, null)),
-          "kakao"
-      ));
+          "kakao");
       // Then
-      assertThat(response).isInstanceOf(IllegalArgumentException.class);
+      assertThat(user.getName()).isEqualTo(nickName);
+      assertThat(user.getProfileImage()).isEqualTo(profileImage);
+      assertThat(user.getEmail()).isNull();
     }
 
     @ParameterizedTest
@@ -146,20 +162,32 @@ class UserServiceTest {
   class ModifyTest {
 
     List<User> userList;
+    MockMultipartFile mockMultipartFile;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
       userList = new ArrayList<>();
       User user = userService.join(
-          mockOAuth2User("moosong", getAttributes("moosong", "profileImage", "songe08@gmail.com")),
+          mockOAuth2User("moosong", getAttributes("moosong",
+              "http://k.kakaocdn.net/dn/b42VJI/btrC2YcVANJ/0FMEJe7roD0N1IWkFGG8M1/img_640x640.jpg",
+              "songe08@gmail.com")),
           "kakao"
       );
       userList.add(user);
       User user2 = userService.join(
-          mockOAuth2User("MS", getAttributes("MS", "profileImage", "real@gmail.com")),
+          mockOAuth2User("MS", getAttributes("MS",
+              "http://k.kakaocdn.net/dn/b42VJI/btrC2YcVANJ/0FMEJe7roD0N1IWkFGG8M1/img_640x640.jpg",
+              "real@gmail.com")),
           "kakao"
       );
       userList.add(user2);
+      mockMultipartFile = getMockMultipartFile("testCustomerUpload1", "png",
+          "src/test/resources/uploadFile/testCustomerUpload1.png");
+    }
+
+    @AfterEach
+    void tearDown() {
+      userList.forEach(user -> uploadService.delete(user.getProfileImage()));
     }
 
     @Test
@@ -169,10 +197,33 @@ class UserServiceTest {
       UserUpdateRequest request = UserUpdateRequest.builder()
           .email("tiger@naver.com")
           .name("tiger")
+          .phone("010-1234-5678")
           .build();
+
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
+
       // When, Then
       userList.forEach(user -> {
-        UserDetailResponse actual = userService.modify(user.getId(), request);
+        UserDetailResponse actual = userService.modify(user.getId(), request, mockMultipartFile);
+        assertThat(actual).isEqualTo(UserConverter.from(user));
+      });
+    }
+
+    @Test
+    @DisplayName("성공 : 비어있는 이미지로 프로필을 수정하는 경우")
+    void successByNullImage() {
+      // Given
+      UserUpdateRequest request = UserUpdateRequest.builder()
+          .email("tiger@naver.com")
+          .name("tiger")
+          .phone("010-1234-5678")
+          .build();
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
+      // When, Then
+      userList.forEach(user -> {
+        UserDetailResponse actual = userService.modify(user.getId(), request, null);
         assertThat(actual).isEqualTo(UserConverter.from(user));
       });
     }
@@ -182,8 +233,11 @@ class UserServiceTest {
     void fail() {
       // Given
       UserUpdateRequest request = UserUpdateRequest.builder().build();
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
       // When
-      Throwable response = catchThrowable(() -> userService.modify(0L, request));
+      Throwable response = catchThrowable(
+          () -> userService.modify(0L, request, mockMultipartFile));
       // Then
       assertThat(response).isInstanceOf(Exception.class);
     }
@@ -195,9 +249,12 @@ class UserServiceTest {
       UserUpdateRequest request = UserUpdateRequest.builder()
           .email("tiger@naver.com")
           .build();
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
       // When, Then
       userList.forEach(user -> {
-        Throwable response = catchThrowable(()-> userService.modify(user.getId(), request));
+        Throwable response = catchThrowable(
+            () -> userService.modify(user.getId(), request, mockMultipartFile));
         assertThat(response).isInstanceOf(Exception.class);
       });
     }
@@ -209,9 +266,12 @@ class UserServiceTest {
       UserUpdateRequest request = UserUpdateRequest.builder()
           .name("tiger")
           .build();
+      when(uploadService.uploadImg(any(MultipartFile.class))).thenReturn("image_url");
+      doNothing().when(uploadService).delete(any(String.class));
       // When, Then
       userList.forEach(user -> {
-        Throwable response = catchThrowable(()-> userService.modify(user.getId(), request));
+        Throwable response = catchThrowable(
+            () -> userService.modify(user.getId(), request, mockMultipartFile));
         assertThat(response).isInstanceOf(Exception.class);
       });
     }
@@ -236,5 +296,12 @@ class UserServiceTest {
     given(oauth2User.getName()).willReturn(name);
     given(oauth2User.getAttributes()).willReturn(attributes);
     return oauth2User;
+  }
+
+  private MockMultipartFile getMockMultipartFile(String fileName, String contentType, String path)
+      throws IOException {
+    FileInputStream fileInputStream = new FileInputStream(path);
+    return new MockMultipartFile(
+        fileName, fileName + "." + contentType, contentType, fileInputStream);
   }
 }

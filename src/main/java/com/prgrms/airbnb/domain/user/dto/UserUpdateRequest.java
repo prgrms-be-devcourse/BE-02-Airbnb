@@ -1,15 +1,15 @@
 package com.prgrms.airbnb.domain.user.dto;
 
 
+import javax.validation.constraints.*;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
 public class UserUpdateRequest {
-  private Long id;
   private String name;
-  private String profileImage;
+  @Email
   private String email;
   private String phone;
 }
