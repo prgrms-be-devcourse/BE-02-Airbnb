@@ -33,7 +33,8 @@ public class UserRestController {
   @PutMapping
   public ResponseEntity<UserDetailResponse> modifyInfo(
       @AuthenticationPrincipal JwtAuthentication authentication,
-      @RequestPart UserUpdateRequest request, @RequestPart MultipartFile multipartFile) {
+      @RequestPart(name = "request") UserUpdateRequest request,
+      @RequestPart(name = "image", required = false) MultipartFile multipartFile) {
     UserDetailResponse response = userService.modify(authentication.userId, request, multipartFile);
     return ResponseEntity.ok(response);
   }
