@@ -1,14 +1,18 @@
 package com.prgrms.airbnb.domain.reservation.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import java.time.LocalDate;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.ObjectUtils;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "reservation")
@@ -68,9 +72,13 @@ public class Reservation extends BaseEntity {
     return reservationStatus.equals(ReservationStatus.WAIT_REVIEW);
   }
 
+  public boolean canReservation(LocalDate newStartDate, LocalDate newEndDate) {
+    return validateDateForReservation(newStartDate, newEndDate);
+  }
+
   public boolean canCancelled() {
-    if (validateDateForCancel()) {
-      //TODO: 환불 정책 필요, 에러 추가 필요
+    if (!validateDateForCancel()) {
+      //TODO: 환불 정책 필요
       throw new IllegalArgumentException();
     }
     return this.reservationStatus.equals(ReservationStatus.WAITED_OK)
@@ -134,16 +142,20 @@ public class Reservation extends BaseEntity {
   }
 
   private void checkDate(LocalDate startDate, LocalDate endDate) {
-    if (startDate.isAfter(endDate)) {
+    if (LocalDate.now().isBefore(startDate) && startDate.isAfter(endDate)) {
       throw new IllegalArgumentException();
     }
   }
 
-  private boolean validateDateForCancel(){
+  private boolean validateDateForCancel() {
     return startDate.isAfter(LocalDate.now()) || startDate.isEqual(LocalDate.now());
   }
 
-  private boolean validateDateForReview(){
+  private boolean validateDateForReview() {
     return endDate.plusDays(14).isBefore(LocalDate.now());
+  }
+
+  private boolean validateDateForReservation(LocalDate newStartDate, LocalDate newEndDate) {
+    return endDate.isBefore(newStartDate) || newEndDate.isBefore(startDate);
   }
 }
