@@ -324,44 +324,5 @@ class ReservationServiceForHostTest {
           .containsOnly(save1.getId(), save2.getId(), save3.getId());
 
     }
-
-    @Test
-    @DisplayName("실패: 존재하지 않는 hostId 입력")
-    void failWrongHostId() {
-
-      //예약 추가
-      ReservationDetailResponseForGuest save1 = reservationServiceForGuest
-          .save(createReservationRequest);
-
-      createReservationRequest = CreateReservationRequest.builder()
-          .reservationStatus(reservationStatus)
-          .startDate(LocalDate.of(2023, 1, 3))
-          .endDate(LocalDate.of(2023, 1, 7))
-          .period(term)
-          .oneDayCharge(charge)
-          .userId(userId2)
-          .roomId(roomId)
-          .build();
-      ReservationDetailResponseForGuest save2 = reservationServiceForGuest
-          .save(createReservationRequest);
-
-      createReservationRequest = CreateReservationRequest.builder()
-          .reservationStatus(reservationStatus)
-          .startDate(LocalDate.of(2023, 4, 3))
-          .endDate(LocalDate.of(2023, 4, 7))
-          .period(term)
-          .oneDayCharge(charge)
-          .userId(userId2)
-          .roomId(roomId)
-          .build();
-      ReservationDetailResponseForGuest save3 = reservationServiceForGuest
-          .save(createReservationRequest);
-
-      PageRequest pageable = PageRequest.of(0, 5);
-
-      assertThatThrownBy( () -> reservationServiceForHost
-          .findByHostId(Long.MAX_VALUE, pageable))
-          .isInstanceOf(IllegalArgumentException.class);
-    }
   }
 }
