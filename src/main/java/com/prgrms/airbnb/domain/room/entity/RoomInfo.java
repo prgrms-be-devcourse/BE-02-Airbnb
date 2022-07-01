@@ -32,21 +32,29 @@ public class RoomInfo {
     setBathroomCount(bathroomCount);
   }
 
-  public void setMaxGuest(Integer maxGuest) {
-    if (ObjectUtils.isEmpty(maxGuest) || maxGuest <= 0) {
+  public void changeMaxGuest(Integer maxGuest) {
+    setMaxGuest(maxGuest);
+  }
+
+  public void changeBedCount(Integer bedCount) {
+    setBedCount(bedCount);
+  }
+
+  private void setMaxGuest(Integer maxGuest) {
+    if (ObjectUtils.isEmpty(maxGuest) || (maxGuest <= 0)) {
       throw new IllegalArgumentException();
     }
     this.maxGuest = maxGuest;
   }
 
   private void setRoomCount(Integer roomCount) {
-    if (ObjectUtils.isEmpty(roomCount) || roomCount <= 0) {
+    if (ObjectUtils.isEmpty(roomCount) || (roomCount <= 0)) {
       throw new IllegalArgumentException();
     }
     this.roomCount = roomCount;
   }
 
-  public void setBedCount(Integer bedCount) {
+  private void setBedCount(Integer bedCount) {
     if (ObjectUtils.isEmpty(bedCount) || bedCount < 0) {
       throw new IllegalArgumentException();
     }

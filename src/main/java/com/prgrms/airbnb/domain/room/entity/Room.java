@@ -62,9 +62,9 @@ public class Room extends BaseEntity {
                 RoomInfo roomInfo, RoomType roomType, List<RoomImage> images, Long userId) {
 
         setAddress(address);
-        setCharge(charge);
-        setName(name);
-        setDescription(description);
+        changeCharge(charge);
+        changeName(name);
+        changeDescription(description);
         this.roomInfo = roomInfo;
         setRoomType(roomType);
         images.forEach(this::setImage);
@@ -79,7 +79,7 @@ public class Room extends BaseEntity {
         setAddress(address);
         setCharge(charge);
         setName(name);
-        setDescription(description);
+        changeDescription(description);
         this.roomInfo = roomInfo;
         setRoomType(roomType);
         this.reviewInfo = reviewInfo;
@@ -88,21 +88,19 @@ public class Room extends BaseEntity {
         this.isDeleted = Boolean.FALSE;
     }
 
-    public void setCharge(Integer charge) {
-        if (charge < 0) {
-            throw new IllegalArgumentException("가격은 0보다 작을 수 없습니다.");
-        }
-        this.charge = charge;
+    public void enrollRoomImages(List<RoomImage> roomImages) {
+        roomImages.forEach(roomImage -> roomImage.setRoom(this));
     }
 
-    public void setName(String newName) {
-        if (StringUtils.isBlank(newName)) {
-            throw new IllegalArgumentException("이름은 필수 입력사항입니다.");
-        }
-        this.name = newName;
+    public void changeCharge(Integer charge) {
+        setCharge(charge);
     }
 
-    public void setDescription(String description) {
+    public void changeName(String newName) {
+        setName(newName);
+    }
+
+    public void changeDescription(String description) {
         this.description = description;
     }
 
@@ -112,6 +110,20 @@ public class Room extends BaseEntity {
 
     public void deleteImage(RoomImage roomImage) {
         roomImage.deleteRoom();
+    }
+
+    private void setCharge(Integer charge) {
+        if (charge < 0) {
+            throw new IllegalArgumentException("가격은 0보다 작을 수 없습니다.");
+        }
+        this.charge = charge;
+    }
+
+    private void setName(String newName) {
+        if (StringUtils.isBlank(newName)) {
+            throw new IllegalArgumentException("이름은 필수 입력사항입니다.");
+        }
+        this.name = newName;
     }
 
     private void setRoomType(RoomType roomType) {

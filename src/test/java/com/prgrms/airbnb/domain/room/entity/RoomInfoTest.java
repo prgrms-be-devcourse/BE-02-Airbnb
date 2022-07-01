@@ -202,7 +202,7 @@ class RoomInfoTest {
 
       //when
       Integer newMaxGuest = 3;
-      roomInfo.setMaxGuest(newMaxGuest);
+      roomInfo.changeMaxGuest(newMaxGuest);
 
       //then
       Assertions.assertThat(roomInfo.getMaxGuest()).isEqualTo(newMaxGuest);
@@ -219,7 +219,7 @@ class RoomInfoTest {
       Integer newMaxGuest = 0;
 
       //then
-      assertThrows(RuntimeException.class, () -> roomInfo.setMaxGuest(newMaxGuest));
+      assertThrows(RuntimeException.class, () -> roomInfo.changeMaxGuest(newMaxGuest));
     }
 
     @Test
@@ -233,7 +233,7 @@ class RoomInfoTest {
       Integer newMaxGuest = -1;
 
       //then
-      assertThrows(RuntimeException.class, () -> roomInfo.setMaxGuest(newMaxGuest));
+      assertThrows(RuntimeException.class, () -> roomInfo.changeMaxGuest(newMaxGuest));
     }
 
     @Test
@@ -245,7 +245,7 @@ class RoomInfoTest {
 
       //when
       Integer newBedCount = 3;
-      roomInfo.setBedCount(newBedCount);
+      roomInfo.changeBedCount(newBedCount);
 
       //then
       Assertions.assertThat(roomInfo.getBedCount()).isEqualTo(newBedCount);
@@ -260,7 +260,7 @@ class RoomInfoTest {
 
       //when
       Integer newBedCount = 0;
-      roomInfo.setBedCount(newBedCount);
+      roomInfo.changeBedCount(newBedCount);
 
       //then
       Assertions.assertThat(roomInfo.getBedCount()).isEqualTo(newBedCount);
@@ -277,7 +277,7 @@ class RoomInfoTest {
       Integer newBedCount = -1;
 
       //then
-      assertThrows(RuntimeException.class, () -> roomInfo.setBedCount(newBedCount));
+      assertThrows(RuntimeException.class, () -> roomInfo.changeBedCount(newBedCount));
     }
   }
 }

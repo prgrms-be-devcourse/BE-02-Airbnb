@@ -12,7 +12,6 @@ import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.room.util.RoomConverter;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -51,19 +50,13 @@ public class RoomServiceForHost {
       throw new RuntimeException("기존에 등록된 주소가 있습니다.");
     }
 
-    createRoomRequest.setRoomImages(
-        Optional.ofNullable(multipartFiles)
-            .orElseGet(Collections::emptyList)
-        .stream().sequential().map(
-            m -> new RoomImage(uploadService.uploadImg(m))
-            )
-            .collect(Collectors.toList())
-    );
-
     User user = userRepository.findById(hostId)
         .orElseThrow(RuntimeException::new);
     Room room = RoomConverter.toRoom(createRoomRequest, user);
     Room savedRoom = roomRepository.save(room);
+
+    List<RoomImage> roomImages = uploadImages(multipartFiles);
+    room.enrollRoomImages(roomImages);
 
     return RoomConverter.ofDetail(savedRoom);
   }
@@ -78,24 +71,20 @@ public class RoomServiceForHost {
         .orElseThrow(IllegalArgumentException::new);
     validateHost(room, hostId);
 
-    room.setName(updateRoomRequest.getName());
-    room.setCharge(updateRoomRequest.getCharge());
-    room.setDescription(updateRoomRequest.getDescription());
+    room.changeName(updateRoomRequest.getName());
+    room.changeCharge(updateRoomRequest.getCharge());
+    room.changeDescription(updateRoomRequest.getDescription());
+    room.getRoomInfo().changeMaxGuest(updateRoomRequest.getMaxGuest());
+    room.getRoomInfo().changeBedCount(updateRoomRequest.getBedCount());
 
-    List<RoomImage> updateImageList =
-        Optional.ofNullable(multipartFiles).orElseGet(Collections::emptyList)
-        .stream().sequential().map(
-            m -> new RoomImage(uploadService.uploadImg(m))
-            )
-        .collect(Collectors.toList());
+    List<RoomImage> deleteRoomImageList =
+        getDeleteRoomImageList(updateRoomRequest, room);
 
-    room.getRoomImages()
-        .removeIf(roomImage -> !updateImageList.contains(roomImage));
+    deleteRoomImageList.forEach(roomImage -> uploadService.delete(roomImage.getPath()));
+    deleteRoomImageList.forEach(RoomImage::deleteRoom);
 
-    updateImageList.forEach(room::setImage);
-
-    room.getRoomInfo().setMaxGuest(updateRoomRequest.getMaxGuest());
-    room.getRoomInfo().setBedCount(updateRoomRequest.getBedCount());
+    List<RoomImage> updateRoomImageList = uploadImages(multipartFiles);
+    room.enrollRoomImages(updateRoomImageList);
 
     return RoomConverter.ofDetail(room);
   }
@@ -130,4 +119,16 @@ public class RoomServiceForHost {
       throw new RuntimeException("잘못된 접근 [room의 host가 아님]");
     }
   }
+
+  private List<RoomImage> uploadImages(List<MultipartFile> multipartFiles) {
+    return Optional.ofNullable(multipartFiles).orElseGet(Collections::emptyList)
+        .stream().map(m -> new RoomImage(uploadService.uploadImg(m))).collect(Collectors.toList());
+  }
+
+  private List<RoomImage> getDeleteRoomImageList(UpdateRoomRequest updateRoomRequest, Room room) {
+    return room.getRoomImages().stream()
+        .filter(roomImage -> !updateRoomRequest.getRoomImages().contains(roomImage))
+        .collect(Collectors.toList());
+  }
+
 }
