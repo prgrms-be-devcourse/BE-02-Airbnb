@@ -324,5 +324,17 @@ class ReservationServiceForHostTest {
           .containsOnly(save1.getId(), save2.getId(), save3.getId());
 
     }
+
+    @Test
+    @DisplayName("성공: 아무 숙소가 없는 host 리스트 가져오기 성공")
+    void successEmptyReservationList() {
+
+      PageRequest pageable = PageRequest.of(0, 5);
+      Slice<ReservationSummaryResponse> reservationList = reservationServiceForHost
+          .findByHostId(host.getId(), pageable);
+
+      assertThat(reservationList).hasSize(0);
+
+    }
   }
 }
