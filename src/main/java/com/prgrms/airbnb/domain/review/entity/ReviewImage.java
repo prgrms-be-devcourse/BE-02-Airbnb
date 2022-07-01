@@ -35,6 +35,17 @@ public class ReviewImage extends BaseEntity {
     this.path = path;
   }
 
+  public ReviewImage(Long id, String path) {
+    this.id = id;
+    this.path = path;
+  }
+
+  public ReviewImage(Long id, String path, Review review) {
+    this.id = id;
+    this.path = path;
+    this.review = review;
+  }
+
   public void setReview(Review review) {
     if (this.review != null) {
       this.review.getImages().remove(this);
