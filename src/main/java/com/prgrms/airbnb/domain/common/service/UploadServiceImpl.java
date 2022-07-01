@@ -1,7 +1,7 @@
 package com.prgrms.airbnb.domain.common.service;
 
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UploadServiceImpl implements UploadService {
 
-  private final AmazonS3Client amazonS3Client;
+  private final AmazonS3 amazonS3;
   @Value("${cloud.aws.s3.bucket.name}")
   public String bucket;
   @Value("${cloud.aws.s3.bucket.url}")
@@ -63,7 +63,7 @@ public class UploadServiceImpl implements UploadService {
       objectMetadata.setContentLength(bytes.length);
       objectMetadata.setContentType(ext.substring(1));
       ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-      final TransferManager transferManager = new TransferManager(this.amazonS3Client);
+      final TransferManager transferManager = new TransferManager(this.amazonS3);
       final PutObjectRequest request = new PutObjectRequest(bucket, Filename, byteArrayInputStream,
           objectMetadata);
       final Upload upload = transferManager.upload(request);
@@ -78,7 +78,7 @@ public class UploadServiceImpl implements UploadService {
   @Override
   public void delete(String path) {
     try {
-      amazonS3Client.deleteObject(bucket, path.split("/")[3]);
+      amazonS3.deleteObject(bucket, path.split("/")[3]);
     } catch (AmazonServiceException e) {
       e.printStackTrace();
     }

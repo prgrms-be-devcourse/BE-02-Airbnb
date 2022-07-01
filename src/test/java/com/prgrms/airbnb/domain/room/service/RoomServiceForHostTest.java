@@ -3,7 +3,10 @@ package com.prgrms.airbnb.domain.room.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.prgrms.airbnb.domain.common.service.UploadService;
+import com.prgrms.airbnb.domain.localStack.LocalStackS3Config;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,9 +42,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = LocalStackS3Config.class)
 @Transactional
 class RoomServiceForHostTest {
+
+  @Autowired
+  AmazonS3 amazonS3;
 
   @Autowired
   RoomRepository roomRepository;
@@ -82,6 +88,9 @@ class RoomServiceForHostTest {
 
   @BeforeEach
   void setup() throws IOException {
+
+    amazonS3.createBucket("fbnb");
+
     Group group = groupRepository.findByName("USER_GROUP")
         .orElseThrow(() -> new IllegalStateException("Could not found group for USER_GROUP"));
 
@@ -227,7 +236,7 @@ class RoomServiceForHostTest {
       //then
       assertThat(createRoomResponse)
           .usingRecursiveComparison()
-          .ignoringFields("id", "userId")
+          .ignoringFields("id","roomImages", "userId")
           .isEqualTo(createRoomRequest);
 
       assertThat(createRoomResponse.getId()).isNotNull();
