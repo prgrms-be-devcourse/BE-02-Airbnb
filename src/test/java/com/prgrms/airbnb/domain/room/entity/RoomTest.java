@@ -232,7 +232,7 @@ class RoomTest {
 
       //when
       String newRoomName = "new roomName";
-      room.setName(newRoomName);
+      room.changeName(newRoomName);
 
       //then
       assertThat(room.getName()).isEqualTo(newRoomName);
@@ -250,7 +250,7 @@ class RoomTest {
       String newRoomName = null;
 
       //then
-      assertThrows(RuntimeException.class, () -> room.setName(newRoomName));
+      assertThrows(RuntimeException.class, () -> room.changeName(newRoomName));
     }
 
     @Test
@@ -265,7 +265,7 @@ class RoomTest {
       String newRoomName = "";
 
       //then
-      assertThrows(RuntimeException.class, () -> room.setName(newRoomName));
+      assertThrows(RuntimeException.class, () -> room.changeName(newRoomName));
     }
 
     @Test
@@ -280,7 +280,7 @@ class RoomTest {
       String newRoomName = " ";
 
       //then
-      assertThrows(RuntimeException.class, () -> room.setName(newRoomName));
+      assertThrows(RuntimeException.class, () -> room.changeName(newRoomName));
     }
 
     @Test
@@ -293,7 +293,7 @@ class RoomTest {
 
       //when
       Integer newCharge = 10;
-      room.setCharge(newCharge);
+      room.changeCharge(newCharge);
 
       //then
       assertThat(room.getCharge()).isEqualTo(newCharge);
@@ -309,7 +309,7 @@ class RoomTest {
 
       //when
       Integer newCharge = 0;
-      room.setCharge(newCharge);
+      room.changeCharge(newCharge);
 
       //then
       assertThat(room.getCharge()).isEqualTo(newCharge);
@@ -327,7 +327,7 @@ class RoomTest {
       Integer newCharge = -1;
 
       //then
-      assertThrows(RuntimeException.class, () -> room.setCharge(newCharge));
+      assertThrows(RuntimeException.class, () -> room.changeCharge(newCharge));
     }
 
     @Test
@@ -401,7 +401,7 @@ class RoomTest {
 
       //when
       String newDescription = "new Description";
-      room.setDescription(newDescription);
+      room.changeDescription(newDescription);
 
       //then
       assertThat(room.getDescription()).isEqualTo(newDescription);
@@ -417,7 +417,7 @@ class RoomTest {
 
       //when
       String newDescription = null;
-      room.setDescription(newDescription);
+      room.changeDescription(newDescription);
 
       //then
       assertThat(room.getDescription()).isEqualTo(newDescription);
