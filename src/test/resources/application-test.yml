@@ -1,0 +1,9 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

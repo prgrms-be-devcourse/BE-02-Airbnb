@@ -76,6 +76,13 @@ dependencies {
 
 	//s3 설정
 	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.3.1'
+
+	implementation("com.amazonaws:aws-java-sdk-s3")
+	testImplementation 'org.testcontainers:testcontainers:1.17.2'
+	testImplementation 'org.testcontainers:junit-jupiter:1.17.2'
+	testImplementation 'org.testcontainers:localstack:1.17.2'
+	compile group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+	compile group: 'commons-io', name: 'commons-io', version: '2.4'
 }
 
 tasks.named('test') {
