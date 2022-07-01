@@ -45,19 +45,10 @@ public class ReservationServiceForHost {
   }
 
   public Slice<ReservationSummaryResponse> findByHostId(Long hostId, Pageable pageable) {
-    List<Long> collect = roomRepository.findAllByUserId(hostId)
-        .stream()
-        .map(Room::getId)
-        .collect(Collectors.toList());
+    Slice<Reservation> allReservationByHostId = reservationRepository
+        .findAllReservationByHostId(hostId, pageable);
 
-    if (collect.isEmpty()) {
-      throw new IllegalArgumentException();
-    }
-
-    Slice<Reservation> reservationList = reservationRepository.findByRoomIdOrderByCreatedAtDesc(
-        collect, pageable);
-
-    return reservationList.map(ReservationConverter::ofSummary);
+    return allReservationByHostId.map(ReservationConverter::ofSummary);
   }
 
   @Transactional
