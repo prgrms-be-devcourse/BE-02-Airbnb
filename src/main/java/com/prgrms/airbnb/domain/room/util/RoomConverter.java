@@ -6,6 +6,7 @@ import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import com.prgrms.airbnb.domain.user.entity.User;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RoomConverter {
@@ -18,7 +19,7 @@ public class RoomConverter {
         createRoomRequest.getDescription(),
         createRoomRequest.getRoomInfo(),
         createRoomRequest.getRoomType(),
-        createRoomRequest.getRoomImages(),
+        new ArrayList<>(),
         user.getId()
     );
   }
