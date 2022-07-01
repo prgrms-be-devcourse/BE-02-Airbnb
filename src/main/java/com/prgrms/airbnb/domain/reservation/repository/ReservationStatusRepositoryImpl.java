@@ -43,16 +43,16 @@ public class ReservationStatusRepositoryImpl implements ReservationStatusReposit
   @Override
   public Slice<Reservation> findAllReservationByHostId(Long hostId, Pageable pageable) {
 
-    List<Reservation> fetch = jpaQueryFactory.selectFrom(reservation)
+    List<Reservation> reservationList = jpaQueryFactory.selectFrom(reservation)
         .join(room).on(reservation.roomId.eq(room.id)).fetchJoin()
         .where(room.userId.eq(hostId))
         .fetch();
     boolean hasNext = false;
-    if (fetch.size() > pageable.getPageSize()) {
-      fetch.remove(pageable.getPageSize());
+    if (reservationList.size() > pageable.getPageSize()) {
+      reservationList.remove(pageable.getPageSize());
       hasNext = true;
     }
-    return new SliceImpl<>(fetch, pageable, hasNext);
+    return new SliceImpl<>(reservationList, pageable, hasNext);
   }
 
   @Override
