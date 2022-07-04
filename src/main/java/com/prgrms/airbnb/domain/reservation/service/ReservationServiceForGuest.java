@@ -11,7 +11,6 @@ import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
-import java.time.LocalDate;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -68,10 +67,10 @@ public class ReservationServiceForGuest {
   }
 
   @Transactional
-  public void cancel(String reservationId) {
+  public void cancel(Long userId, String reservationId) {
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(IllegalArgumentException::new);
-    if (!reservation.canCancelled()) {
+    if (!reservation.canCancelled(userId)) {
       //TODO: 취소가 될 수 없는데 취소하려 함
       throw new IllegalArgumentException();
     }
