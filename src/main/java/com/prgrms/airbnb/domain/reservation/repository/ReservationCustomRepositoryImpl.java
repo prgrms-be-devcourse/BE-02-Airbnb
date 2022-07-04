@@ -16,11 +16,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
-public class ReservationStatusRepositoryImpl implements ReservationStatusRepository {
+public class ReservationCustomRepositoryImpl implements ReservationCustomRepository {
 
   private JPAQueryFactory jpaQueryFactory;
 
-  public ReservationStatusRepositoryImpl(EntityManager em) {
+  public ReservationCustomRepositoryImpl(EntityManager em) {
     this.jpaQueryFactory = new JPAQueryFactory(em);
   }
 
