@@ -10,8 +10,6 @@ import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import com.prgrms.airbnb.domain.user.entity.User;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -45,19 +43,10 @@ public class ReservationServiceForHost {
   }
 
   public Slice<ReservationSummaryResponse> findByHostId(Long hostId, Pageable pageable) {
-    List<Long> collect = roomRepository.findAllByUserId(hostId)
-        .stream()
-        .map(Room::getId)
-        .collect(Collectors.toList());
+    Slice<Reservation> allReservationByHostId = reservationRepository
+        .findAllReservationByHostId(hostId, pageable);
 
-    if (collect.isEmpty()) {
-      throw new IllegalArgumentException();
-    }
-
-    Slice<Reservation> reservationList = reservationRepository.findByRoomIdOrderByCreatedAtDesc(
-        collect, pageable);
-
-    return reservationList.map(ReservationConverter::ofSummary);
+    return allReservationByHostId.map(ReservationConverter::ofSummary);
   }
 
   @Transactional

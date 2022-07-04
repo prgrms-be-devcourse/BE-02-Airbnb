@@ -51,18 +51,10 @@ public class ReservationServiceForGuest {
         .orElseThrow(IllegalArgumentException::new);
     User host = userRepository.findById(room.getUserId())
         .orElseThrow(IllegalArgumentException::new);
-
-    if (LocalDate.now().isAfter(createReservationRequest.getStartDate())) {
-      throw new IllegalArgumentException();
-    }
     //TODO: 저장하기전에 앞서 예약이 존재하는지 확인해야함
-    if (reservationRepository.findAll()
-        .stream()
-        .anyMatch(v ->
-            !v.canReservation(
-                createReservationRequest.getStartDate(),
-                createReservationRequest.getEndDate())
-        )) {
+    if (reservationRepository.existReservation(room.getId(),
+        createReservationRequest.getStartDate(),
+        createReservationRequest.getEndDate())) {
       throw new IllegalArgumentException();
     }
     String reservationId = reservationRepository.createReservationId();
