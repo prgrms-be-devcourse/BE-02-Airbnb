@@ -6,14 +6,15 @@ import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForGues
 import com.prgrms.airbnb.domain.reservation.dto.ReservationSummaryResponse;
 import com.prgrms.airbnb.domain.reservation.service.ReservationServiceForGuest;
 import com.prgrms.airbnb.domain.user.service.UserService;
+import java.net.URI;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,22 +42,10 @@ public class ReservationRestControllerForGuest {
         .orElseThrow(IllegalArgumentException::new);
     ReservationDetailResponseForGuest save = reservationServiceForGuest.save(
         createReservationRequest);
-    return ResponseEntity.ok(save);
+    return ResponseEntity.created(URI.create("/api/v1/guest/reservations/" + save.getId())).body(save);
   }
 
-  @PutMapping("/{reservationId}")
-  public ResponseEntity<ReservationDetailResponseForGuest> cancel(
-      @AuthenticationPrincipal JwtAuthentication authentication,
-      @PathVariable String reservationId) {
-    Long userId = authentication.userId;
-    reservationServiceForGuest.cancel(userId, reservationId);
-    ReservationDetailResponseForGuest reservationDetail = reservationServiceForGuest.findDetailById(
-        reservationId, userId);
-
-    return ResponseEntity.ok(reservationDetail);
-  }
-
-  @GetMapping("/lists")
+  @GetMapping("")
   public ResponseEntity<Slice<ReservationSummaryResponse>> getReservationList(
       @AuthenticationPrincipal JwtAuthentication authentication,
       Pageable pageable) {
@@ -74,8 +63,16 @@ public class ReservationRestControllerForGuest {
     Long userId = authentication.userId;
     ReservationDetailResponseForGuest reservationDetail = reservationServiceForGuest.findDetailById(
         reservationId, userId);
-
     return ResponseEntity.ok(reservationDetail);
+  }
+
+  @DeleteMapping("/{reservationId}")
+  public ResponseEntity<Object> cancel(
+      @AuthenticationPrincipal JwtAuthentication authentication,
+      @PathVariable String reservationId) {
+    Long userId = authentication.userId;
+    reservationServiceForGuest.cancel(userId, reservationId);
+    return ResponseEntity.noContent().build();
   }
 
 }

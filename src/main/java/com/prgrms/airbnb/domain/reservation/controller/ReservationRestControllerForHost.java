@@ -5,7 +5,6 @@ import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForHost
 import com.prgrms.airbnb.domain.reservation.dto.ReservationSummaryResponse;
 import com.prgrms.airbnb.domain.reservation.entity.ReservationStatus;
 import com.prgrms.airbnb.domain.reservation.service.ReservationServiceForHost;
-import com.prgrms.airbnb.domain.user.service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/v1/host/reservations")
@@ -21,50 +21,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationRestControllerForHost {
 
   private final ReservationServiceForHost reservationServiceForHost;
-  private final UserService userService;
 
   public ReservationRestControllerForHost(
-      ReservationServiceForHost reservationServiceForHost,
-      UserService userService) {
+      ReservationServiceForHost reservationServiceForHost) {
     this.reservationServiceForHost = reservationServiceForHost;
-    this.userService = userService;
   }
 
-  @PutMapping("/approve/{reservationId}")
+  @PutMapping("/{reservationId}")
   public ResponseEntity<ReservationDetailResponseForHost> approve(
       @AuthenticationPrincipal JwtAuthentication authentication,
-      @PathVariable String reservationId) {
+      @PathVariable String reservationId,
+      @RequestParam String status) {
     Long hostId = authentication.userId;
     ReservationStatus reservationStatus = ReservationStatus.valueOf(status);
     ReservationDetailResponseForHost approvalReservation = reservationServiceForHost.approval(reservationId,
-        hostId, ReservationStatus.ACCEPTED);
+        hostId, reservationStatus);
 
     return ResponseEntity.ok(approvalReservation);
   }
 
-  @PutMapping("/reject/{reservationId}")
-  public ResponseEntity<ReservationDetailResponseForHost> reject(
-      @AuthenticationPrincipal JwtAuthentication authentication,
-      @PathVariable String reservationId) {
-    Long hostId = authentication.userId;
-    ReservationDetailResponseForHost rejectReservation = reservationServiceForHost.approval(reservationId,
-        hostId, ReservationStatus.ACCEPTED_BEFORE_CANCELLED);
-
-    return ResponseEntity.ok(rejectReservation);
-  }
-
-  @PutMapping("/cancel/{reservationId}")
-  public ResponseEntity<ReservationDetailResponseForHost> cancel(
-      @AuthenticationPrincipal JwtAuthentication authentication,
-      @PathVariable String reservationId) {
-    Long hostId = authentication.userId;
-    ReservationDetailResponseForHost cancelReservation = reservationServiceForHost.approval(reservationId,
-        hostId, ReservationStatus.ACCEPTED_AFTER_CANCELLED);
-
-    return ResponseEntity.ok(cancelReservation);
-  }
-
-  @GetMapping("/lists")
+  @GetMapping("")
   public ResponseEntity<Slice<ReservationSummaryResponse>> getReservationList(
       @AuthenticationPrincipal JwtAuthentication authentication,
       Pageable pageable) {
