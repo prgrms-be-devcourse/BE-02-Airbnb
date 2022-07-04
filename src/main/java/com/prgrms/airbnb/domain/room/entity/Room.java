@@ -152,8 +152,9 @@ public class Room extends BaseEntity {
   }
 
   @Embeddable
+  @Getter
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
-  public class ReviewInfo {
+  public static class ReviewInfo {
 
     private Double reviewRating = 0.0;
     private Long reviewCount = 0L;
