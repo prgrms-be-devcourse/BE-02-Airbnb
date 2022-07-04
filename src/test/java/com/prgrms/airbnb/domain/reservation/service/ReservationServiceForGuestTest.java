@@ -206,6 +206,7 @@ class ReservationServiceForGuestTest {
           .userId(userId1)
           .roomId(roomId)
           .build();
+
       assertThatThrownBy(() -> reservationServiceForGuest.save(createReservationRequest))
           .isInstanceOf(IllegalArgumentException.class);
     }
@@ -248,7 +249,7 @@ class ReservationServiceForGuestTest {
           .save(createReservationRequest);
 
       ReservationDetailResponseForGuest detailById = reservationServiceForGuest
-          .findDetailById(save.getId());
+          .findDetailById(save.getId(), userId1);
 
       assertThat(save).usingRecursiveComparison().isEqualTo(detailById);
     }
@@ -257,7 +258,7 @@ class ReservationServiceForGuestTest {
     @DisplayName("실패: 존재하지않는 예약번호 입력")
     void failWrongReservationId() {
       reservationServiceForGuest.save(createReservationRequest);
-      assertThatThrownBy(() -> reservationServiceForGuest.findDetailById("abcd1234"))
+      assertThatThrownBy(() -> reservationServiceForGuest.findDetailById("abcd1234", userId1))
           .isInstanceOf(IllegalArgumentException.class);
     }
   }
@@ -273,9 +274,9 @@ class ReservationServiceForGuestTest {
       ReservationDetailResponseForGuest save = reservationServiceForGuest
           .save(createReservationRequest);
 
-      reservationServiceForGuest.cancel(save.getId());
+      reservationServiceForGuest.cancel(userId1, save.getId());
       ReservationDetailResponseForGuest detailById = reservationServiceForGuest
-          .findDetailById(save.getId());
+          .findDetailById(save.getId(), userId1);
       assertThat(detailById.getReservationStatus()).isEqualTo(ReservationStatus.GUEST_CANCELLED);
     }
 
@@ -285,7 +286,7 @@ class ReservationServiceForGuestTest {
       ReservationDetailResponseForGuest save = reservationServiceForGuest
           .save(createReservationRequest);
 
-      assertThatThrownBy(() -> reservationServiceForGuest.cancel("abcd1234"))
+      assertThatThrownBy(() -> reservationServiceForGuest.cancel(userId1, "abcd1234"))
           .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -300,7 +301,7 @@ class ReservationServiceForGuestTest {
       reservation.changeStatus(ReservationStatus.ACCEPTED);
       reservation.changeStatus(ReservationStatus.WAIT_REVIEW);
 
-      assertThatThrownBy(() -> reservationServiceForGuest.cancel(reservation.getId()))
+      assertThatThrownBy(() -> reservationServiceForGuest.cancel(userId1, reservation.getId()))
           .isInstanceOf(IllegalArgumentException.class);
     }
   }

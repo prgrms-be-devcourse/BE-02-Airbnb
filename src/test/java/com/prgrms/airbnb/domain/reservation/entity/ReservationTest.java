@@ -37,8 +37,8 @@ class ReservationTest {
   @BeforeEach
   void setup() {
     id = reservationRepository.createReservationId();
-    startDate = LocalDate.of(2022, 6, 9);
-    endDate = LocalDate.of(2022, 6, 12);
+    startDate = LocalDate.of(2023, 6, 9);
+    endDate = LocalDate.of(2023, 6, 12);
     term = 3;
     oneDayCharge = 1000;
     userId = 10L;

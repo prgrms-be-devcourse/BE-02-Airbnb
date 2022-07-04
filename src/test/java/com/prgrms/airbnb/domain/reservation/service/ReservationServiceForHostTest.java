@@ -185,7 +185,7 @@ class ReservationServiceForHostTest {
           .save(createReservationRequest);
 
       ReservationDetailResponseForHost detailById = reservationServiceForHost
-          .findDetailById(save.getId());
+          .findDetailById(save.getId(), host.getId());
 
       assertThat(save).usingRecursiveComparison().ignoringFields("host").isEqualTo(detailById);
       assertThat(detailById.getGuest().getId()).isEqualTo(userId1);
@@ -196,7 +196,7 @@ class ReservationServiceForHostTest {
     @DisplayName("실패: 존재하지않는 예약번호 입력")
     void failWrongReservationId() {
       reservationServiceForGuest.save(createReservationRequest);
-      assertThatThrownBy(() -> reservationServiceForHost.findDetailById("abcd1234"))
+      assertThatThrownBy(() -> reservationServiceForHost.findDetailById("abcd1234", userId1))
           .isInstanceOf(IllegalArgumentException.class);
     }
   }

@@ -72,13 +72,17 @@ public class Reservation extends BaseEntity {
     return reservationStatus.equals(ReservationStatus.WAIT_REVIEW);
   }
 
-  public boolean canCancelled() {
-    if (!validateDateForCancel()) {
+  public boolean canCancelled(Long userId) {
+    if (!validateDateForCancel() || !validateUserId(userId)) {
       //TODO: 환불 정책 필요
       throw new IllegalArgumentException();
     }
     return this.reservationStatus.equals(ReservationStatus.WAITED_OK)
         || this.reservationStatus.equals(ReservationStatus.ACCEPTED);
+  }
+
+  public boolean validateUserId(Long userId){
+    return this.userId.equals(userId);
   }
 
   private void setId(String id) {
@@ -138,7 +142,7 @@ public class Reservation extends BaseEntity {
   }
 
   private void checkDate(LocalDate startDate, LocalDate endDate) {
-    if (LocalDate.now().isBefore(startDate) && startDate.isAfter(endDate)) {
+    if (LocalDate.now().isAfter(startDate) || startDate.isAfter(endDate)) {
       throw new IllegalArgumentException();
     }
   }
