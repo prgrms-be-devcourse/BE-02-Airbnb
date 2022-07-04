@@ -27,10 +27,9 @@ public class HostReviewService {
     this.roomRepository = roomRepository;
   }
 
-  public Slice<ReviewResponse> findAllByRoomId(Long authenticationUserId, Long roomId,
-      Pageable pageable) {
+  public Slice<ReviewResponse> findAllByRoomId(Long userId, Long roomId, Pageable pageable) {
     Room room = roomRepository.findById(roomId).orElseThrow(IllegalArgumentException::new);
-    validateAuthority(authenticationUserId, room.getUserId());
+    validateAuthority(userId, room.getUserId());
     Slice<Review> reviewList = reviewRepository.findAllByRoomIdForHost(roomId, pageable);
     return reviewList.map(ReviewConverter::of);
   }

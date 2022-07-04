@@ -1,0 +1,31 @@
+<configuration>
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
+    <append>true</append>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <file>src/main/resources//logFile.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+    </rollingPolicy>
+  </appender>
+  <conversionRule
+    conversionWord="clr"
+    converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+  <logger level="warn" name="com.prgrms.airbnb">
+    <appender-ref ref="FILE"/>
+  </logger>
+  <property name="FILE_LOG_PATTERN"
+    value="%d{HH:mm:ss.SSS} [%thread] %-4level %logger{36} - %msg%n"/>
+
+  <property name="CONSOLE_LOG_PATTERN"
+    value="%clr(%d{HH:mm:ss.SSS}){yellow} [%thread] %clr(%-4level) %logger{36} - %msg%n"/>
+  <root level="info">
+    <appender-ref ref="STDOUT"/>
+  </root>
+</configuration>

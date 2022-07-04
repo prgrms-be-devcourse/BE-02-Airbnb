@@ -44,11 +44,11 @@ public class GuestReviewService {
   }
 
   @Transactional
-  public ReviewResponse save(Long authenticationUserId, String reservationId,
+  public ReviewResponse save(Long userId, String reservationId,
       CreateReviewRequest createReviewRequest, List<MultipartFile> images) {
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(IllegalArgumentException::new);
-    validateAuthority(authenticationUserId, reservation.getUserId());
+    validateAuthority(userId, reservation.getUserId());
     if (!reservation.canReviewed()) {
       //TODO: 리뷰를 남길 수 없는 경우.
       throw new IllegalArgumentException();
@@ -64,12 +64,12 @@ public class GuestReviewService {
   }
 
   @Transactional
-  public ReviewResponse modify(Long authenticationUserId, Long reviewId,
-      UpdateReviewRequest updateReviewRequest, List<MultipartFile> images) {
+  public ReviewResponse modify(Long userId, Long reviewId, UpdateReviewRequest updateReviewRequest,
+      List<MultipartFile> images) {
     Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
     Reservation reservation = reservationRepository.findById(review.getReservationId())
         .orElseThrow(IllegalArgumentException::new);
-    validateAuthority(authenticationUserId, reservation.getUserId());
+    validateAuthority(userId, reservation.getUserId());
     review.changeComment(updateReviewRequest.getComment());
     review.changeRating(updateReviewRequest.getRating());
     review.changeVisible(updateReviewRequest.getVisible());
@@ -81,19 +81,17 @@ public class GuestReviewService {
     return ReviewConverter.of(review);
   }
 
-  public Slice<ReviewResponse> findAllByRoomId(Long authenticationUserId, Long roomId,
-      Pageable pageable) {
-    Slice<Review> reviewList = reviewRepository.findAllByRoomIdForGuest(roomId,
-        authenticationUserId, pageable);
+  public Slice<ReviewResponse> findAllByRoomId(Long userId, Long roomId, Pageable pageable) {
+    Slice<Review> reviewList = reviewRepository.findAllByRoomIdForGuest(roomId, userId, pageable);
     return reviewList.map(ReviewConverter::of);
   }
 
   @Transactional
-  public void remove(Long authenticationUserId, Long reviewId) {
+  public void remove(Long userId, Long reviewId) {
     Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
     Reservation reservation = reservationRepository.findById(review.getReservationId())
         .orElseThrow(IllegalArgumentException::new);
-    validateAuthority(authenticationUserId, reservation.getUserId());
+    validateAuthority(userId, reservation.getUserId());
     review.getImages().forEach(reviewImage -> uploadService.delete(reviewImage.getPath()));
     reviewRepository.delete(review);
   }

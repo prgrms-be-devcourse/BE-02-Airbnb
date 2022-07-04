@@ -1,6 +1,7 @@
 package com.prgrms.airbnb.domain.user.controller;
 
 import com.prgrms.airbnb.config.jwt.JwtAuthentication;
+import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
 import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;
 import com.prgrms.airbnb.domain.user.service.UserService;
@@ -26,7 +27,9 @@ public class UserRestController {
   @GetMapping
   public ResponseEntity<UserDetailResponse> getInfo(
       @AuthenticationPrincipal JwtAuthentication authentication) {
-    UserDetailResponse response = userService.findById(authentication.userId).orElseThrow();
+    UserDetailResponse response = userService.findById(authentication.userId).orElseThrow(() -> {
+      throw new UnAuthorizedAccessException(this.getClass().getName());
+    });
     return ResponseEntity.ok(response);
   }
 

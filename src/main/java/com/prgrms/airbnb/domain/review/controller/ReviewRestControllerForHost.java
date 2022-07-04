@@ -26,8 +26,8 @@ public class ReviewRestControllerForHost {
   public ResponseEntity<Slice<ReviewResponse>> getByRoomId(
       @AuthenticationPrincipal JwtAuthentication authentication, @PathVariable Long roomId,
       Pageable pageable) {
-    Long hostId = authentication.userId;
-    Slice<ReviewResponse> reviewResponses = hostReviewService.findAllByRoomId(hostId, roomId,
+    Long userId = authentication.userId;
+    Slice<ReviewResponse> reviewResponses = hostReviewService.findAllByRoomId(userId, roomId,
         pageable);
     return ResponseEntity.ok(reviewResponses);
   }
