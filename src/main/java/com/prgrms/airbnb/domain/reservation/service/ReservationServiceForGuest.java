@@ -35,9 +35,12 @@ public class ReservationServiceForGuest {
     this.roomRepository = roomRepository;
   }
 
-  public ReservationDetailResponseForGuest findDetailById(String reservationId) {
+  public ReservationDetailResponseForGuest findDetailById(String reservationId, Long userId) {
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(IllegalArgumentException::new);
+
+    if(!reservation.validateUserId(userId)) throw new IllegalArgumentException();
+
     Room room = roomRepository.findById(reservation.getRoomId())
         .orElseThrow(IllegalArgumentException::new);
     User host = userRepository.findById(room.getUserId())
