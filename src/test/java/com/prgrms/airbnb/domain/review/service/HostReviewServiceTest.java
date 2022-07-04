@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
+import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.review.dto.ReviewResponse;
 import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.entity.ReviewImage;
@@ -97,7 +98,7 @@ class HostReviewServiceTest {
       //when
       //then
       Assertions.assertThatThrownBy(() -> hostReviewService.findAllByRoomId(1L, 10L, pageRequest))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(UnAuthorizedAccessException.class);
     }
   }
 }

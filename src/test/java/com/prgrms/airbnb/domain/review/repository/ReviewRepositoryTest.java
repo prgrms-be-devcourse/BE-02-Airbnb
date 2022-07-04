@@ -1,6 +1,7 @@
 package com.prgrms.airbnb.domain.review.repository;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import com.prgrms.airbnb.domain.reservation.entity.Reservation;
 import com.prgrms.airbnb.domain.reservation.entity.ReservationStatus;
 import com.prgrms.airbnb.domain.reservation.repository.ReservationRepository;
@@ -142,7 +143,7 @@ class ReviewRepositoryTest {
     void failCommentIsNull() {
       Assertions.assertThatThrownBy(
               () -> new Review("", rating, "245325", true, List.of(reviewImage1, reviewImage2)))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -150,7 +151,7 @@ class ReviewRepositoryTest {
     void failRatingIsNull() {
       Assertions.assertThatThrownBy(
               () -> new Review(comment, null, "245325", true, List.of(reviewImage1, reviewImage2)))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -158,7 +159,7 @@ class ReviewRepositoryTest {
     void failRatingIsOutOfBoundary() {
       Assertions.assertThatThrownBy(
               () -> new Review(comment, 7, "245325", true, List.of(reviewImage1, reviewImage2)))
-          .isInstanceOf(RuntimeException.class);
+          .isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -166,7 +167,7 @@ class ReviewRepositoryTest {
     void failReservationIsNull() {
       Assertions.assertThatThrownBy(
               () -> new Review(comment, rating, null, true, List.of(reviewImage1, reviewImage2)))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -174,7 +175,7 @@ class ReviewRepositoryTest {
     void failVisibleIsNull() {
       Assertions.assertThatThrownBy(
               () -> new Review(comment, rating, "245325", null, List.of(reviewImage1, reviewImage2)))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(InvalidParamException.class);
     }
   }
 
