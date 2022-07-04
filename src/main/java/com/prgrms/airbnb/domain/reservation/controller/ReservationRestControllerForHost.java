@@ -35,6 +35,7 @@ public class ReservationRestControllerForHost {
       @AuthenticationPrincipal JwtAuthentication authentication,
       @PathVariable String reservationId) {
     Long hostId = authentication.userId;
+    ReservationStatus reservationStatus = ReservationStatus.valueOf(status);
     ReservationDetailResponseForHost approvalReservation = reservationServiceForHost.approval(reservationId,
         hostId, ReservationStatus.ACCEPTED);
 
