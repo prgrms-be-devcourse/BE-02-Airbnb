@@ -1,23 +1,31 @@
 <configuration>
-  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ROLLING_FILE_ERROR_LOG">
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
+    <append>true</append>
     <encoder>
       <pattern>${FILE_LOG_PATTERN}</pattern>
     </encoder>
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-      <level>WARN</level>
-      <onMatch>ACCEPT</onMatch>
-      <onMismatch>DENY</onMismatch>
-    </filter>
+    <file>src/main/resources//logFile.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>logs/error/error-%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
     </rollingPolicy>
   </appender>
-
+  <conversionRule
+    conversionWord="clr"
+    converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+  <logger level="warn" name="com.prgrms.airbnb">
+    <appender-ref ref="FILE"/>
+  </logger>
   <property name="FILE_LOG_PATTERN"
-    value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+    value="%d{HH:mm:ss.SSS} [%thread] %-4level %logger{36} - %msg%n"/>
 
-  <root level="WARN">
-    <appender-ref ref="ROLLING_FILE_ERROR_LOG"/>
+  <property name="CONSOLE_LOG_PATTERN"
+    value="%clr(%d{HH:mm:ss.SSS}){yellow} [%thread] %clr(%-4level) %logger{36} - %msg%n"/>
+  <root level="info">
+    <appender-ref ref="STDOUT"/>
   </root>
-
 </configuration>

@@ -14,8 +14,10 @@ public class LogConfigure {
   @Around("within(com.prgrms.airbnb.domain.common.exception..*)")
   public Object logging(ProceedingJoinPoint pjp) throws Throwable {
     long now = System.currentTimeMillis();
-    log.warn("Error : {}({}) = {}", pjp.getSignature().getDeclaringTypeName(),
-        pjp.getSignature().getName(), now);
+    if (pjp.getArgs()[0] instanceof RuntimeException) {
+      RuntimeException e = (RuntimeException) pjp.getArgs()[0];
+      log.warn("Error : {}({}) = {}", e.getClass(), e.getMessage(), now);
+    }
     Object result = pjp.proceed();
     return result;
   }

@@ -40,8 +40,8 @@ public class ExceptionAdvice {
     return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorResponse> exception(Exception e) {
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<ErrorResponse> runtimeException(RuntimeException e) {
     ErrorResponse errorResponse = new ErrorResponse(ErrorType.INTERNAL_SERVER_ERROR);
 
     return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
