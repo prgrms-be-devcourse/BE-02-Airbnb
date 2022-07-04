@@ -14,7 +14,6 @@ import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.entity.ReviewImage;
 import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.review.util.ReviewConverter;
-import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -36,14 +36,16 @@ public class GuestReviewService {
   private final ReservationRepository reservationRepository;
   private final RoomRepository roomRepository;
   private final UploadService uploadService;
+  private final ApplicationEventPublisher publisher;
 
   public GuestReviewService(ReviewRepository reviewRepository,
       ReservationRepository reservationRepository, RoomRepository roomRepository,
-      UploadService uploadService) {
+      UploadService uploadService, ApplicationEventPublisher publisher) {
     this.reviewRepository = reviewRepository;
     this.reservationRepository = reservationRepository;
     this.roomRepository = roomRepository;
     this.uploadService = uploadService;
+    this.publisher = publisher;
   }
 
   @Transactional
@@ -60,10 +62,8 @@ public class GuestReviewService {
     uploadNewImages(images, review);
     Review savedReview = reviewRepository.save(review);
     reservation.changeStatus(ReservationStatus.COMPLETE);
-    Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(() -> {
-      throw new NotFoundException(this.getClass().getName());
-    });
-    room.getReviewInfo().updateReviewInfo(createReviewRequest.getRating());
+    publisher.publishEvent(
+        new UpdateReviewInfoEvent(reservation.getRoomId(), createReviewRequest.getRating()));
     return ReviewConverter.of(savedReview);
   }
 
@@ -83,10 +83,8 @@ public class GuestReviewService {
     review.changeVisible(updateReviewRequest.getVisible());
     deleteImages(updateReviewRequest, review);
     uploadNewImages(images, review);
-    Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(() -> {
-      throw new NotFoundException(this.getClass().getName());
-    });
-    room.getReviewInfo().changeReviewInfo(review.getRating(), updateReviewRequest.getRating());
+    publisher.publishEvent(new ChangeReviewInfoEvent(reservation.getRoomId(), review.getRating(),
+        updateReviewRequest.getRating()));
     return ReviewConverter.of(review);
   }
 
