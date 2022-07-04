@@ -7,6 +7,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
+import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.reservation.entity.Reservation;
 import com.prgrms.airbnb.domain.reservation.entity.ReservationStatus;
@@ -36,6 +39,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -60,6 +64,8 @@ class GuestReviewServiceTest {
   private RoomRepository roomRepository;
   @Mock
   private ReservationRepository reservationRepository;
+  @Mock
+  ApplicationEventPublisher publisher;
 
   @BeforeEach
   void setUp() {
@@ -94,7 +100,7 @@ class GuestReviewServiceTest {
       when(reservationRepository.findById(reservation1.getId())).thenReturn(
           Optional.of(reservation1));
       when(uploadService.uploadImg(any())).thenReturn("path");
-      when(roomRepository.findById(10L)).thenReturn(Optional.of(room));
+      doNothing().when(publisher).publishEvent(any(UpdateReviewInfoEvent.class));
       when(reviewRepository.save(any())).thenReturn(review1);
       //when
       ReviewResponse reviewResponse = guestReviewService.save(1L, reservation1.getId(), request,
@@ -102,7 +108,7 @@ class GuestReviewServiceTest {
       //then
       Assertions.assertThat(reservation1.getReservationStatus())
           .isEqualTo(ReservationStatus.COMPLETE);
-      Assertions.assertThat(room.getReviewInfo().getReviewCount()).isEqualTo(6);
+      Assertions.assertThat(room.getReviewInfo().getReviewCount()).isEqualTo(5);
     }
 
     @Test
@@ -120,7 +126,7 @@ class GuestReviewServiceTest {
       //then
       Assertions.assertThatThrownBy(
               () -> guestReviewService.save(1L, reservation1.getId(), request, multipartFiles))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(BadRequestException.class);
     }
 
     @Test
@@ -140,7 +146,7 @@ class GuestReviewServiceTest {
       //then
       Assertions.assertThatThrownBy(
               () -> guestReviewService.save(2L, reservation1.getId(), request, multipartFiles))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(UnAuthorizedAccessException.class);
     }
   }
 
@@ -162,7 +168,7 @@ class GuestReviewServiceTest {
       when(uploadService.uploadImg(any())).thenReturn("path");
       when(reviewRepository.findById(any())).thenReturn(Optional.of(review1));
       when(reservationRepository.findById(any())).thenReturn(Optional.of(reservation1));
-      when(roomRepository.findById(10L)).thenReturn(Optional.of(room));
+      doNothing().when(publisher).publishEvent(any(ChangeReviewInfoEvent.class));
       doNothing().when(uploadService).delete(any());
       //when
       ReviewResponse reviewResponse = guestReviewService.modify(1L, 3L, request, multipartFiles);
@@ -186,7 +192,6 @@ class GuestReviewServiceTest {
       when(uploadService.uploadImg(any())).thenReturn("path");
       when(reviewRepository.findById(any())).thenReturn(Optional.of(review1));
       when(reservationRepository.findById(any())).thenReturn(Optional.of(reservation1));
-      when(roomRepository.findById(10L)).thenReturn(Optional.of(room));
       //when
       ReviewResponse reviewResponse = guestReviewService.modify(1L, 3L, request, multipartFiles);
       //then
@@ -208,7 +213,6 @@ class GuestReviewServiceTest {
       reservation1.changeStatus(ReservationStatus.COMPLETE);
       when(reviewRepository.findById(any())).thenReturn(Optional.of(review1));
       when(reservationRepository.findById(any())).thenReturn(Optional.of(reservation1));
-      when(roomRepository.findById(10L)).thenReturn(Optional.of(room));
       //when
       ReviewResponse reviewResponse = guestReviewService.modify(1L, 3L, request, null);
       //then
@@ -229,7 +233,7 @@ class GuestReviewServiceTest {
       //then
       Assertions.assertThatThrownBy(
               () -> guestReviewService.modify(2L, 3L, request, multipartFiles))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(NotFoundException.class);
     }
   }
 
@@ -256,8 +260,7 @@ class GuestReviewServiceTest {
     @DisplayName("성공: 익명글인 타인의 리뷰를 조회합니다.")
     public void findAllByRoomIdWithOtherReviewAndVisibleFalse() {
       //given
-      Slice<Review> reviews = new SliceImpl<>(List.of(review2), PageRequest.of(0, 2),
-          false);
+      Slice<Review> reviews = new SliceImpl<>(List.of(review2), PageRequest.of(0, 2), false);
       when(reviewRepository.findAllByRoomIdForGuest(room.getId(), 2L,
           PageRequest.of(0, 2))).thenReturn(reviews);
       //when
@@ -293,7 +296,7 @@ class GuestReviewServiceTest {
       //when
       //then
       Assertions.assertThatThrownBy(() -> guestReviewService.remove(2L, 3L))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(UnAuthorizedAccessException.class);
     }
   }
 }
