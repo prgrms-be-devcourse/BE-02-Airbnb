@@ -1,6 +1,7 @@
 package com.prgrms.airbnb.domain.review.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,31 +98,31 @@ public class Review extends BaseEntity {
 
   private void setComment(String comment) {
     if (StringUtils.isBlank(comment)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException(this.getClass().getName());
     }
     this.comment = comment;
   }
 
   private void setRating(Integer rating) {
     if (ObjectUtils.isEmpty(rating)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException(this.getClass().getName());
     }
     if (rating < 0 || rating > 5) {
-      throw new RuntimeException();
+      throw new InvalidParamException(this.getClass().getName());
     }
     this.rating = rating;
   }
 
   private void setReservationId(String reservationId) {
     if (ObjectUtils.isEmpty(reservationId)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException(this.getClass().getName());
     }
     this.reservationId = reservationId;
   }
 
   private void setVisible(Boolean visible) {
     if (ObjectUtils.isEmpty(visible)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException(this.getClass().getName());
     }
     this.visible = visible;
   }

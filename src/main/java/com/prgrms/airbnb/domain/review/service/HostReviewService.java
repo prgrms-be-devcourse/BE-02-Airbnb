@@ -1,5 +1,7 @@
 package com.prgrms.airbnb.domain.review.service;
 
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
+import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.reservation.repository.ReservationRepository;
 import com.prgrms.airbnb.domain.review.dto.ReviewResponse;
 import com.prgrms.airbnb.domain.review.entity.Review;
@@ -28,7 +30,9 @@ public class HostReviewService {
   }
 
   public Slice<ReviewResponse> findAllByRoomId(Long userId, Long roomId, Pageable pageable) {
-    Room room = roomRepository.findById(roomId).orElseThrow(IllegalArgumentException::new);
+    Room room = roomRepository.findById(roomId).orElseThrow(() -> {
+      throw new NotFoundException(this.getClass().getName());
+    });
     validateAuthority(userId, room.getUserId());
     Slice<Review> reviewList = reviewRepository.findAllByRoomIdForHost(roomId, pageable);
     return reviewList.map(ReviewConverter::of);
@@ -36,7 +40,7 @@ public class HostReviewService {
 
   private void validateAuthority(Long authenticationUserId, Long userId) {
     if (!authenticationUserId.equals(userId)) {
-      throw new IllegalArgumentException();
+      throw new UnAuthorizedAccessException(this.getClass().getName());
     }
   }
 }

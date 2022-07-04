@@ -1,5 +1,8 @@
 package com.prgrms.airbnb.domain.review.service;
 
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
+import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.reservation.entity.Reservation;
 import com.prgrms.airbnb.domain.reservation.entity.ReservationStatus;
@@ -46,19 +49,20 @@ public class GuestReviewService {
   @Transactional
   public ReviewResponse save(Long userId, String reservationId,
       CreateReviewRequest createReviewRequest, List<MultipartFile> images) {
-    Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(IllegalArgumentException::new);
+    Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> {
+      throw new NotFoundException(this.getClass().getName());
+    });
     validateAuthority(userId, reservation.getUserId());
     if (!reservation.canReviewed()) {
-      //TODO: 리뷰를 남길 수 없는 경우.
-      throw new IllegalArgumentException();
+      throw new BadRequestException(this.getClass().getName());
     }
     Review review = ReviewConverter.toReview(reservationId, createReviewRequest);
     uploadNewImages(images, review);
     Review savedReview = reviewRepository.save(review);
     reservation.changeStatus(ReservationStatus.COMPLETE);
-    Room room = roomRepository.findById(reservation.getRoomId())
-        .orElseThrow(IllegalArgumentException::new);
+    Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(() -> {
+      throw new NotFoundException(this.getClass().getName());
+    });
     room.getReviewInfo().updateReviewInfo(createReviewRequest.getRating());
     return ReviewConverter.of(savedReview);
   }
@@ -66,17 +70,22 @@ public class GuestReviewService {
   @Transactional
   public ReviewResponse modify(Long userId, Long reviewId, UpdateReviewRequest updateReviewRequest,
       List<MultipartFile> images) {
-    Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
+    Review review = reviewRepository.findById(reviewId).orElseThrow(() -> {
+      throw new NotFoundException(this.getClass().getName());
+    });
     Reservation reservation = reservationRepository.findById(review.getReservationId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     validateAuthority(userId, reservation.getUserId());
     review.changeComment(updateReviewRequest.getComment());
     review.changeRating(updateReviewRequest.getRating());
     review.changeVisible(updateReviewRequest.getVisible());
     deleteImages(updateReviewRequest, review);
     uploadNewImages(images, review);
-    Room room = roomRepository.findById(reservation.getRoomId())
-        .orElseThrow(IllegalArgumentException::new);
+    Room room = roomRepository.findById(reservation.getRoomId()).orElseThrow(() -> {
+      throw new NotFoundException(this.getClass().getName());
+    });
     room.getReviewInfo().changeReviewInfo(review.getRating(), updateReviewRequest.getRating());
     return ReviewConverter.of(review);
   }
@@ -88,9 +97,13 @@ public class GuestReviewService {
 
   @Transactional
   public void remove(Long userId, Long reviewId) {
-    Review review = reviewRepository.findById(reviewId).orElseThrow(IllegalArgumentException::new);
+    Review review = reviewRepository.findById(reviewId).orElseThrow(() -> {
+      throw new NotFoundException(this.getClass().getName());
+    });
     Reservation reservation = reservationRepository.findById(review.getReservationId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     validateAuthority(userId, reservation.getUserId());
     review.getImages().forEach(reviewImage -> uploadService.delete(reviewImage.getPath()));
     reviewRepository.delete(review);
@@ -98,7 +111,7 @@ public class GuestReviewService {
 
   private void validateAuthority(Long authenticationUserId, Long userId) {
     if (!authenticationUserId.equals(userId)) {
-      throw new IllegalArgumentException();
+      throw new UnAuthorizedAccessException(this.getClass().getName());
     }
   }
 
