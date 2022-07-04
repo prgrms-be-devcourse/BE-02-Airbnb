@@ -3,8 +3,10 @@ package com.prgrms.airbnb.domain.room.service;
 import static com.prgrms.airbnb.domain.room.service.RoomServiceForHostTest.getMockMultipartFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.Email;
+import com.prgrms.airbnb.domain.localStack.LocalStackS3Config;
 import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
 import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
 import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
@@ -35,9 +37,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = LocalStackS3Config.class)
 @Transactional
 class RoomServiceForGuestTest {
+
+  @Autowired
+  AmazonS3 amazonS3;
 
   @Autowired
   RoomServiceForGuest roomServiceForGuest;
@@ -76,6 +81,9 @@ class RoomServiceForGuestTest {
 
   @BeforeEach
   void setupForFindByHostId() throws IOException {
+
+    amazonS3.createBucket("bucket");
+
     defaultAddress = new Address("default address1", "default address2");
     defaultCharge = 1000;
     defaultRoomName = "default roomName";
