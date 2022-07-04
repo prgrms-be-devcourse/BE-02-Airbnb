@@ -1,0 +1,23 @@
+<configuration>
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ROLLING_FILE_ERROR_LOG">
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>WARN</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/error/error-%d{yyyy-MM-dd}.log</fileNamePattern>
+    </rollingPolicy>
+  </appender>
+
+  <property name="FILE_LOG_PATTERN"
+    value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+  <root level="WARN">
+    <appender-ref ref="ROLLING_FILE_ERROR_LOG"/>
+  </root>
+
+</configuration>

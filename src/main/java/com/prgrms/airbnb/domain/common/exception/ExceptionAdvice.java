@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionAdvice {
 
+
   @ExceptionHandler(UnAuthorizedAccessException.class)
   public ResponseEntity<ErrorResponse> unAuthorizedAccessException(UnAuthorizedAccessException e) {
     ErrorResponse errorResponse = new ErrorResponse(ErrorType.UN_AUTHORIZED_ACCESS);
@@ -42,6 +43,7 @@ public class ExceptionAdvice {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> exception(Exception e) {
     ErrorResponse errorResponse = new ErrorResponse(ErrorType.INTERNAL_SERVER_ERROR);
+
     return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
