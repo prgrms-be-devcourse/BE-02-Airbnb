@@ -8,7 +8,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReservationRepository extends JpaRepository<Reservation, String>,
-    ReservationStatusRepository {
+    ReservationCustomRepository {
 
   Slice<Reservation> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
