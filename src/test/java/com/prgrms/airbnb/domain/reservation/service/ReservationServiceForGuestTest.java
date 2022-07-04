@@ -206,6 +206,7 @@ class ReservationServiceForGuestTest {
           .userId(userId1)
           .roomId(roomId)
           .build();
+
       assertThatThrownBy(() -> reservationServiceForGuest.save(createReservationRequest))
           .isInstanceOf(IllegalArgumentException.class);
     }
