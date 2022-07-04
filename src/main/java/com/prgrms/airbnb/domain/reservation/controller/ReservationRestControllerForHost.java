@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/api/v1/host/reservation")
+@RequestMapping("/api/v1/host/reservations")
 @RestController
 public class ReservationRestControllerForHost {
 
