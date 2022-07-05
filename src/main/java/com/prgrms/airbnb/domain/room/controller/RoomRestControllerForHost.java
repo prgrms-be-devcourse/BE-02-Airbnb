@@ -7,6 +7,7 @@ import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.dto.UpdateRoomRequest;
 import com.prgrms.airbnb.domain.room.entity.SortTypeForHost;
 import com.prgrms.airbnb.domain.room.service.RoomServiceForHost;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class RoomRestControllerForHost {
     }
 
     @PostMapping
+    @ApiOperation(value = "Room 1개 등록", notes = "호스트는 룸 1개를 사진들과 함께 등록할 수 있다.")
     public ResponseEntity<RoomDetailResponse> registerRoom(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @RequestPart(value = "room") CreateRoomRequest createRoomRequest,
@@ -41,6 +43,7 @@ public class RoomRestControllerForHost {
     }
 
     @PutMapping
+    @ApiOperation(value = "Room의 정보 수정", notes = "호스트는 본인의 룸 정보를 수정할 수 있다.")
     public ResponseEntity<RoomDetailResponse> modifyRoom(
             @RequestPart(value = "room") UpdateRoomRequest updateRoomRequest,
             @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles,
@@ -54,6 +57,7 @@ public class RoomRestControllerForHost {
     }
 
     @GetMapping
+    @ApiOperation(value = "Host의 전체 Room 목록 조회", notes = "호스트는 본인의 Room 목록을 조회할 수 있다.")
     public ResponseEntity<Slice<RoomSummaryResponse>> getByHostId(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @RequestParam("sortType") SortTypeForHost sortType,
@@ -67,6 +71,7 @@ public class RoomRestControllerForHost {
     }
 
     @GetMapping("/{roomId}")
+    @ApiOperation(value = "Room 1개 상세정보 조회", notes = "호스트는 본인의 특정 Room 1개의 상세 정보를 조회할 수 있다.")
     public ResponseEntity<RoomDetailResponse> getDetail(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable("roomId") Long roomId) {
@@ -77,6 +82,7 @@ public class RoomRestControllerForHost {
     }
 
     @DeleteMapping("/{roomId}")
+    @ApiOperation(value = "Room 삭제", notes = "호스트는 본인의 Room을 삭제할 수 있다.")
     public ResponseEntity<Object> delete(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable("roomId") Long roomId) {

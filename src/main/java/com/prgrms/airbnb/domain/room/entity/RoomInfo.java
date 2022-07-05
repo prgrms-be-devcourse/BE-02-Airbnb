@@ -1,5 +1,6 @@
 package com.prgrms.airbnb.domain.room.entity;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,16 @@ import javax.persistence.Embeddable;
 @ToString
 public class RoomInfo {
 
+  @ApiModelProperty(example = "최대 수용 인원")
   private Integer maxGuest;
 
+  @ApiModelProperty(example = "방 개수")
   private Integer roomCount;
 
+  @ApiModelProperty(example = "침대 개수")
   private Integer bedCount;
 
+  @ApiModelProperty(example = "화장실 개수")
   private Integer bathroomCount;
 
   public RoomInfo(Integer maxGuest, Integer roomCount, Integer bedCount, Integer bathroomCount) {

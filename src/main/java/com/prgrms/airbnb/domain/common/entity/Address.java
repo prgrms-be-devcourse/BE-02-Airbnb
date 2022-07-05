@@ -1,5 +1,6 @@
 package com.prgrms.airbnb.domain.common.entity;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -14,7 +15,10 @@ import javax.persistence.Embeddable;
 @ToString
 public class Address {
 
+  @ApiModelProperty(example = "시, 도, 군")
   private String address1;
+
+  @ApiModelProperty(example = "상세 주소")
   private String address2;
 
   public Address(String address1, String address2) {
