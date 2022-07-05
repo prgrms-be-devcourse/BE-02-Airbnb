@@ -1,6 +1,8 @@
 package com.prgrms.airbnb.domain.reservation.entity;
 
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -75,7 +77,7 @@ public class Reservation extends BaseEntity {
   public boolean canCancelled(Long userId) {
     if (!validateDateForCancel() || !validateUserId(userId)) {
       //TODO: 환불 정책 필요
-      throw new IllegalArgumentException();
+      throw new BadRequestException(this.getClass().getName());
     }
     return this.reservationStatus.equals(ReservationStatus.WAITED_OK)
         || this.reservationStatus.equals(ReservationStatus.ACCEPTED);
@@ -87,7 +89,7 @@ public class Reservation extends BaseEntity {
 
   private void setId(String id) {
     if (ObjectUtils.isEmpty(id)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("잘못된 reservationId 입력: " + id);
     }
     this.id = id;
   }
@@ -95,48 +97,48 @@ public class Reservation extends BaseEntity {
   private void setReservationStatus(ReservationStatus reservationStatus) {
     if (ObjectUtils.isEmpty(reservationStatus) || !(reservationStatus.equals(
         ReservationStatus.WAITED_OK))) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("잘못된 reservationStatus 입력: " + reservationStatus);
     }
   }
 
   private void setStartDate(LocalDate checkIn) {
     if (ObjectUtils.isEmpty(checkIn)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("잘못된 startDate 입력: " + checkIn);
     }
     this.startDate = checkIn;
   }
 
   private void setEndDate(LocalDate checkOut) {
     if (ObjectUtils.isEmpty(checkOut)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("잘못된 endDate 입력: " + checkOut);
     }
     this.endDate = checkOut;
   }
 
   private void setTerm(Integer period) {
     if (ObjectUtils.isEmpty(period) || period <= 0) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("잘못된 period 입력: " + period);
     }
     this.term = period;
   }
 
   private void setUserId(Long userId) {
     if (ObjectUtils.isEmpty(userId)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("잘못된 userId 입력: " + userId);
     }
     this.userId = userId;
   }
 
   private void setRoomId(Long roomId) {
     if (ObjectUtils.isEmpty(roomId)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("잘못된 roomId 입력: " + roomId);
     }
     this.roomId = roomId;
   }
 
   private void calculatePrice(Integer charge) {
     if (ObjectUtils.isEmpty(charge) || charge < 0) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("잘못된 charge 입력: " + charge);
     }
     totalPrice = charge * term;
   }
