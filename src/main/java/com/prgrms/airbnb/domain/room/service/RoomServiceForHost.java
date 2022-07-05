@@ -1,5 +1,8 @@
 package com.prgrms.airbnb.domain.room.service;
 
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
+import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
 import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
@@ -47,11 +50,11 @@ public class RoomServiceForHost {
       Long hostId) {
 
     if (roomRepository.existsByAddress(createRoomRequest.getAddress())) {
-      throw new RuntimeException("기존에 등록된 주소가 있습니다.");
+      throw new BadRequestException("기존에 등록된 주소가 있습니다.");
     }
 
     User user = userRepository.findById(hostId)
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() -> new NotFoundException("해당 id의 user를 찾을 수 없습니다."));
     Room room = RoomConverter.toRoom(createRoomRequest, user);
     Room savedRoom = roomRepository.save(room);
 
@@ -68,7 +71,7 @@ public class RoomServiceForHost {
       Long hostId) {
 
     Room room = roomRepository.findById(updateRoomRequest.getId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> new NotFoundException("해당 id의 room을 찾을 수 없습니다."));
     validateHost(room, hostId);
 
     room.changeName(updateRoomRequest.getName());
@@ -91,7 +94,7 @@ public class RoomServiceForHost {
   public RoomDetailResponse findDetailById(Long id, Long hostId) {
 
     Room room = roomRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("해당 id를 가진 room이 존재하지 않습니다."));
+        .orElseThrow(() -> new NotFoundException("해당 id를 가진 room이 존재하지 않습니다."));
     validateHost(room, hostId);
 
     return RoomConverter.ofDetail(room);
@@ -106,16 +109,17 @@ public class RoomServiceForHost {
         .map(RoomConverter::ofSummary);
   }
 
+  @Transactional
   public void remove(Long roomId, Long hostId) {
     Room room = roomRepository.findById(roomId)
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() -> new NotFoundException("해당 id를 가진 room이 존재하지 않습니다."));
     validateHost(room, hostId);
     roomRepository.deleteById(roomId);
   }
 
   private void validateHost(Room room, Long hostId) {
     if (!room.getUserId().equals(hostId)) {
-      throw new RuntimeException("잘못된 접근 [room의 host가 아님]");
+      throw new UnAuthorizedAccessException("해당 room에 접근할 권한이 없는 사용자입니다.");
     }
   }
 
@@ -129,5 +133,4 @@ public class RoomServiceForHost {
         .filter(roomImage -> !updateRoomRequest.getRoomImages().contains(roomImage))
         .collect(Collectors.toList());
   }
-
 }

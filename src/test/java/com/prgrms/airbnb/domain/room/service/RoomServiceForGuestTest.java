@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.amazonaws.services.s3.AmazonS3;
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.Email;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
 import com.prgrms.airbnb.domain.localStack.LocalStackS3Config;
 import com.prgrms.airbnb.domain.room.dto.CreateRoomRequest;
 import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
@@ -189,7 +190,7 @@ class RoomServiceForGuestTest {
 
       //given
       Room room = roomRepository.findById(roomId)
-          .orElseThrow(RuntimeException::new);
+          .orElseThrow(() -> new NotFoundException("해당 아이디를 가진 room을 찾을 수 없습니다. Id : " + roomId));
       //when
       RoomDetailResponse roomDetailResponse = roomServiceForGuest.findDetailById(roomId);
 
@@ -207,7 +208,7 @@ class RoomServiceForGuestTest {
       Long nonExistId = -1L;
 
       //then
-      Assertions.assertThrows(RuntimeException.class,
+      Assertions.assertThrows(NotFoundException.class,
           () -> roomServiceForGuest.findDetailById(nonExistId));
     }
 
@@ -219,6 +220,7 @@ class RoomServiceForGuestTest {
       Long nonExistId = null;
 
       //then
+      // TODO: 2022/07/05 여기도 같은 이슈
       Assertions.assertThrows(RuntimeException.class,
           () -> roomServiceForGuest.findDetailById(nonExistId));
     }

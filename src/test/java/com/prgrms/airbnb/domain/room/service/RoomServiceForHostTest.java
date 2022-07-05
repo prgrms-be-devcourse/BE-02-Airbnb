@@ -4,6 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
+import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.localStack.LocalStackS3Config;
 import com.prgrms.airbnb.domain.room.entity.RoomImage;
@@ -35,6 +39,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.mock.web.MockMultipartFile;
@@ -289,7 +294,7 @@ class RoomServiceForHostTest {
           .build();
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(BadRequestException.class,
           () -> roomServiceForHost.save(createRoomRequest, defaultMultipartFiles, hostId));
     }
 
@@ -457,7 +462,7 @@ class RoomServiceForHostTest {
           .build();
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
@@ -476,7 +481,7 @@ class RoomServiceForHostTest {
           .build();
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
@@ -517,7 +522,7 @@ class RoomServiceForHostTest {
           .build();
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
@@ -536,7 +541,7 @@ class RoomServiceForHostTest {
           .build();
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
@@ -555,7 +560,7 @@ class RoomServiceForHostTest {
           .build();
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
@@ -640,7 +645,7 @@ class RoomServiceForHostTest {
           .build();
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
@@ -660,7 +665,7 @@ class RoomServiceForHostTest {
           .build();
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
@@ -727,7 +732,7 @@ class RoomServiceForHostTest {
           .build();
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> roomServiceForHost.modify(updateRoomRequest, defaultMultipartFiles, hostId));
     }
 
@@ -810,7 +815,7 @@ class RoomServiceForHostTest {
       Long wrongHostId = -1L;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(UnAuthorizedAccessException.class,
           () -> roomServiceForHost.findDetailById(roomId, wrongHostId));
     }
 
@@ -822,7 +827,7 @@ class RoomServiceForHostTest {
       Long wrongRoomId = -1L;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(NotFoundException.class,
           () -> roomServiceForHost.findDetailById(wrongRoomId, hostId));
     }
 
@@ -835,7 +840,7 @@ class RoomServiceForHostTest {
       Long wrongHostId = -2L;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(NotFoundException.class,
           () -> roomServiceForHost.findDetailById(wrongRoomId, wrongHostId));
     }
   }
@@ -905,6 +910,7 @@ class RoomServiceForHostTest {
       Long wrongRoomId = null;
 
       //then
+      // TODO: 2022/07/05 null로 조회할 경우 InvalidDataAccessApiUsageException이 발생하는데 이에 대한 해결 방향을 회으를 통해 알아봅시다. 
       assertThrows(RuntimeException.class, () -> roomServiceForHost.remove(wrongRoomId, hostId));
     }
 
@@ -913,7 +919,7 @@ class RoomServiceForHostTest {
     public void failWrongHostId() throws Exception {
 
       //then
-      assertThrows(RuntimeException.class, () -> roomServiceForHost.remove(roomId, hostId1));
+      assertThrows(UnAuthorizedAccessException.class, () -> roomServiceForHost.remove(roomId, hostId1));
     }
   }
 }

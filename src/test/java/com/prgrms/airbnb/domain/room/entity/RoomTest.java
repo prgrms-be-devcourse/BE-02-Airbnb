@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -122,7 +123,7 @@ class RoomTest {
       String testRoomName = null;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new Room(address, charge, testRoomName, roomDescription, roomInfo, RoomType.APARTMENT,
               images, hostId));
     }
@@ -135,7 +136,7 @@ class RoomTest {
       String testRoomName = "";
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new Room(address, charge, testRoomName, roomDescription, roomInfo, RoomType.APARTMENT,
               images, hostId));
     }
@@ -148,7 +149,7 @@ class RoomTest {
       String testRoomName = " ";
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new Room(address, charge, testRoomName, roomDescription, roomInfo, RoomType.APARTMENT,
               images, hostId));
     }
@@ -161,7 +162,7 @@ class RoomTest {
       Integer testCharge = null;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new Room(address, testCharge, roomName, roomDescription, roomInfo, RoomType.APARTMENT,
               images, hostId));
     }
@@ -174,7 +175,7 @@ class RoomTest {
       Integer testCharge = -10;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new Room(address, testCharge, roomName, roomDescription, roomInfo, RoomType.APARTMENT,
               images, hostId));
     }
@@ -187,7 +188,7 @@ class RoomTest {
       Long testHostId = null;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new Room(address, charge, roomName, roomDescription, roomInfo, RoomType.APARTMENT,
               images, testHostId));
     }
@@ -200,7 +201,7 @@ class RoomTest {
       Address testAddress = null;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new Room(testAddress, charge, roomName, roomDescription, roomInfo, RoomType.APARTMENT,
               images, hostId));
     }
@@ -250,7 +251,7 @@ class RoomTest {
       String newRoomName = null;
 
       //then
-      assertThrows(RuntimeException.class, () -> room.changeName(newRoomName));
+      assertThrows(InvalidParamException.class, () -> room.changeName(newRoomName));
     }
 
     @Test
@@ -265,7 +266,7 @@ class RoomTest {
       String newRoomName = "";
 
       //then
-      assertThrows(RuntimeException.class, () -> room.changeName(newRoomName));
+      assertThrows(InvalidParamException.class, () -> room.changeName(newRoomName));
     }
 
     @Test
@@ -280,7 +281,7 @@ class RoomTest {
       String newRoomName = " ";
 
       //then
-      assertThrows(RuntimeException.class, () -> room.changeName(newRoomName));
+      assertThrows(InvalidParamException.class, () -> room.changeName(newRoomName));
     }
 
     @Test
@@ -327,7 +328,7 @@ class RoomTest {
       Integer newCharge = -1;
 
       //then
-      assertThrows(RuntimeException.class, () -> room.changeCharge(newCharge));
+      assertThrows(InvalidParamException.class, () -> room.changeCharge(newCharge));
     }
 
     @Test
@@ -358,7 +359,7 @@ class RoomTest {
       RoomImage newRoomImage = null;
 
       //then
-      assertThrows(RuntimeException.class, () -> room.setImage(newRoomImage));
+      assertThrows(InvalidParamException.class, () -> room.setImage(newRoomImage));
     }
 
     @Test
@@ -388,7 +389,7 @@ class RoomTest {
       RoomImage roomImage5 = new RoomImage("roomImage Path 5");
 
       //then
-      assertThrows(RuntimeException.class, () -> room.deleteImage(roomImage5));
+      assertThrows(InvalidParamException.class, () -> room.deleteImage(roomImage5));
     }
 
     @Test
