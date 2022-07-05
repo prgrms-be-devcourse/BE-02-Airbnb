@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.Email;
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
 import com.prgrms.airbnb.domain.reservation.dto.CreateReservationRequest;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForGuest;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForHost;
@@ -197,7 +199,7 @@ class ReservationServiceForHostTest {
     void failWrongReservationId() {
       reservationServiceForGuest.save(createReservationRequest);
       assertThatThrownBy(() -> reservationServiceForHost.findDetailById("abcd1234", userId1))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(NotFoundException.class);
     }
   }
 
@@ -271,11 +273,11 @@ class ReservationServiceForHostTest {
       assertThatThrownBy(() ->
           reservationServiceForHost
               .approval(save.getId(), host.getId(), ReservationStatus.WAIT_REVIEW))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(BadRequestException.class);
       assertThatThrownBy(() ->
           reservationServiceForHost
               .approval(save.getId(), host.getId(), ReservationStatus.COMPLETE))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(BadRequestException.class);
     }
   }
 
