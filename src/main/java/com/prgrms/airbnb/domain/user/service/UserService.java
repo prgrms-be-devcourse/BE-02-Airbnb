@@ -1,7 +1,8 @@
 package com.prgrms.airbnb.domain.user.service;
 
 import com.prgrms.airbnb.domain.common.entity.Email;
-import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
 import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;
@@ -71,7 +72,7 @@ public class UserService {
 
   public Optional<UserDetailResponse> findById(Long userId) {
     User user = userRepository.findById(userId).orElseThrow(() -> {
-      throw new UnAuthorizedAccessException(this.getClass().getName());
+      throw new NotFoundException(this.getClass().getName());
     });
     return Optional.of(user).map(UserConverter::from);
   }
@@ -84,7 +85,7 @@ public class UserService {
   public UserDetailResponse modify(Long userId, UserUpdateRequest request,
       MultipartFile multipartFile) {
     User user = userRepository.findById(userId).orElseThrow(() -> {
-      throw new UnAuthorizedAccessException(this.getClass().getName());
+      throw new NotFoundException(this.getClass().getName());
     });
 
     if (Objects.nonNull(multipartFile)) {
@@ -104,7 +105,7 @@ public class UserService {
   @Transactional
   public UserDetailResponse changeUserToHost(Long userId) {
     User user = userRepository.findById(userId).orElseThrow(() -> {
-      throw new UnAuthorizedAccessException(this.getClass().getName());
+      throw new NotFoundException(this.getClass().getName());
     });
     Group group = groupRepository.findByName("HOST_GROUP").orElse(initHostGroupPermission());
     user.changeGroup(group);
@@ -119,16 +120,28 @@ public class UserService {
   }
 
   private Group initHostGroupPermission() {
-    Permission permission = permissionRepository.save(new Permission("ROLE_HOST"));
+    Permission hostPermission = permissionRepository.save(new Permission("ROLE_HOST"));
+    Permission userPermission = permissionRepository.findByName("ROLE_USER").orElseThrow(() -> {
+      throw new InvalidParamException(this.getClass().getName());
+    });
     Group group = groupRepository.save(new Group("HOST_GROUP"));
-    groupPermissionRepository.save(new GroupPermission(group, permission));
+    groupPermissionRepository.save(new GroupPermission(group, userPermission));
+    groupPermissionRepository.save(new GroupPermission(group, hostPermission));
     return group;
   }
 
   private Group initAdminGroupPermission() {
-    Permission permission = permissionRepository.save(new Permission("ROLE_ADMIN"));
+    Permission adminPermission = permissionRepository.save(new Permission("ROLE_ADMIN"));
+    Permission userPermission = permissionRepository.findByName("ROLE_USER").orElseThrow(() -> {
+      throw new InvalidParamException(this.getClass().getName());
+    });
+    Permission hostPermission = permissionRepository.findByName("ROLE_HOST").orElseThrow(() -> {
+      throw new InvalidParamException(this.getClass().getName());
+    });
     Group group = groupRepository.save(new Group("ADMIN_GROUP"));
-    groupPermissionRepository.save(new GroupPermission(group, permission));
+    groupPermissionRepository.save(new GroupPermission(group, userPermission));
+    groupPermissionRepository.save(new GroupPermission(group, hostPermission));
+    groupPermissionRepository.save(new GroupPermission(group, adminPermission));
     return group;
   }
 }

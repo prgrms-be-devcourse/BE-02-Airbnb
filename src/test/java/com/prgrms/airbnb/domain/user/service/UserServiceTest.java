@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
 import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
@@ -154,7 +155,7 @@ class UserServiceTest {
       // Given, When
       Throwable response = catchThrowable(() -> userService.findById(0L).orElseThrow());
       // Then
-      assertThat(response).isInstanceOf(UnAuthorizedAccessException.class);
+      assertThat(response).isInstanceOf(NotFoundException.class);
     }
   }
 
@@ -240,7 +241,7 @@ class UserServiceTest {
       Throwable response = catchThrowable(
           () -> userService.modify(0L, request, mockMultipartFile));
       // Then
-      assertThat(response).isInstanceOf(UnAuthorizedAccessException.class);
+      assertThat(response).isInstanceOf(NotFoundException.class);
     }
 
     @Test
