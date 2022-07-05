@@ -9,7 +9,7 @@ public class ReservationConverter {
 
   public static Reservation toReservation(String reservationNo,
       CreateReservationRequest createReservationRequest) {
-    return  new Reservation(reservationNo,
+    return new Reservation(reservationNo,
         createReservationRequest.getReservationStatus(),
         createReservationRequest.getStartDate(),
         createReservationRequest.getEndDate(),
