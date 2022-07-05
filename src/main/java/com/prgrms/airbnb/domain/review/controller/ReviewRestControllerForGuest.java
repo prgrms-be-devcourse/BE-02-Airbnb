@@ -5,6 +5,8 @@ import com.prgrms.airbnb.domain.review.dto.CreateReviewRequest;
 import com.prgrms.airbnb.domain.review.dto.ReviewResponse;
 import com.prgrms.airbnb.domain.review.dto.UpdateReviewRequest;
 import com.prgrms.airbnb.domain.review.service.GuestReviewService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import java.net.URI;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -32,10 +34,12 @@ public class ReviewRestControllerForGuest {
   }
 
   @PostMapping("/{reservationId}")
+  @ApiOperation(value = "예약 아이디로 리뷰 등록")
   public ResponseEntity<ReviewResponse> register(
-      @AuthenticationPrincipal JwtAuthentication authentication, @PathVariable String reservationId,
-      @RequestPart(value = "review") CreateReviewRequest createReviewRequest,
-      @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) {
+      @ApiParam(value = "token", required = true) @AuthenticationPrincipal JwtAuthentication authentication,
+      @ApiParam(value = "예약 아이디", required = true) @PathVariable String reservationId,
+      @ApiParam(value = "리뷰 생성 DTO", required = true) @RequestPart(value = "review") CreateReviewRequest createReviewRequest,
+      @ApiParam(value = "리뷰 생성 사진", required = false) @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) {
     Long userId = authentication.userId;
     ReviewResponse reviewResponse = guestReviewService.save(userId, reservationId,
         createReviewRequest, multipartFiles);
@@ -44,10 +48,12 @@ public class ReviewRestControllerForGuest {
   }
 
   @PutMapping("/{reviewId}")
+  @ApiOperation(value = "리뷰 아이디로 리뷰 수정")
   public ResponseEntity<ReviewResponse> modify(
-      @AuthenticationPrincipal JwtAuthentication authentication, @PathVariable Long reviewId,
-      @RequestPart(value = "review") UpdateReviewRequest updateReviewRequest,
-      @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) {
+      @ApiParam(value = "token", required = true) @AuthenticationPrincipal JwtAuthentication authentication,
+      @ApiParam(value = "리뷰 아이디", required = true) @PathVariable Long reviewId,
+      @ApiParam(value = "리뷰 수정 DTO", required = true) @RequestPart(value = "review") UpdateReviewRequest updateReviewRequest,
+      @ApiParam(value = "리뷰 수정 추가 사진", required = false) @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) {
     Long userId = authentication.userId;
     ReviewResponse reviewResponse = guestReviewService.modify(userId, reviewId, updateReviewRequest,
         multipartFiles);
@@ -55,9 +61,10 @@ public class ReviewRestControllerForGuest {
   }
 
   @GetMapping("/{roomId}")
+  @ApiOperation(value = "룸 아이디로 리뷰 리스트 조회")
   public ResponseEntity<Slice<ReviewResponse>> getByRoomId(
-      @AuthenticationPrincipal JwtAuthentication authentication, @PathVariable Long roomId,
-      Pageable pageable) {
+      @ApiParam(value = "token", required = true) @AuthenticationPrincipal JwtAuthentication authentication,
+      @ApiParam(value = "룸 아이디", required = true) @PathVariable Long roomId, Pageable pageable) {
     Long userId = authentication.userId;
     Slice<ReviewResponse> reviewResponses = guestReviewService.findAllByRoomId(userId, roomId,
         pageable);
@@ -65,8 +72,10 @@ public class ReviewRestControllerForGuest {
   }
 
   @DeleteMapping("/{reviewId}")
-  public ResponseEntity<Void> delete(@AuthenticationPrincipal JwtAuthentication authentication,
-      @PathVariable Long reviewId) {
+  @ApiOperation(value = "리뷰 아이디로 리뷰 삭제")
+  public ResponseEntity<Void> delete(
+      @ApiParam(value = "token", required = true) @AuthenticationPrincipal JwtAuthentication authentication,
+      @ApiParam(value = "리뷰 아이디", required = true) @PathVariable Long reviewId) {
     Long userId = authentication.userId;
     guestReviewService.remove(userId, reviewId);
     return ResponseEntity.noContent().build();
