@@ -1,5 +1,7 @@
 package com.prgrms.airbnb.domain.reservation.service;
 
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForHost;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationSummaryResponse;
 import com.prgrms.airbnb.domain.reservation.entity.Reservation;
@@ -34,13 +36,21 @@ public class ReservationServiceForHost {
 
   public ReservationDetailResponseForHost findDetailById(String reservationId, Long hostId) {
     Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     User guest = userRepository.findById(reservation.getUserId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     Room room = roomRepository.findById(reservation.getRoomId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
 
-    if(!room.getUserId().equals(hostId)) throw new IllegalArgumentException();
+    if(!room.getUserId().equals(hostId)){
+      throw new BadRequestException(this.getClass().getName());
+    }
 
     return ReservationConverter.ofDetailForHost(reservation, guest, room);
   }
@@ -56,14 +66,20 @@ public class ReservationServiceForHost {
   public ReservationDetailResponseForHost approval(String reservationId, Long userId,
       ReservationStatus reservationStatus) {
     Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     Room room = roomRepository.findById(reservation.getRoomId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     User guest = userRepository.findById(reservation.getUserId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     if (!userId.equals(room.getUserId())) {
       //TODO 권한 없음 에러 처리 필요
-      throw new IllegalArgumentException();
+      throw new BadRequestException(this.getClass().getName());
     }
     reservation.changeStatus(reservationStatus);
     return ReservationConverter.ofDetailForHost(reservation, guest, room);
