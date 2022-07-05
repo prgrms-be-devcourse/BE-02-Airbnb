@@ -24,7 +24,7 @@ public class RoomServiceForGuest {
 
   public RoomDetailResponse findDetailById(Long id) {
     Room room = roomRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("해당 id의 room을 찾을 수 없습니다."));
+        .orElseThrow(() -> new NotFoundException("[" + this.getClass().getName() + "] 해당 id의 room을 찾을 수 없습니다."));
     return RoomConverter.ofDetail(room);
   }
 

@@ -50,11 +50,11 @@ public class RoomServiceForHost {
       Long hostId) {
 
     if (roomRepository.existsByAddress(createRoomRequest.getAddress())) {
-      throw new BadRequestException("기존에 등록된 주소가 있습니다.");
+      throw new BadRequestException("[" + this.getClass().getName() + "] 기존에 등록된 주소가 있습니다.");
     }
 
     User user = userRepository.findById(hostId)
-        .orElseThrow(() -> new NotFoundException("해당 id의 user를 찾을 수 없습니다."));
+        .orElseThrow(() -> new NotFoundException("[" + this.getClass().getName() + "] 해당 id의 user를 찾을 수 없습니다."));
     Room room = RoomConverter.toRoom(createRoomRequest, user);
     Room savedRoom = roomRepository.save(room);
 
@@ -71,7 +71,7 @@ public class RoomServiceForHost {
       Long hostId) {
 
     Room room = roomRepository.findById(updateRoomRequest.getId())
-        .orElseThrow(() -> new NotFoundException("해당 id의 room을 찾을 수 없습니다."));
+        .orElseThrow(() -> new NotFoundException("[" + this.getClass().getName() + "] 해당 id의 room을 찾을 수 없습니다."));
     validateHost(room, hostId);
 
     room.changeName(updateRoomRequest.getName());
@@ -94,7 +94,7 @@ public class RoomServiceForHost {
   public RoomDetailResponse findDetailById(Long id, Long hostId) {
 
     Room room = roomRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("해당 id를 가진 room이 존재하지 않습니다."));
+        .orElseThrow(() -> new NotFoundException("[" + this.getClass().getName() + "] 해당 id를 가진 room이 존재하지 않습니다."));
     validateHost(room, hostId);
 
     return RoomConverter.ofDetail(room);
@@ -112,14 +112,14 @@ public class RoomServiceForHost {
   @Transactional
   public void remove(Long roomId, Long hostId) {
     Room room = roomRepository.findById(roomId)
-        .orElseThrow(() -> new NotFoundException("해당 id를 가진 room이 존재하지 않습니다."));
+        .orElseThrow(() -> new NotFoundException("[" + this.getClass().getName() + "] 해당 id를 가진 room이 존재하지 않습니다."));
     validateHost(room, hostId);
     roomRepository.deleteById(roomId);
   }
 
   private void validateHost(Room room, Long hostId) {
     if (!room.getUserId().equals(hostId)) {
-      throw new UnAuthorizedAccessException("해당 room에 접근할 권한이 없는 사용자입니다.");
+      throw new UnAuthorizedAccessException("[" + this.getClass().getName() + "] 해당 room에 접근할 권한이 없는 사용자입니다.");
     }
   }
 

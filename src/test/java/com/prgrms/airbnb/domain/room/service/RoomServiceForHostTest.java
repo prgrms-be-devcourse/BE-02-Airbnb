@@ -911,7 +911,7 @@ class RoomServiceForHostTest {
 
       //then
       // TODO: 2022/07/05 null로 조회할 경우 InvalidDataAccessApiUsageException이 발생하는데 이에 대한 해결 방향을 회으를 통해 알아봅시다. 
-      assertThrows(RuntimeException.class, () -> roomServiceForHost.remove(wrongRoomId, hostId));
+      assertThrows(NotFoundException.class, () -> roomServiceForHost.remove(wrongRoomId, hostId));
     }
 
     @Test
