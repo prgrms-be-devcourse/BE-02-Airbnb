@@ -5,6 +5,7 @@ import com.prgrms.airbnb.domain.common.converter.PhoneConverter;
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.common.entity.Phone;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -96,14 +97,14 @@ public class User extends BaseEntity {
 
   private void setGroup(Group group) {
     if (ObjectUtils.isEmpty(group)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException(this.getClass().getName());
     }
     this.group = group;
   }
 
   private void checkBlank(String target) {
     if (StringUtils.isBlank(target)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException(this.getClass().getName());
     }
   }
 

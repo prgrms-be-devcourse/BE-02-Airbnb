@@ -70,7 +70,10 @@ public class UserService {
   }
 
   public Optional<UserDetailResponse> findById(Long userId) {
-    return userRepository.findById(userId).map(UserConverter::from);
+    User user = userRepository.findById(userId).orElseThrow(() -> {
+      throw new UnAuthorizedAccessException(this.getClass().getName());
+    });
+    return Optional.of(user).map(UserConverter::from);
   }
 
   public Optional<User> findByProviderAndProviderId(String provider, String providerId) {

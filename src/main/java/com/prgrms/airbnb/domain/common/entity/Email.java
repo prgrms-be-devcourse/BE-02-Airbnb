@@ -1,5 +1,6 @@
 package com.prgrms.airbnb.domain.common.entity;
 
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ public class Email {
 
   private void validationEmail(String email) {
     if (StringUtils.isBlank(email) || !email.matches(EMAIL_REGX)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException(this.getClass().getName());
     }
   }
 
