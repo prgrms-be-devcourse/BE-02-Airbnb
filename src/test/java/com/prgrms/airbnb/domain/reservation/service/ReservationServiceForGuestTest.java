@@ -5,6 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.Email;
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
 import com.prgrms.airbnb.domain.reservation.dto.CreateReservationRequest;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForGuest;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationSummaryResponse;
@@ -179,7 +182,9 @@ class ReservationServiceForGuestTest {
     @DisplayName("성공: reservation 생성 성공")
     void success() {
       Room getRoom = roomRepository.findById(createReservationRequest.getRoomId())
-          .orElseThrow(IllegalArgumentException::new);
+          .orElseThrow(() -> {
+            throw new NotFoundException(this.getClass().getName());
+          });
       ReservationDetailResponseForGuest responseForGuest = reservationServiceForGuest
           .save(createReservationRequest);
 
@@ -208,7 +213,7 @@ class ReservationServiceForGuestTest {
           .build();
 
       assertThatThrownBy(() -> reservationServiceForGuest.save(createReservationRequest))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -218,7 +223,7 @@ class ReservationServiceForGuestTest {
           .save(createReservationRequest);
 
       assertThatThrownBy(() -> reservationServiceForGuest.save(createReservationRequest))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(BadRequestException.class);
     }
 
     @Test
@@ -234,7 +239,7 @@ class ReservationServiceForGuestTest {
           .roomId(Long.MAX_VALUE)
           .build();
       assertThatThrownBy(() -> reservationServiceForGuest.save(createReservationRequest))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(NotFoundException.class);
     }
   }
 
@@ -259,7 +264,7 @@ class ReservationServiceForGuestTest {
     void failWrongReservationId() {
       reservationServiceForGuest.save(createReservationRequest);
       assertThatThrownBy(() -> reservationServiceForGuest.findDetailById("abcd1234", userId1))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(NotFoundException.class);
     }
   }
 
@@ -287,7 +292,7 @@ class ReservationServiceForGuestTest {
           .save(createReservationRequest);
 
       assertThatThrownBy(() -> reservationServiceForGuest.cancel(userId1, "abcd1234"))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -295,14 +300,16 @@ class ReservationServiceForGuestTest {
     void failCancelByReservationStatus() {
       ReservationDetailResponseForGuest save = reservationServiceForGuest
           .save(createReservationRequest);
-      Reservation reservation = reservationRepository.findById(save.getId()).orElse(null);
+      Reservation reservation = reservationRepository.findById(save.getId()).orElseThrow(() -> {
+        throw new NotFoundException(this.getClass().getName());
+      });
 
       //WAIT_OK 와 ACCEPTED 상태일때만 취소 가능
       reservation.changeStatus(ReservationStatus.ACCEPTED);
       reservation.changeStatus(ReservationStatus.WAIT_REVIEW);
 
       assertThatThrownBy(() -> reservationServiceForGuest.cancel(userId1, reservation.getId()))
-          .isInstanceOf(IllegalArgumentException.class);
+          .isInstanceOf(BadRequestException.class);
     }
   }
 
