@@ -1,18 +1,23 @@
 <configuration>
   <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
     <encoder>
-      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
     <append>true</append>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
     <file>src/main/resources//logFile.log</file>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>WARN</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
     </rollingPolicy>
-    <encoder>
-      <pattern>${FILE_LOG_PATTERN}</pattern>
-    </encoder>
   </appender>
   <conversionRule
     conversionWord="clr"
@@ -20,12 +25,9 @@
   <logger level="warn" name="com.prgrms.airbnb">
     <appender-ref ref="FILE"/>
   </logger>
-  <property name="FILE_LOG_PATTERN"
-    value="%d{HH:mm:ss.SSS} [%thread] %-4level %logger{36} - %msg%n"/>
 
-  <property name="CONSOLE_LOG_PATTERN"
-    value="%clr(%d{HH:mm:ss.SSS}){yellow} [%thread] %clr(%-4level) %logger{36} - %msg%n"/>
   <root level="info">
     <appender-ref ref="STDOUT"/>
+    <appender-ref ref="FILE"/>
   </root>
 </configuration>
