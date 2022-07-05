@@ -2,6 +2,7 @@ package com.prgrms.airbnb.domain.room.entity;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +66,7 @@ class RoomInfoTest {
       Integer testMaxGuest = null;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(testMaxGuest, roomCount, bedCount, bathroomCount));
     }
 
@@ -77,7 +78,7 @@ class RoomInfoTest {
       Integer testMaxGuest = 0;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(testMaxGuest, roomCount, bedCount, bathroomCount));
     }
 
@@ -89,7 +90,7 @@ class RoomInfoTest {
       Integer testMaxGuest = -1;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(testMaxGuest, roomCount, bedCount, bathroomCount));
     }
 
@@ -101,7 +102,7 @@ class RoomInfoTest {
       Integer testRoomCount = null;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(maxGuest, testRoomCount, bedCount, bathroomCount));
     }
 
@@ -113,7 +114,7 @@ class RoomInfoTest {
       Integer testRoomCount = 0;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(maxGuest, testRoomCount, bedCount, bathroomCount));
     }
 
@@ -125,7 +126,7 @@ class RoomInfoTest {
       Integer testRoomCount = -1;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(maxGuest, testRoomCount, bedCount, bathroomCount));
     }
 
@@ -137,7 +138,7 @@ class RoomInfoTest {
       Integer testBedCount = null;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(maxGuest, roomCount, testBedCount, bathroomCount));
     }
 
@@ -149,7 +150,7 @@ class RoomInfoTest {
       Integer testBedCount = -1;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(maxGuest, roomCount, testBedCount, bathroomCount));
     }
 
@@ -161,7 +162,7 @@ class RoomInfoTest {
       Integer testBathroomCount = null;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(maxGuest, roomCount, bedCount, testBathroomCount));
     }
 
@@ -173,7 +174,7 @@ class RoomInfoTest {
       Integer testBathroomCount = 0;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(maxGuest, roomCount, bedCount, testBathroomCount));
     }
 
@@ -185,7 +186,7 @@ class RoomInfoTest {
       Integer testBathroomCount = -1;
 
       //then
-      assertThrows(RuntimeException.class,
+      assertThrows(InvalidParamException.class,
           () -> new RoomInfo(maxGuest, roomCount, bedCount, testBathroomCount));
     }
   }
@@ -219,7 +220,7 @@ class RoomInfoTest {
       Integer newMaxGuest = 0;
 
       //then
-      assertThrows(RuntimeException.class, () -> roomInfo.changeMaxGuest(newMaxGuest));
+      assertThrows(InvalidParamException.class, () -> roomInfo.changeMaxGuest(newMaxGuest));
     }
 
     @Test
@@ -233,7 +234,7 @@ class RoomInfoTest {
       Integer newMaxGuest = -1;
 
       //then
-      assertThrows(RuntimeException.class, () -> roomInfo.changeMaxGuest(newMaxGuest));
+      assertThrows(InvalidParamException.class, () -> roomInfo.changeMaxGuest(newMaxGuest));
     }
 
     @Test
@@ -277,7 +278,7 @@ class RoomInfoTest {
       Integer newBedCount = -1;
 
       //then
-      assertThrows(RuntimeException.class, () -> roomInfo.changeBedCount(newBedCount));
+      assertThrows(InvalidParamException.class, () -> roomInfo.changeBedCount(newBedCount));
     }
   }
 }

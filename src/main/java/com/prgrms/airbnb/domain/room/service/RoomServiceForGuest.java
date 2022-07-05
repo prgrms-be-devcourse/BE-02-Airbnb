@@ -1,5 +1,6 @@
 package com.prgrms.airbnb.domain.room.service;
 
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
 import com.prgrms.airbnb.domain.room.dto.RoomDetailResponse;
 import com.prgrms.airbnb.domain.room.dto.RoomSummaryResponse;
 import com.prgrms.airbnb.domain.room.dto.SearchRoomRequest;
@@ -23,7 +24,7 @@ public class RoomServiceForGuest {
 
   public RoomDetailResponse findDetailById(Long id) {
     Room room = roomRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("해당 id를 가진 room이 존재하지 않습니다."));
+        .orElseThrow(() -> new NotFoundException("[" + this.getClass().getName() + "] 해당 id의 room을 찾을 수 없습니다."));
     return RoomConverter.ofDetail(room);
   }
 
