@@ -33,8 +33,8 @@ public class RoomRestControllerForHost {
   @ApiOperation(value = "Room 1개 등록", notes = "호스트는 룸 1개를 사진들과 함께 등록할 수 있다.")
   public ResponseEntity<RoomDetailResponse> registerRoom(
       @AuthenticationPrincipal JwtAuthentication authentication,
-      @ApiParam(value = "room") @RequestPart(value = "room") CreateRoomRequest createRoomRequest,
-      @ApiParam(value = "file") @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) {
+      @RequestPart(value = "room") CreateRoomRequest createRoomRequest,
+      @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles) {
 
     RoomDetailResponse response
         = roomService.save(createRoomRequest, multipartFiles, authentication.userId);
@@ -46,9 +46,9 @@ public class RoomRestControllerForHost {
   @PutMapping
   @ApiOperation(value = "Room의 정보 수정", notes = "호스트는 본인의 룸 정보를 수정할 수 있다.")
   public ResponseEntity<RoomDetailResponse> modifyRoom(
-      @ApiParam(value = "room") @RequestPart(value = "room") UpdateRoomRequest updateRoomRequest,
-      @ApiParam(value = "room") @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles,
-      @ApiParam(value = "room") @AuthenticationPrincipal JwtAuthentication authentication) {
+      @RequestPart(value = "room") UpdateRoomRequest updateRoomRequest,
+      @RequestPart(value = "file", required = false) List<MultipartFile> multipartFiles,
+      @AuthenticationPrincipal JwtAuthentication authentication) {
 
     Long userId = authentication.userId;
     RoomDetailResponse modifiedRoom
