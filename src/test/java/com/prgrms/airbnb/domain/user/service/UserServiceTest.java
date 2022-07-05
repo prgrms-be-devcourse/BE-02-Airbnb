@@ -9,6 +9,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.prgrms.airbnb.domain.common.entity.Email;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
+import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
 import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;
@@ -111,7 +114,7 @@ class UserServiceTest {
           "kakao"
       ));
       // Then
-      assertThat(response).isInstanceOf(IllegalArgumentException.class);
+      assertThat(response).isInstanceOf(InvalidParamException.class);
     }
   }
 
@@ -152,7 +155,7 @@ class UserServiceTest {
       // Given, When
       Throwable response = catchThrowable(() -> userService.findById(0L).orElseThrow());
       // Then
-      assertThat(response).isInstanceOf(Exception.class);
+      assertThat(response).isInstanceOf(NotFoundException.class);
     }
   }
 
@@ -238,7 +241,7 @@ class UserServiceTest {
       Throwable response = catchThrowable(
           () -> userService.modify(0L, request, mockMultipartFile));
       // Then
-      assertThat(response).isInstanceOf(Exception.class);
+      assertThat(response).isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -254,7 +257,7 @@ class UserServiceTest {
       userList.forEach(user -> {
         Throwable response = catchThrowable(
             () -> userService.modify(user.getId(), request, mockMultipartFile));
-        assertThat(response).isInstanceOf(Exception.class);
+        assertThat(response).isInstanceOf(InvalidParamException.class);
       });
     }
 
@@ -271,7 +274,7 @@ class UserServiceTest {
       userList.forEach(user -> {
         Throwable response = catchThrowable(
             () -> userService.modify(user.getId(), request, mockMultipartFile));
-        assertThat(response).isInstanceOf(Exception.class);
+        assertThat(response).isInstanceOf(InvalidParamException.class);
       });
     }
   }

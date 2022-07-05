@@ -38,11 +38,6 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
     this.userService = userService;
   }
 
-  @Override
-  public void configure(WebSecurity web) {
-    web.ignoring().antMatchers("/assets/**", "/h2-console/**");
-  }
-
   @Bean
   public AccessDeniedHandler accessDeniedHandler() {
     return (request, response, e) -> {
@@ -91,7 +86,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
         .authorizeRequests()
-        .antMatchers("/api/user/me").hasAnyRole("USER", "ADMIN")
+        .antMatchers("/assets/**", "/h2-console/**").hasAnyRole("USER", "HOST", "ADMIN")
         .anyRequest().permitAll()
         .and()
         .formLogin()
@@ -109,9 +104,6 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
-        /**
-         * OAuth2 설정
-         */
         .oauth2Login()
         .authorizationEndpoint()
         .authorizationRequestRepository(authorizationRequestRepository())
@@ -121,11 +113,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         .exceptionHandling()
         .accessDeniedHandler(accessDeniedHandler())
         .and()
-        /**
-         * Jwt 필터
-         */
         .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class)
     ;
   }
-
 }
