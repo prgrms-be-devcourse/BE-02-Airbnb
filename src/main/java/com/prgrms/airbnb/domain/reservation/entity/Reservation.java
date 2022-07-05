@@ -143,7 +143,7 @@ public class Reservation extends BaseEntity {
 
   private void checkDate(LocalDate startDate, LocalDate endDate) {
     if (LocalDate.now().isAfter(startDate) || startDate.isAfter(endDate)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("잘못된 startDate, endDate 입력: " + startDate + " " + endDate);
     }
   }
 
