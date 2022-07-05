@@ -1,6 +1,7 @@
-package com.prgrms.airbnb.domain.review.service;
+package com.prgrms.airbnb.domain.room.event;
 
 import com.prgrms.airbnb.domain.common.exception.NotFoundException;
+import com.prgrms.airbnb.domain.review.event.UpdateReviewInfoEvent;
 import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -10,20 +11,20 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class ChangeReviewInfoListener {
+public class UpdateReviewInfoListener {
 
   private final RoomRepository roomRepository;
 
-  public ChangeReviewInfoListener(RoomRepository roomRepository) {
+  public UpdateReviewInfoListener(RoomRepository roomRepository) {
     this.roomRepository = roomRepository;
   }
 
   @Async
-  @EventListener(ChangeReviewInfoEvent.class)
-  public void handleContextStart(ChangeReviewInfoEvent event) {
+  @EventListener(UpdateReviewInfoEvent.class)
+  public void handleContextStart(UpdateReviewInfoEvent event) {
     Room room = roomRepository.findById(event.getRoomId()).orElseThrow(() -> {
       throw new NotFoundException(this.getClass().getName());
     });
-    room.getReviewInfo().changeReviewInfo(event.getOldRating(), event.getNewRating());
+    room.getReviewInfo().updateReviewInfo(event.getRating());
   }
 }

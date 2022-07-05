@@ -1,4 +1,4 @@
-package com.prgrms.airbnb.domain.review.service;
+package com.prgrms.airbnb.domain.review.event;
 
 import lombok.Getter;
 
