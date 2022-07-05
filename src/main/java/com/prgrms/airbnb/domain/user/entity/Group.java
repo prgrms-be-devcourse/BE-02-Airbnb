@@ -1,5 +1,7 @@
 package com.prgrms.airbnb.domain.user.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,10 +15,12 @@ import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "groups")
+@NoArgsConstructor
 public class Group {
 
   @Id
   @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(name = "name")
@@ -24,6 +28,10 @@ public class Group {
 
   @OneToMany(mappedBy = "group")
   private List<GroupPermission> permissions = new ArrayList<>();
+
+  public Group(String name) {
+    this.name = name;
+  }
 
   public Long getId() {
     return id;

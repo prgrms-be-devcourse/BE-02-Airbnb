@@ -5,8 +5,12 @@ import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
 import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;
 import com.prgrms.airbnb.domain.user.entity.Group;
+import com.prgrms.airbnb.domain.user.entity.GroupPermission;
+import com.prgrms.airbnb.domain.user.entity.Permission;
 import com.prgrms.airbnb.domain.user.entity.User;
+import com.prgrms.airbnb.domain.user.repository.GroupPermissionRepository;
 import com.prgrms.airbnb.domain.user.repository.GroupRepository;
+import com.prgrms.airbnb.domain.user.repository.PermissionRepository;
 import com.prgrms.airbnb.domain.user.repository.UserRepository;
 import com.prgrms.airbnb.domain.user.util.UserConverter;
 import java.util.Map;
@@ -29,12 +33,17 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final GroupRepository groupRepository;
+  private final PermissionRepository permissionRepository;
+  private final GroupPermissionRepository groupPermissionRepository;
   private final UploadService uploadService;
 
   public UserService(UserRepository userRepository, GroupRepository groupRepository,
-      UploadService uploadService) {
+      PermissionRepository permissionRepository,
+      GroupPermissionRepository groupPermissionRepository, UploadService uploadService) {
     this.userRepository = userRepository;
     this.groupRepository = groupRepository;
+    this.permissionRepository = permissionRepository;
+    this.groupPermissionRepository = groupPermissionRepository;
     this.uploadService = uploadService;
   }
 
@@ -51,9 +60,8 @@ public class UserService {
           String nickname = (String) properties.get("nickname");
           String profileImage = (String) properties.get("profile_image");
           String email = (String) kakaoAccount.get("email");
-          Group group = groupRepository.findByName("USER_GROUP")
-              .orElseThrow(() -> new IllegalStateException("그룹을 찾을 수 없습니다."));
           Email newEmail = Objects.isNull(email) ? null : new Email(email);
+          Group group = groupRepository.findByName("USER_GROUP").orElse(initUserGroupPermission());
           return userRepository.save(
               new User(nickname, authorizedClientRegistrationId, providerId, profileImage, group,
                   newEmail));
@@ -85,5 +93,12 @@ public class UserService {
     user.changePhone(request.getPhone());
     userRepository.save(user);
     return UserConverter.from(user);
+  }
+
+  private Group initUserGroupPermission() {
+    Permission permission = permissionRepository.save(new Permission("ROLE_USER"));
+    Group group = groupRepository.save(new Group("USER_GROUP"));
+    groupPermissionRepository.save(new GroupPermission(group, permission));
+    return group;
   }
 }
