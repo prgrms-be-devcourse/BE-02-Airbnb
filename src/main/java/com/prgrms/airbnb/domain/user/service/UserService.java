@@ -1,6 +1,7 @@
 package com.prgrms.airbnb.domain.user.service;
 
 import com.prgrms.airbnb.domain.common.entity.Email;
+import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
 import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;
@@ -79,7 +80,9 @@ public class UserService {
   @Transactional
   public UserDetailResponse modify(Long userId, UserUpdateRequest request,
       MultipartFile multipartFile) {
-    User user = userRepository.findById(userId).orElseThrow(RuntimeException::new);
+    User user = userRepository.findById(userId).orElseThrow(() -> {
+      throw new UnAuthorizedAccessException(this.getClass().getName());
+    });
 
     if (Objects.nonNull(multipartFile)) {
       if (Objects.nonNull(user.getProfileImage()) && user.getProfileImage().startsWith(s3Cdn)) {
@@ -95,9 +98,33 @@ public class UserService {
     return UserConverter.from(user);
   }
 
+  @Transactional
+  public UserDetailResponse changeUserToHost(Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(() -> {
+      throw new UnAuthorizedAccessException(this.getClass().getName());
+    });
+    Group group = groupRepository.findByName("HOST_GROUP").orElse(initHostGroupPermission());
+    user.changeGroup(group);
+    return UserConverter.from(user);
+  }
+
   private Group initUserGroupPermission() {
     Permission permission = permissionRepository.save(new Permission("ROLE_USER"));
     Group group = groupRepository.save(new Group("USER_GROUP"));
+    groupPermissionRepository.save(new GroupPermission(group, permission));
+    return group;
+  }
+
+  private Group initHostGroupPermission() {
+    Permission permission = permissionRepository.save(new Permission("ROLE_HOST"));
+    Group group = groupRepository.save(new Group("HOST_GROUP"));
+    groupPermissionRepository.save(new GroupPermission(group, permission));
+    return group;
+  }
+
+  private Group initAdminGroupPermission() {
+    Permission permission = permissionRepository.save(new Permission("ROLE_ADMIN"));
+    Group group = groupRepository.save(new Group("ADMIN_GROUP"));
     groupPermissionRepository.save(new GroupPermission(group, permission));
     return group;
   }

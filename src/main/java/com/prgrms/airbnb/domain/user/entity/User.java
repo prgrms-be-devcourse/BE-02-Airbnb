@@ -126,4 +126,8 @@ public class User extends BaseEntity {
       setPhone(new Phone(phone));
     }
   }
+
+  public void changeGroup(Group group) {
+    setGroup(group);
+  }
 }
