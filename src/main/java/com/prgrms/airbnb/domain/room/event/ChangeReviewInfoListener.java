@@ -5,9 +5,10 @@ import com.prgrms.airbnb.domain.review.event.ChangeReviewInfoEvent;
 import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Service
@@ -20,11 +21,10 @@ public class ChangeReviewInfoListener {
   }
 
   @Async
-  @EventListener(ChangeReviewInfoEvent.class)
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = ChangeReviewInfoEvent.class)
   public void handleContextStart(ChangeReviewInfoEvent event) {
-    Room room = roomRepository.findById(event.getRoomId()).orElseThrow(() -> {
-      throw new NotFoundException(this.getClass().getName());
-    });
+    Room room = roomRepository.findById(event.getRoomId())
+        .orElseThrow(() -> new NotFoundException(this.getClass().getName()));
     room.getReviewInfo().changeReviewInfo(event.getOldRating(), event.getNewRating());
   }
 }
