@@ -18,8 +18,8 @@ import static java.util.stream.Collectors.toList;
 public class Group {
 
   @Id
+  @GeneratedValue
   @Column(name = "id")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(name = "name")
