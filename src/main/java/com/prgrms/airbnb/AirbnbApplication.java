@@ -15,7 +15,7 @@ public class AirbnbApplication {
   }
 
   @PostConstruct
-  public void started() {
+  public void setTimeZone() {
     TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
   }
 }
