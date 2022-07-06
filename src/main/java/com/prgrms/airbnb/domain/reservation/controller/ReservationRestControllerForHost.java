@@ -5,6 +5,11 @@ import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForHost
 import com.prgrms.airbnb.domain.reservation.dto.ReservationSummaryResponse;
 import com.prgrms.airbnb.domain.reservation.entity.ReservationStatus;
 import com.prgrms.airbnb.domain.reservation.service.ReservationServiceForHost;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/v1/host/reservations")
 @RestController
+@Api(tags = {"host에 관한 예약 정보를 제공하는 Controller"})
 public class ReservationRestControllerForHost {
 
   private final ReservationServiceForHost reservationServiceForHost;
@@ -28,7 +34,13 @@ public class ReservationRestControllerForHost {
   }
 
   @PutMapping("/{reservationId}")
+  @ApiOperation(value = "예약 상태 변경")
+  @ApiImplicitParams({
+      @ApiImplicitParam(name = "reservationId", value = "예약 번호(id)", required = true),
+      @ApiImplicitParam(name = "status", value = "설정하고자 하는 예약 상태", required = true),
+  })
   public ResponseEntity<ReservationDetailResponseForHost> approve(
+      @ApiParam(value = "token", required = true)
       @AuthenticationPrincipal JwtAuthentication authentication,
       @PathVariable String reservationId,
       @RequestParam String status) {
@@ -41,7 +53,9 @@ public class ReservationRestControllerForHost {
   }
 
   @GetMapping("")
+  @ApiOperation(value = "호스트의 모든 예약 정보 조회")
   public ResponseEntity<Slice<ReservationSummaryResponse>> getReservationList(
+      @ApiParam(value = "token", required = true)
       @AuthenticationPrincipal JwtAuthentication authentication,
       Pageable pageable) {
     Long hostId = authentication.userId;
@@ -52,8 +66,11 @@ public class ReservationRestControllerForHost {
   }
 
   @GetMapping("/{reservationId}")
+  @ApiOperation(value = "호스트의 예약 상세정보 조회")
   public ResponseEntity<ReservationDetailResponseForHost> getDetail(
+      @ApiParam(value = "token", required = true)
       @AuthenticationPrincipal JwtAuthentication authentication,
+      @ApiParam(value = "상세 조회할 예약번호(id)", required = true)
       @PathVariable String reservationId) {
     Long hostId = authentication.userId;
     ReservationDetailResponseForHost reservationDetail = reservationServiceForHost.findDetailById(
