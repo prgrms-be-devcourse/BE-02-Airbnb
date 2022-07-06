@@ -1,6 +1,7 @@
 package com.prgrms.airbnb.domain.reservation.controller;
 
 import com.prgrms.airbnb.config.jwt.JwtAuthentication;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
 import com.prgrms.airbnb.domain.reservation.dto.CreateReservationRequest;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForGuest;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationSummaryResponse;
@@ -39,7 +40,9 @@ public class ReservationRestControllerForGuest {
       @RequestParam CreateReservationRequest createReservationRequest) {
     Long userId = authentication.userId;
     userService.findById(userId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     ReservationDetailResponseForGuest save = reservationServiceForGuest.save(
         createReservationRequest);
     return ResponseEntity.created(URI.create("/api/v1/guest/reservations/" + save.getId())).body(save);

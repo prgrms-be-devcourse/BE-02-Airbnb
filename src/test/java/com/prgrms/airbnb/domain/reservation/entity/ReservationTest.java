@@ -3,6 +3,8 @@ package com.prgrms.airbnb.domain.reservation.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import com.prgrms.airbnb.domain.reservation.repository.ReservationRepository;
 import java.time.LocalDate;
 import javax.transaction.Transactional;
@@ -91,7 +93,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -108,7 +110,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -125,7 +127,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -143,7 +145,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -161,7 +163,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -179,7 +181,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -197,7 +199,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -215,7 +217,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -233,7 +235,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -251,7 +253,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -269,7 +271,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -287,7 +289,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
 
     @Test
@@ -305,7 +307,7 @@ class ReservationTest {
               userId,
               roomId
           )
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(InvalidParamException.class);
     }
   }
 
@@ -348,7 +350,7 @@ class ReservationTest {
       //기본 WAIT_OK 상태에서는 ACCEPTED_AFTER_CANCELLED, WAIT_REVIEW, COMPLETE 변경 불가
       assertThatThrownBy(
           () -> reservation.changeStatus(ReservationStatus.WAIT_REVIEW)
-      ).isInstanceOf(IllegalArgumentException.class);
+      ).isInstanceOf(BadRequestException.class);
     }
   }
 }

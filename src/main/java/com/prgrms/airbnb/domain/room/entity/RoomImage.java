@@ -1,11 +1,19 @@
 package com.prgrms.airbnb.domain.room.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "room_image")
@@ -13,14 +21,17 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RoomImage extends BaseEntity {
 
+  @ApiModelProperty(example = "RoomImage 아이디")
   @Id
   @GeneratedValue
   @Column(name = "id")
   private Long id;
 
+  @ApiModelProperty(example = "AmazonS3 저장 경로")
   @Column(name = "path")
   private String path;
 
+  @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
   private Room room;

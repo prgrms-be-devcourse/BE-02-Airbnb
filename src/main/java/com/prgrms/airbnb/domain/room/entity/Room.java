@@ -2,6 +2,7 @@ package com.prgrms.airbnb.domain.room.entity;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
+import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -67,8 +68,8 @@ public class Room extends BaseEntity {
   @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<RoomImage> roomImages = new ArrayList<>();
 
-  public Room(Address address, Integer charge, String name, String description,
-      RoomInfo roomInfo, RoomType roomType, List<RoomImage> images, Long userId) {
+  public Room(Address address, Integer charge, String name, String description, RoomInfo roomInfo,
+      RoomType roomType, List<RoomImage> images, Long userId) {
 
     setAddress(address);
     setCharge(charge);
@@ -118,44 +119,50 @@ public class Room extends BaseEntity {
   }
 
   public void setImage(RoomImage roomImage) {
+    if (roomImage == null) {
+      throw new InvalidParamException("[" + this.getClass().getName() + "] 잘못된 입력입니다.");
+    }
     roomImage.setRoom(this);
   }
 
   public void deleteImage(RoomImage roomImage) {
+    if (!this.roomImages.contains(roomImage)) {
+      throw new InvalidParamException("[" + this.getClass().getName() + "] 존재하지 않는 이미지입니다.");
+    }
     roomImage.deleteRoom();
   }
 
   private void setCharge(Integer charge) {
-    if (charge < 0) {
-      throw new IllegalArgumentException("가격은 0보다 작을 수 없습니다.");
+    if (charge == null || charge < 0) {
+      throw new InvalidParamException("[" + this.getClass().getName() + "] 1박 가격은 0보다 작을 수 없습니다.");
     }
     this.charge = charge;
   }
 
   private void setName(String newName) {
     if (StringUtils.isBlank(newName)) {
-      throw new IllegalArgumentException("이름은 필수 입력사항입니다.");
+      throw new InvalidParamException("[" + this.getClass().getName() + "] 게시글 제목은 필수로 입력해야합니다.");
     }
     this.name = newName;
   }
 
   private void setRoomType(RoomType roomType) {
     if (ObjectUtils.isEmpty(roomType)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("[" + this.getClass().getName() + "] 주거타입은 필수로 설정해야 합니다.");
     }
     this.roomType = roomType;
   }
 
   private void setUserId(Long userId) {
     if (ObjectUtils.isEmpty(userId)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("[" + this.getClass().getName() + "] 유효하지 않은 UserId 입니다.");
     }
     this.userId = userId;
   }
 
   private void setAddress(Address address) {
     if (ObjectUtils.isEmpty(address)) {
-      throw new IllegalArgumentException();
+      throw new InvalidParamException("[" + this.getClass().getName() + "] 유효하지 않은 주소입니다.");
     }
     this.address = address;
   }
@@ -170,7 +177,8 @@ public class Room extends BaseEntity {
 
     public ReviewInfo(Double reviewRating, Long reviewCount) {
       if (reviewCount < 0) {
-        throw new IllegalArgumentException();
+        throw new InvalidParamException(
+            "[" + this.getClass().getName() + "] 리뷰 개수는 0보다 작을 수 없습니다.");
       }
       this.reviewRating = reviewRating;
       this.reviewCount = reviewCount;

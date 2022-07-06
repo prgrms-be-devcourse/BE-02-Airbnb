@@ -1,5 +1,7 @@
 package com.prgrms.airbnb.domain.reservation.service;
 
+import com.prgrms.airbnb.domain.common.exception.BadRequestException;
+import com.prgrms.airbnb.domain.common.exception.NotFoundException;
 import com.prgrms.airbnb.domain.reservation.dto.CreateReservationRequest;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationDetailResponseForGuest;
 import com.prgrms.airbnb.domain.reservation.dto.ReservationSummaryResponse;
@@ -36,28 +38,39 @@ public class ReservationServiceForGuest {
 
   public ReservationDetailResponseForGuest findDetailById(String reservationId, Long userId) {
     Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
 
-    if(!reservation.validateUserId(userId)) throw new IllegalArgumentException();
+    if(!reservation.validateUserId(userId)){
+      throw new BadRequestException(this.getClass().getName());
+    }
 
     Room room = roomRepository.findById(reservation.getRoomId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     User host = userRepository.findById(room.getUserId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     return ReservationConverter.ofDetailForGuest(reservation, host, room);
   }
 
   @Transactional(isolation = Isolation.REPEATABLE_READ)
   public ReservationDetailResponseForGuest save(CreateReservationRequest createReservationRequest) {
     Room room = roomRepository.findById(createReservationRequest.getRoomId())
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     User host = userRepository.findById(room.getUserId())
-        .orElseThrow(IllegalArgumentException::new);
-    //TODO: 저장하기전에 앞서 예약이 존재하는지 확인해야함
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     if (reservationRepository.existReservation(room.getId(),
         createReservationRequest.getStartDate(),
         createReservationRequest.getEndDate())) {
-      throw new IllegalArgumentException();
+      throw new BadRequestException(this.getClass().getName());
     }
     String reservationId = reservationRepository.createReservationId();
     Reservation reservation = ReservationConverter.toReservation(reservationId,
@@ -69,10 +82,11 @@ public class ReservationServiceForGuest {
   @Transactional
   public void cancel(Long userId, String reservationId) {
     Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(IllegalArgumentException::new);
+        .orElseThrow(() -> {
+          throw new NotFoundException(this.getClass().getName());
+        });
     if (!reservation.canCancelled(userId)) {
-      //TODO: 취소가 될 수 없는데 취소하려 함
-      throw new IllegalArgumentException();
+      throw new BadRequestException(this.getClass().getName());
     }
     reservation.changeStatus(ReservationStatus.GUEST_CANCELLED);
   }

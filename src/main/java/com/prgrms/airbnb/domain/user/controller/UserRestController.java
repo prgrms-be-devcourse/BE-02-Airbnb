@@ -8,6 +8,7 @@ import com.prgrms.airbnb.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -39,6 +40,13 @@ public class UserRestController {
       @RequestPart(name = "request") UserUpdateRequest request,
       @RequestPart(name = "image", required = false) MultipartFile multipartFile) {
     UserDetailResponse response = userService.modify(authentication.userId, request, multipartFile);
+    return ResponseEntity.ok(response);
+  }
+
+  @PatchMapping
+  public ResponseEntity<UserDetailResponse> changePermissionToHost(
+      @AuthenticationPrincipal JwtAuthentication authentication) {
+    UserDetailResponse response = userService.changeUserToHost(authentication.userId);
     return ResponseEntity.ok(response);
   }
 }
