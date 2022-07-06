@@ -5,12 +5,12 @@ import com.prgrms.airbnb.config.jwt.JwtAuthenticationFilter;
 import com.prgrms.airbnb.config.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.prgrms.airbnb.config.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.prgrms.airbnb.domain.user.service.UserService;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,8 +22,6 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
-
-import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity

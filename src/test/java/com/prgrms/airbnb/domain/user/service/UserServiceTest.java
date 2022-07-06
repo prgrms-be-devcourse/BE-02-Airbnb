@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 import com.prgrms.airbnb.domain.common.entity.Email;
 import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import com.prgrms.airbnb.domain.common.exception.NotFoundException;
-import com.prgrms.airbnb.domain.common.exception.UnAuthorizedAccessException;
 import com.prgrms.airbnb.domain.common.service.UploadService;
 import com.prgrms.airbnb.domain.user.dto.UserDetailResponse;
 import com.prgrms.airbnb.domain.user.dto.UserUpdateRequest;

@@ -1,5 +1,6 @@
 package com.prgrms.airbnb.domain.review.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +28,7 @@ public class ReviewImage extends BaseEntity {
   @Column(name = "path")
   private String path;
 
+  @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "review_id", referencedColumnName = "id", nullable = false)
   private Review review;

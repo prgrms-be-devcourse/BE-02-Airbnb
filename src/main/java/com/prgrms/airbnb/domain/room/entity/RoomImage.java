@@ -3,11 +3,17 @@ package com.prgrms.airbnb.domain.room.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.prgrms.airbnb.domain.common.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "room_image")

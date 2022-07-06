@@ -1,13 +1,12 @@
 package com.prgrms.airbnb.domain.common.entity;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Embeddable
 @Access(value = AccessType.FIELD)

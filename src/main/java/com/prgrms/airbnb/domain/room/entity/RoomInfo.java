@@ -2,15 +2,14 @@ package com.prgrms.airbnb.domain.room.entity;
 
 import com.prgrms.airbnb.domain.common.exception.InvalidParamException;
 import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.util.ObjectUtils;
-
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Embeddable;
 
 @Embeddable
 @Getter

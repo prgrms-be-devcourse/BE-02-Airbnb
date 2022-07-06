@@ -12,6 +12,8 @@ import com.prgrms.airbnb.domain.review.dto.ReviewResponse;
 import com.prgrms.airbnb.domain.review.dto.UpdateReviewRequest;
 import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.entity.ReviewImage;
+import com.prgrms.airbnb.domain.review.event.AddReviewInfoEvent;
+import com.prgrms.airbnb.domain.review.event.ChangeReviewInfoEvent;
 import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.review.util.ReviewConverter;
 import com.prgrms.airbnb.domain.room.repository.RoomRepository;
@@ -63,7 +65,7 @@ public class GuestReviewService {
     Review savedReview = reviewRepository.save(review);
     reservation.changeStatus(ReservationStatus.COMPLETE);
     publisher.publishEvent(
-        new UpdateReviewInfoEvent(reservation.getRoomId(), createReviewRequest.getRating()));
+        new AddReviewInfoEvent(reservation.getRoomId(), createReviewRequest.getRating()));
     return ReviewConverter.of(savedReview);
   }
 

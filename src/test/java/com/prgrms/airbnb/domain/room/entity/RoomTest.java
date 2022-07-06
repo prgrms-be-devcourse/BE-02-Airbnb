@@ -1,7 +1,7 @@
 package com.prgrms.airbnb.domain.room.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.prgrms.airbnb.domain.common.entity.Address;
 import com.prgrms.airbnb.domain.common.exception.InvalidParamException;

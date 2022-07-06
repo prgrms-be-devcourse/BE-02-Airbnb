@@ -19,6 +19,8 @@ import com.prgrms.airbnb.domain.review.dto.ReviewResponse;
 import com.prgrms.airbnb.domain.review.dto.UpdateReviewRequest;
 import com.prgrms.airbnb.domain.review.entity.Review;
 import com.prgrms.airbnb.domain.review.entity.ReviewImage;
+import com.prgrms.airbnb.domain.review.event.AddReviewInfoEvent;
+import com.prgrms.airbnb.domain.review.event.ChangeReviewInfoEvent;
 import com.prgrms.airbnb.domain.review.repository.ReviewRepository;
 import com.prgrms.airbnb.domain.room.entity.Room;
 import com.prgrms.airbnb.domain.room.entity.Room.ReviewInfo;
@@ -100,7 +102,7 @@ class GuestReviewServiceTest {
       when(reservationRepository.findById(reservation1.getId())).thenReturn(
           Optional.of(reservation1));
       when(uploadService.uploadImg(any())).thenReturn("path");
-      doNothing().when(publisher).publishEvent(any(UpdateReviewInfoEvent.class));
+      doNothing().when(publisher).publishEvent(any(AddReviewInfoEvent.class));
       when(reviewRepository.save(any())).thenReturn(review1);
       //when
       ReviewResponse reviewResponse = guestReviewService.save(1L, reservation1.getId(), request,

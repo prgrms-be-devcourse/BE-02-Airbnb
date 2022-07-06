@@ -3,6 +3,8 @@ package com.prgrms.airbnb.domain.review.controller;
 import com.prgrms.airbnb.config.jwt.JwtAuthentication;
 import com.prgrms.airbnb.domain.review.dto.ReviewResponse;
 import com.prgrms.airbnb.domain.review.service.HostReviewService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +25,10 @@ public class ReviewRestControllerForHost {
   }
 
   @GetMapping("{roomId}")
+  @ApiOperation(value = "룸 아이디로 리뷰 리스트 조회")
   public ResponseEntity<Slice<ReviewResponse>> getByRoomId(
-      @AuthenticationPrincipal JwtAuthentication authentication, @PathVariable Long roomId,
-      Pageable pageable) {
+      @ApiParam(value = "token", required = true) @AuthenticationPrincipal JwtAuthentication authentication,
+      @ApiParam(value = "룸 아이디", required = true) @PathVariable Long roomId, Pageable pageable) {
     Long userId = authentication.userId;
     Slice<ReviewResponse> reviewResponses = hostReviewService.findAllByRoomId(userId, roomId,
         pageable);
