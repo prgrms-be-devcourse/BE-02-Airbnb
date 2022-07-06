@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 public class GroupPermission {
 
   @Id
+  @GeneratedValue
   @Column(name = "id")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @ManyToOne(optional = false)
