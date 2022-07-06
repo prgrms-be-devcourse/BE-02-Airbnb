@@ -167,7 +167,7 @@ public class Room extends BaseEntity {
       this.reviewCount = reviewCount;
     }
 
-    public void updateReviewInfo(Integer newRating) {
+    public void addReviewInfo(Integer newRating) {
       double totalRating = reviewRating * reviewCount;
       reviewCount += 1;
       reviewRating = (totalRating + newRating) / reviewCount;
