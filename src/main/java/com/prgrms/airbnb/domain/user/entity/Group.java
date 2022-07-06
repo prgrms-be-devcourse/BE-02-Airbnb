@@ -1,6 +1,5 @@
 package com.prgrms.airbnb.domain.user.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -14,7 +13,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Entity
-@Table(name = "groups")
+@Table(name = "group_level")
 @NoArgsConstructor
 public class Group {
 
