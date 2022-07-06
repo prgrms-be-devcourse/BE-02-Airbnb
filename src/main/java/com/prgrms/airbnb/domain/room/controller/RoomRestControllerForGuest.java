@@ -6,6 +6,7 @@ import com.prgrms.airbnb.domain.room.dto.SearchRoomRequest;
 import com.prgrms.airbnb.domain.room.service.RoomServiceForGuest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class RoomRestControllerForGuest {
   @GetMapping
   @ApiOperation(value = "Room 검색", notes = "조건에 맞는 Room 목록들을 조회할 수 있다.")
   public ResponseEntity<Slice<RoomSummaryResponse>> getAllRoom(
-      SearchRoomRequest searchRoomRequest,
+      @ApiParam(value = "room 검색 요청 DTO", required = true) SearchRoomRequest searchRoomRequest,
       Pageable pageable) {
 
     Slice<RoomSummaryResponse> searchRoomSummarySlice
@@ -39,7 +40,8 @@ public class RoomRestControllerForGuest {
   @GetMapping("/{roomId}")
   @ApiImplicitParam(name = "roomId", value = "Room 아이디")
   @ApiOperation(value = "Room 상세정보 조회", notes = "Room 1개의 상세정보를 조회할 수 있다.")
-  public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId) {
+  public ResponseEntity<RoomDetailResponse> getRoomDetail(
+      @ApiParam(value = "room 아이디", required = true) @PathVariable Long roomId) {
     RoomDetailResponse roomDetailInfo = roomService.findDetailById(roomId);
 
     return ResponseEntity.ok(roomDetailInfo);
