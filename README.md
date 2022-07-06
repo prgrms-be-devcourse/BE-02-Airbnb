@@ -93,6 +93,12 @@ test : 테스트 코드 수정에 대한 커밋
 
 ### 요구사항 명세서
 
+- [F-bnb Wiki](https://github.com/prgrms-be-devcourse/BE-02-Airbnb/wiki/%EA%B8%B0%EB%8A%A5-%EB%AA%85%EC%84%B8-(MoSCoW)) 👈
+
+### DB 스키마
+
+![image](https://user-images.githubusercontent.com/50647845/177512702-b1e60a97-5bd8-444c-a0d0-63cb7d3e1757.png)
+
 ### API 명세서
 
 ### 스프린트 회고록
