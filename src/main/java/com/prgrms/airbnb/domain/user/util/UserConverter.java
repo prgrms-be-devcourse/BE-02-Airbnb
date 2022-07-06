@@ -12,7 +12,7 @@ public class UserConverter {
         .name(user.getName())
         .email(Objects.isNull(user.getEmail()) ? null : user.getEmail().getEmail())
         .phone(Objects.isNull(user.getPhone()) ? null : user.getPhone().getNumber())
-        .group(user.getGroup())
+        .group(user.getGroup().getName())
         .build();
   }
 

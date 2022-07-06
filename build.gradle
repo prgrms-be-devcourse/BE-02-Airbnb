@@ -54,7 +54,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-devtools'
 	implementation 'com.auth0:java-jwt:3.18.2'
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2' //runtimeOnly 'mysql:mysql-connector-java'
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
@@ -87,6 +88,8 @@ dependencies {
 	// swagger dependency
 	implementation "io.springfox:springfox-boot-starter:3.0.0"
 	implementation "io.springfox:springfox-swagger-ui:3.0.0"
+	implementation("io.swagger:swagger-annotations:1.6.6")
+	implementation("io.swagger:swagger-models:1.6.6")
 }
 
 tasks.named('test') {

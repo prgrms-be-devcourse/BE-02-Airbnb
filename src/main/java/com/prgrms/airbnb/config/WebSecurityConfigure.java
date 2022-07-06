@@ -84,7 +84,10 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
         .authorizeRequests()
-        .antMatchers("/assets/**", "/h2-console/**").hasAnyRole("USER", "HOST", "ADMIN")
+        .antMatchers("/swagger-ui/**", "/v2/api-docs/**", "/asset/**", "/script/**", "/style/**").permitAll()
+        .antMatchers("/api/v1/guest/**").hasAnyRole("USER")
+        .antMatchers("/api/v1/host/**").hasAnyRole("HOST")
+        .antMatchers("/api/v1/**").hasAnyRole("USER", "HOST", "ADMIN")
         .anyRequest().permitAll()
         .and()
         .formLogin()
